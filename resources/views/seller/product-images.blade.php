@@ -81,5 +81,5 @@ var TEXT = [];
 	TEXT['Sorry only you can upload jpg, png and gif file type'] = "{{ __('Sorry only you can upload jpg, png and gif file type') }}";
 	TEXT['Do you really want to delete this record'] = "{{ __('Do you really want to delete this record') }}";
 </script>
-<script src="{{asset('public/backend/pages/product_images_seller.js')}}"></script>
+<script src="{{asset('backend/pages/product_images_seller.js')}}"></script>
 @endpush

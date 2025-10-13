@@ -11,7 +11,7 @@
 	<meta property="og:description" content="{{ $metadata['og_description'] }}" />
 	<meta property="og:type" content="website" />
 	<meta property="og:url" content="{{ url()->current() }}" />
-	<meta property="og:image" content="{{ asset('public/media/'.$metadata['og_image']) }}" />
+	<meta property="og:image" content="{{ asset('media/'.$metadata['og_image']) }}" />
 	<meta property="og:image:width" content="600" />
 	<meta property="og:image:height" content="315" />
 	@if($gtext['fb_publish'] == 1)
@@ -25,7 +25,7 @@
 	<meta name="twitter:url" content="{{ url()->current() }}">
 	<meta name="twitter:title" content="{{ $metadata['og_title'] }}">
 	<meta name="twitter:description" content="{{ $metadata['og_description'] }}">
-	<meta name="twitter:image" content="{{ asset('public/media/'.$metadata['og_image']) }}">
+	<meta name="twitter:image" content="{{ asset('media/'.$metadata['og_image']) }}">
 @endsection
 
 @section('header')
@@ -68,7 +68,7 @@
 						<div class="blog-img">
 							<div class="blog-date">{{ date('d M , Y', strtotime($row->created_at)) }}</div>
 							<a href="{{ route('frontend.article', [$row->id, $row->slug]) }}">
-								<img src="{{ asset('public/media/'.$row->thumbnail) }}" alt="{{ $row->title }}" />
+								<img src="{{ asset('media/'.$row->thumbnail) }}" alt="{{ $row->title }}" />
 							</a>
 						</div>
 						<div class="blog-content">
@@ -87,7 +87,7 @@
 				<div class="col-sm-8 offset-sm-2 col-md-6 offset-md-3 col-lg-4 offset-lg-4 col-xl-4 offset-xl-4 col-xxl-4 offset-xxl-4">
 					<div class="empty_card">
 						<div class="empty_img">
-							<img src="{{ asset('public/frontend/images/empty.png') }}" />
+							<img src="{{ asset('frontend/images/empty.png') }}" />
 						</div>
 						<h3>{{ __('Oops! No product found.') }}</h3>
 					</div>

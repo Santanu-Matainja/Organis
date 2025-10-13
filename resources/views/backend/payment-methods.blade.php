@@ -403,5 +403,5 @@
 var TEXT = [];
 	TEXT['Do you really want to edit this record'] = "{{ __('Do you really want to edit this record') }}";
 </script>
-<script src="{{asset('public/backend/pages/payment-gateway.js')}}"></script>
+<script src="{{asset('backend/pages/payment-gateway.js')}}"></script>
 @endpush

@@ -15,7 +15,7 @@ $tax_rate = $gtax['percentage'];
 	<meta property="og:description" content="{{ $gtext['og_description'] }}" />
 	<meta property="og:type" content="website" />
 	<meta property="og:url" content="{{ url()->current() }}" />
-	<meta property="og:image" content="{{ asset('public/media/'.$gtext['og_image']) }}" />
+	<meta property="og:image" content="{{ asset('media/'.$gtext['og_image']) }}" />
 	<meta property="og:image:width" content="600" />
 	<meta property="og:image:height" content="315" />
 	@if($gtext['fb_publish'] == 1)
@@ -29,7 +29,7 @@ $tax_rate = $gtax['percentage'];
 	<meta name="twitter:url" content="{{ url()->current() }}">
 	<meta name="twitter:title" content="{{ $gtext['og_title'] }}">
 	<meta name="twitter:description" content="{{ $gtext['og_description'] }}">
-	<meta name="twitter:image" content="{{ asset('public/media/'.$gtext['og_image']) }}">
+	<meta name="twitter:image" content="{{ asset('media/'.$gtext['og_image']) }}">
 @endsection
 
 @section('header')
@@ -173,7 +173,7 @@ $tax_rate = $gtax['percentage'];
 								<div class="payment_card">
 									<div class="checkboxlist">
 										<label class="checkbox-title">
-											<input id="payment_method_stripe" name="payment_method" type="radio" value="3"><img src="{{ asset('public/frontend/images/stripe.png') }}" alt="Stripe" />
+											<input id="payment_method_stripe" name="payment_method" type="radio" value="3"><img src="{{ asset('frontend/images/stripe.png') }}" alt="Stripe" />
 										</label>
 									</div>
 									<div id="pay_stripe" class="row hideclass">
@@ -195,7 +195,7 @@ $tax_rate = $gtax['percentage'];
 								<div class="payment_card">
 									<div class="checkboxlist">
 										<label class="checkbox-title">
-											<input id="payment_method_paypal" name="payment_method" type="radio" value="4"><img src="{{ asset('public/frontend/images/paypal.png') }}" alt="Paypal" />
+											<input id="payment_method_paypal" name="payment_method" type="radio" value="4"><img src="{{ asset('frontend/images/paypal.png') }}" alt="Paypal" />
 										</label>
 									</div>
 									<p id="pay_paypal" class="hideclass">{{ __('Pay online via Paypal') }}</p>
@@ -206,7 +206,7 @@ $tax_rate = $gtax['percentage'];
 								<div class="payment_card">
 									<div class="checkboxlist">
 										<label class="checkbox-title">
-											<input id="payment_method_razorpay" name="payment_method" type="radio" value="5"><img src="{{ asset('public/frontend/images/razorpay.png') }}" alt="Razorpay" />
+											<input id="payment_method_razorpay" name="payment_method" type="radio" value="5"><img src="{{ asset('frontend/images/razorpay.png') }}" alt="Razorpay" />
 										</label>
 									</div>
 									<p id="pay_razorpay" class="hideclass">{{ __('Pay online via Razorpay') }}</p>
@@ -217,7 +217,7 @@ $tax_rate = $gtax['percentage'];
 								<div class="payment_card">
 									<div class="checkboxlist">
 										<label class="checkbox-title">
-											<input id="payment_method_mollie" name="payment_method" type="radio" value="6"><img src="{{ asset('public/frontend/images/mollie.png') }}" alt="Mollie" />
+											<input id="payment_method_mollie" name="payment_method" type="radio" value="6"><img src="{{ asset('frontend/images/mollie.png') }}" alt="Mollie" />
 										</label>
 									</div>
 									<p id="pay_mollie" class="hideclass">{{ __('Pay online via Mollie') }}</p>
@@ -228,7 +228,7 @@ $tax_rate = $gtax['percentage'];
 								<div class="payment_card">
 									<div class="checkboxlist">
 										<label class="checkbox-title">
-											<input id="payment_method_cod" name="payment_method" type="radio" value="1"><img src="{{ asset('public/frontend/images/cash_on_delivery.png') }}" alt="Cash on Delivery" />
+											<input id="payment_method_cod" name="payment_method" type="radio" value="1"><img src="{{ asset('frontend/images/cash_on_delivery.png') }}" alt="Cash on Delivery" />
 										</label>
 									</div>
 									<p id="pay_cod" class="hideclass">{{ $gtext['cod_description'] }}</p>
@@ -239,7 +239,7 @@ $tax_rate = $gtax['percentage'];
 								<div class="payment_card">
 									<div class="checkboxlist">
 										<label class="checkbox-title">
-											<input id="payment_method_bank" name="payment_method" type="radio" value="2"><img src="{{ asset('public/frontend/images/bank_transfer.png') }}" alt="Bank Transfer" />
+											<input id="payment_method_bank" name="payment_method" type="radio" value="2"><img src="{{ asset('frontend/images/bank_transfer.png') }}" alt="Bank Transfer" />
 										</label>
 									</div>
 									<p id="pay_bank" class="hideclass">{{ $gtext['bank_description'] }}</p>
@@ -321,7 +321,7 @@ $tax_rate = $gtax['percentage'];
 												<td colspan="2" class="tp_group">
 													<div class="store_logo">
 														<a href="{{ route('frontend.stores', [$row['seller_id'], str_slug($row['store_name'])]) }}">
-															<img src="{{ asset('public/media/'.$row['store_logo']) }}" alt="{{ $row['store_name'] }}" />
+															<img src="{{ asset('media/'.$row['store_logo']) }}" alt="{{ $row['store_name'] }}" />
 														</a>
 													</div>
 													<div class="store_name">
@@ -430,7 +430,7 @@ $tax_rate = $gtax['percentage'];
 @endsection
 
 @push('scripts')
-<script src="{{asset('public/frontend/js/parsley.min.js')}}"></script>
+<script src="{{asset('frontend/js/parsley.min.js')}}"></script>
 <script type="text/javascript">
 var theme_color = "{{ $gtext['theme_color'] }}";
 var site_name = "{{ $gtext['site_name'] }}";
@@ -444,7 +444,7 @@ var TEXT = [];
 	var isenable_stripe = "{{ $gtext['stripe_isenable'] }}";
 	var stripe_key = "{{ $gtext['stripe_key'] }}";
 </script>
-<script src="{{asset('public/frontend/pages/payment_method.js')}}"></script>
+<script src="{{asset('frontend/pages/payment_method.js')}}"></script>
 @endif
 
 @if($gtext['isenable_razorpay'] == 1)
@@ -455,5 +455,5 @@ var TEXT = [];
 	var razorpay_currency = "{{ $gtext['razorpay_currency'] }}";
 </script>
 @endif
-<script src="{{asset('public/frontend/pages/checkout.js')}}"></script>
+<script src="{{asset('frontend/pages/checkout.js')}}"></script>
 @endpush	

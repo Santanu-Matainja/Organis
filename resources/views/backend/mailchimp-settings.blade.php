@@ -64,5 +64,5 @@
 
 @push('scripts')
 <!-- css/js -->
-<script src="{{asset('public/backend/pages/newsletters.js')}}"></script>
+<script src="{{asset('backend/pages/newsletters.js')}}"></script>
 @endpush

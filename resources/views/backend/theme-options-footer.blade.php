@@ -216,6 +216,6 @@ if(payment_gateway_icon != ''){
 	$("#view_payment_gateway_icon").html('<img src="'+public_path+'/media/'+payment_gateway_icon+'">');
 }
 </script>
-<script src="{{asset('public/backend/pages/theme_option_footer.js')}}"></script>
-<script src="{{asset('public/backend/pages/global-media.js')}}"></script>
+<script src="{{asset('backend/pages/theme_option_footer.js')}}"></script>
+<script src="{{asset('backend/pages/global-media.js')}}"></script>
 @endpush

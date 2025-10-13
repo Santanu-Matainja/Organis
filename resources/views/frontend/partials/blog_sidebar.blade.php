@@ -27,7 +27,7 @@
 				<li>
 					<div class="icon">
 						<a href="{{ route('frontend.product-category', [$row->id, $row->slug]) }}">
-							<img src="{{ asset('public/media/'.$row->thumbnail) }}" alt="{{ $row->name }}" />
+							<img src="{{ asset('media/'.$row->thumbnail) }}" alt="{{ $row->name }}" />
 						</a>
 					</div>
 					<div class="desc">
@@ -49,7 +49,7 @@
 				<li>
 					<div class="icon">
 						<a href="{{ route('frontend.brand', [$row->id, str_slug($row->name)]) }}">
-							<img src="{{ asset('public/media/'.$row->thumbnail) }}" alt="{{ $row->name }}" />
+							<img src="{{ asset('media/'.$row->thumbnail) }}" alt="{{ $row->name }}" />
 						</a>
 					</div>
 					<div class="desc">

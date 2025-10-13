@@ -101,5 +101,5 @@
 @endsection
 
 @push('scripts')
-<script src="{{asset('public/backend/pages/mail-setting.js')}}"></script>
+<script src="{{asset('backend/pages/mail-setting.js')}}"></script>
 @endpush

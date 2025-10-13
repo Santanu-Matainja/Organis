@@ -80,5 +80,5 @@
 @endsection
 
 @push('scripts')
-<script src="{{asset('public/backend/pages/general.js')}}"></script>
+<script src="{{asset('backend/pages/general.js')}}"></script>
 @endpush

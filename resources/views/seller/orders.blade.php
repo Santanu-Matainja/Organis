@@ -71,9 +71,9 @@
 
 @push('scripts')
 <!-- css/js -->
-<link rel="stylesheet" href="{{asset('public/backend/bootstrap-datetimepicker/bootstrap-fonticon.css')}}">
-<link rel="stylesheet" href="{{asset('public/backend/bootstrap-datetimepicker/bootstrap-datetimepicker.css')}}">
-<script src="{{asset('public/backend/bootstrap-datetimepicker/bootstrap-datetimepicker.min.js')}}"></script>
+<link rel="stylesheet" href="{{asset('backend/bootstrap-datetimepicker/bootstrap-fonticon.css')}}">
+<link rel="stylesheet" href="{{asset('backend/bootstrap-datetimepicker/bootstrap-datetimepicker.css')}}">
+<script src="{{asset('backend/bootstrap-datetimepicker/bootstrap-datetimepicker.min.js')}}"></script>
 <script type="text/javascript">
 var TEXT = [];
 	TEXT['Do you really want to delete this record'] = "{{ __('Do you really want to delete this record') }}";
@@ -96,5 +96,5 @@ $(function () {
 	});
 });
 </script>
-<script src="{{asset('public/backend/pages/seller-orders.js')}}"></script>
+<script src="{{asset('backend/pages/seller-orders.js')}}"></script>
 @endpush

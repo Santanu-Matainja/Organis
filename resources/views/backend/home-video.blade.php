@@ -144,6 +144,6 @@ if(image != ''){
 	$("#view_trending_image").html('<img src="'+public_path+'/media/'+image+'">');
 }
 </script>
-<script src="{{asset('public/backend/pages/home-video.js')}}"></script>
-<script src="{{asset('public/backend/pages/global-media.js')}}"></script>
+<script src="{{asset('backend/pages/home-video.js')}}"></script>
+<script src="{{asset('backend/pages/global-media.js')}}"></script>
 @endpush

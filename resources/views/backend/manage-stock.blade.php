@@ -129,5 +129,5 @@
 var TEXT = [];
 	TEXT['Do you really want to edit this record'] = "{{ __('Do you really want to edit this record') }}";
 </script>
-<script src="{{asset('public/backend/pages/manage-stock.js')}}"></script>
+<script src="{{asset('backend/pages/manage-stock.js')}}"></script>
 @endpush

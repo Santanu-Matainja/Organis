@@ -138,5 +138,5 @@ var TEXT = [];
 	TEXT['Do you really want to delete this record'] = "{{ __('Do you really want to delete this record') }}";
 	TEXT['Delete'] = "{{ __('Delete') }}";
 </script>
-<script src="{{asset('public/backend/pages/media.js')}}"></script>
+<script src="{{asset('backend/pages/media.js')}}"></script>
 @endpush

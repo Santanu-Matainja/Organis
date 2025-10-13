@@ -69,5 +69,5 @@
 
 @push('scripts')
 <!-- css/js -->
-<script src="{{asset('public/backend/pages/google_analytics.js')}}"></script>
+<script src="{{asset('backend/pages/google_analytics.js')}}"></script>
 @endpush

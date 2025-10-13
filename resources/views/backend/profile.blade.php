@@ -100,6 +100,6 @@
 <script type="text/javascript">
 var media_type = 'Thumbnail';
 </script>
-<script src="{{asset('public/backend/pages/profile.js')}}"></script>
-<script src="{{asset('public/backend/pages/global-media.js')}}"></script>
+<script src="{{asset('backend/pages/profile.js')}}"></script>
+<script src="{{asset('backend/pages/global-media.js')}}"></script>
 @endpush

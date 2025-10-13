@@ -110,9 +110,9 @@
 @endsection
 
 @push('scripts')
-<link rel="stylesheet" href="{{asset('public/backend/bootstrap-datetimepicker/bootstrap-fonticon.css')}}">
-<link rel="stylesheet" href="{{asset('public/backend/bootstrap-datetimepicker/bootstrap-datetimepicker.css')}}">
-<script src="{{asset('public/backend/bootstrap-datetimepicker/bootstrap-datetimepicker.min.js')}}"></script>
+<link rel="stylesheet" href="{{asset('backend/bootstrap-datetimepicker/bootstrap-fonticon.css')}}">
+<link rel="stylesheet" href="{{asset('backend/bootstrap-datetimepicker/bootstrap-datetimepicker.css')}}">
+<script src="{{asset('backend/bootstrap-datetimepicker/bootstrap-datetimepicker.min.js')}}"></script>
 <!-- css/js -->
 <script type="text/javascript">
 var TEXT = [];
@@ -124,5 +124,5 @@ var TEXT = [];
 	TEXT['Please select action'] = "{{ __('Please select action') }}";
 	TEXT['Please select record'] = "{{ __('Please select record') }}";
 </script>
-<script src="{{asset('public/backend/pages/coupons.js')}}"></script>
+<script src="{{asset('backend/pages/coupons.js')}}"></script>
 @endpush

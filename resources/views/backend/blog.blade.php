@@ -224,8 +224,8 @@
 
 @push('scripts')
 <!-- css/js -->
-<link href="{{asset('public/backend/editor/summernote-lite.min.css')}}" rel="stylesheet">
-<script src="{{asset('public/backend/editor/summernote-lite.min.js')}}"></script>
+<link href="{{asset('backend/editor/summernote-lite.min.css')}}" rel="stylesheet">
+<script src="{{asset('backend/editor/summernote-lite.min.js')}}"></script>
 <script type="text/javascript">
 var media_type = 'Blog_Thumbnail';
 var TEXT = [];
@@ -237,6 +237,6 @@ var TEXT = [];
 	TEXT['Please select action'] = "{{ __('Please select action') }}";
 	TEXT['Please select record'] = "{{ __('Please select record') }}";
 </script>
-<script src="{{asset('public/backend/pages/blogs.js')}}"></script>
-<script src="{{asset('public/backend/pages/global-media.js')}}"></script>
+<script src="{{asset('backend/pages/blogs.js')}}"></script>
+<script src="{{asset('backend/pages/global-media.js')}}"></script>
 @endpush

@@ -320,5 +320,5 @@ var TEXT = [];
 	TEXT['Please select record'] = "{{ __('Please select record') }}";
 	TEXT['Please fill up all mandatory fields'] = "{{ __('Please fill up all mandatory fields') }}";
 </script>
-<script src="{{asset('public/backend/pages/contacts_page.js')}}"></script>
+<script src="{{asset('backend/pages/contacts_page.js')}}"></script>
 @endpush

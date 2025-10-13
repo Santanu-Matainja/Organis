@@ -96,5 +96,5 @@ var product_id = "{{ $datalist['id'] }}";
 var TEXT = [];
 	TEXT['Do you really want to delete this record'] = "{{ __('Do you really want to delete this record') }}";
 </script>
-<script src="{{asset('public/backend/pages/related-products_seller.js')}}"></script>
+<script src="{{asset('backend/pages/related-products_seller.js')}}"></script>
 @endpush

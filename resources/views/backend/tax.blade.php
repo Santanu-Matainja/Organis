@@ -70,5 +70,5 @@
 
 @push('scripts')
 <!-- css/js -->
-<script src="{{asset('public/backend/pages/tax.js')}}"></script>
+<script src="{{asset('backend/pages/tax.js')}}"></script>
 @endpush

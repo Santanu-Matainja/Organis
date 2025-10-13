@@ -102,5 +102,5 @@
 
 @push('scripts')
 <!-- css/js -->
-<script src="{{asset('public/backend/pages/currency.js')}}"></script>
+<script src="{{asset('backend/pages/currency.js')}}"></script>
 @endpush

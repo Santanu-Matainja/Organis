@@ -28,7 +28,7 @@
 								<div class="col-lg-3 mb-30">
 									<div class="theme-view-card">
 										<div class="theme-image">
-											<img src="{{asset('public/backend/images/home-1.jpg')}}" />
+											<img src="{{asset('backend/images/home-1.jpg')}}" />
 										</div>
 										<div class="theme-footer">
 											<div class="theme-title">Home Page 1</div>
@@ -39,7 +39,7 @@
 								<div class="col-lg-3 mb-30">
 									<div class="theme-view-card">
 										<div class="theme-image">
-											<img src="{{asset('public/backend/images/home-2.jpg')}}" />
+											<img src="{{asset('backend/images/home-2.jpg')}}" />
 										</div>
 										<div class="theme-footer">
 											<div class="theme-title">Home Page 2</div>
@@ -51,7 +51,7 @@
 								<div class="col-lg-3 mb-30">
 									<div class="theme-view-card">
 										<div class="theme-image">
-											<img src="{{asset('public/backend/images/home-3.jpg')}}" />
+											<img src="{{asset('backend/images/home-3.jpg')}}" />
 										</div>
 										<div class="theme-footer">
 											<div class="theme-title">Home Page 3</div>
@@ -62,7 +62,7 @@
 								<div class="col-lg-3 mb-30">
 									<div class="theme-view-card">
 										<div class="theme-image">
-											<img src="{{asset('public/backend/images/home-4.jpg')}}" />
+											<img src="{{asset('backend/images/home-4.jpg')}}" />
 										</div>
 										<div class="theme-footer">
 											<div class="theme-title">Home Page 4</div>
@@ -77,7 +77,7 @@
 								<div class="col-lg-2">
 									<div class="theme-view-card">
 										<div class="theme-image">
-											<img src="{{asset('public/backend/images/full_width.jpg')}}" />
+											<img src="{{asset('backend/images/full_width.jpg')}}" />
 										</div>
 										<div class="theme-footer">
 											<div class="theme-title">{{ __('Full width without sidebar') }}</div>
@@ -88,7 +88,7 @@
 								<div class="col-lg-2">
 									<div class="theme-view-card">
 										<div class="theme-image">
-											<img src="{{asset('public/backend/images/left_sidebar.jpg')}}" />
+											<img src="{{asset('backend/images/left_sidebar.jpg')}}" />
 										</div>
 										<div class="theme-footer">
 											<div class="theme-title">{{ __('Left Sidebar') }}</div>
@@ -99,7 +99,7 @@
 								<div class="col-lg-2">
 									<div class="theme-view-card">
 										<div class="theme-image">
-											<img src="{{asset('public/backend/images/right_sidebar.jpg')}}" />
+											<img src="{{asset('backend/images/right_sidebar.jpg')}}" />
 										</div>
 										<div class="theme-footer">
 											<div class="theme-title">{{ __('Right Sidebar') }}</div>
@@ -115,7 +115,7 @@
 								<div class="col-lg-2">
 									<div class="theme-view-card">
 										<div class="theme-image">
-											<img src="{{asset('public/backend/images/full_width.jpg')}}" />
+											<img src="{{asset('backend/images/full_width.jpg')}}" />
 										</div>
 										<div class="theme-footer">
 											<div class="theme-title">{{ __('Full width without sidebar') }}</div>
@@ -126,7 +126,7 @@
 								<div class="col-lg-2">
 									<div class="theme-view-card">
 										<div class="theme-image">
-											<img src="{{asset('public/backend/images/left_sidebar.jpg')}}" />
+											<img src="{{asset('backend/images/left_sidebar.jpg')}}" />
 										</div>
 										<div class="theme-footer">
 											<div class="theme-title">{{ __('Left Sidebar') }}</div>
@@ -137,7 +137,7 @@
 								<div class="col-lg-2">
 									<div class="theme-view-card">
 										<div class="theme-image">
-											<img src="{{asset('public/backend/images/right_sidebar.jpg')}}" />
+											<img src="{{asset('backend/images/right_sidebar.jpg')}}" />
 										</div>
 										<div class="theme-footer">
 											<div class="theme-title">{{ __('Right Sidebar') }}</div>
@@ -153,7 +153,7 @@
 								<div class="col-lg-2">
 									<div class="theme-view-card">
 										<div class="theme-image">
-											<img src="{{asset('public/backend/images/full_width.jpg')}}" />
+											<img src="{{asset('backend/images/full_width.jpg')}}" />
 										</div>
 										<div class="theme-footer">
 											<div class="theme-title">{{ __('Full width without sidebar') }}</div>
@@ -164,7 +164,7 @@
 								<div class="col-lg-2">
 									<div class="theme-view-card">
 										<div class="theme-image">
-											<img src="{{asset('public/backend/images/left_sidebar.jpg')}}" />
+											<img src="{{asset('backend/images/left_sidebar.jpg')}}" />
 										</div>
 										<div class="theme-footer">
 											<div class="theme-title">{{ __('Left Sidebar') }}</div>
@@ -175,7 +175,7 @@
 								<div class="col-lg-2">
 									<div class="theme-view-card">
 										<div class="theme-image">
-											<img src="{{asset('public/backend/images/right_sidebar.jpg')}}" />
+											<img src="{{asset('backend/images/right_sidebar.jpg')}}" />
 										</div>
 										<div class="theme-footer">
 											<div class="theme-title">{{ __('Right Sidebar') }}</div>
@@ -209,5 +209,5 @@
 var Activated = "{{ __('Activated') }}";
 var Activate = "{{ __('Activate') }}";
 </script>
-<script src="{{asset('public/backend/pages/page_variation.js')}}"></script>
+<script src="{{asset('backend/pages/page_variation.js')}}"></script>
 @endpush

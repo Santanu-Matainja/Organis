@@ -59,5 +59,5 @@
 @endsection
 
 @push('scripts')
-<script src="{{asset('public/backend/pages/google-recaptcha.js')}}"></script>
+<script src="{{asset('backend/pages/google-recaptcha.js')}}"></script>
 @endpush

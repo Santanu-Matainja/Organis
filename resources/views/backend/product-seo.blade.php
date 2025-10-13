@@ -112,6 +112,6 @@ if(og_image != ''){
 	$("#view_og_image").html('<img src="'+public_path+'/media/'+og_image+'">');
 }
 </script>
-<script src="{{asset('public/backend/pages/product_seo.js')}}"></script>
-<script src="{{asset('public/backend/pages/global-media.js')}}"></script>
+<script src="{{asset('backend/pages/product_seo.js')}}"></script>
+<script src="{{asset('backend/pages/global-media.js')}}"></script>
 @endpush

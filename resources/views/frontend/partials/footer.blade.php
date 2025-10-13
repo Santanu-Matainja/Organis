@@ -1,6 +1,6 @@
 <!-- Footer Top Section -->
 @if($gtext['is_subscribe_footer'] == 1)
-<section class="footer-top" style="background-image: url({{ asset('public/media/'.$gtext['subscribe_background_image']) }});">
+<section class="footer-top" style="background-image: url({{ asset('media/'.$gtext['subscribe_background_image']) }});">
 	<div class="container">
 		<div class="row">
 			<div class="col-sm-12 offset-sm-0 col-md-10 offset-md-1 col-lg-8 offset-lg-2 col-xl-8 offset-xl-2 col-xxl-6 offset-xxl-3">
@@ -27,7 +27,7 @@ $FooterSection = FooterSection();
 
 <!-- Footer Section -->
 @if($FooterSection->is_publish == 1)
-<footer class="footer-section" style="background-image: url({{ $FooterSection->image ? asset('public/media/'.$FooterSection->image) : '' }});">
+<footer class="footer-section" style="background-image: url({{ $FooterSection->image ? asset('media/'.$FooterSection->image) : '' }});">
 	<div class="footer-middle">
 		<div class="container">
 			<div class="row">
@@ -38,7 +38,7 @@ $FooterSection = FooterSection();
 							<div class="info-card">
 								@if($gtext['about_logo_footer'] != '')
 								<div class="info-logo">
-									<img src="{{ asset('public/media/'.$gtext['about_logo_footer']) }}" alt="" />
+									<img src="{{ asset('media/'.$gtext['about_logo_footer']) }}" alt="" />
 								</div>
 								@endif
 								@if($gtext['about_desc_footer'] != '')
@@ -131,7 +131,7 @@ $FooterSection = FooterSection();
 					@if($gtext['is_publish_payment'] == 1)
 					<div class="payment-method">
 						@if($gtext['payment_gateway_icon'] != '')
-						<img src="{{ asset('public/media/'.$gtext['payment_gateway_icon']) }}" />
+						<img src="{{ asset('media/'.$gtext['payment_gateway_icon']) }}" />
 						@endif
 					</div>
 					@endif

@@ -4,7 +4,7 @@
 	<div class="review-card">
 		<div class="review-photo">
 			@if($row->photo != '')
-			<img src="{{ asset('public/media/'.$row->photo) }}" alt="{{ $row->name }}" />
+			<img src="{{ asset('media/'.$row->photo) }}" alt="{{ $row->name }}" />
 			@else
 			<span class="username">{{ strtoupper(sub_str($row->name, 0, 1)) }}</span>
 			@endif

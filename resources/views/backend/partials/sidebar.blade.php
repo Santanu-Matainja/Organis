@@ -1,7 +1,7 @@
 <div class="sidebar-wrapper">
 	<div class="logo">
 		<a href="{{ route('backend.dashboard') }}">
-			<img src="{{ $gtext['back_logo'] ? asset('public/media/'.$gtext['back_logo']) : asset('public/backend/images/backend-logo.png') }}" alt="logo">
+			<img src="{{ $gtext['back_logo'] ? asset('media/'.$gtext['back_logo']) : asset('backend/images/backend-logo.png') }}" alt="logo">
 		</a>
 	</div>
 	<div class="version">Theme V {{config('custom.version')}}</div>

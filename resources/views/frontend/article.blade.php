@@ -11,7 +11,7 @@
 	<meta property="og:description" content="{{ $data->og_description }}" />
 	<meta property="og:type" content="article" />
 	<meta property="og:url" content="{{ url()->current() }}" />
-	<meta property="og:image" content="{{ $data->og_image ? asset('public/media/'.$data->og_image) : asset('public/media/'.$data->thumbnail) }}" />
+	<meta property="og:image" content="{{ $data->og_image ? asset('media/'.$data->og_image) : asset('media/'.$data->thumbnail) }}" />
 	<meta property="og:image:width" content="600" />
 	<meta property="og:image:height" content="315" />
 	@if($gtext['fb_publish'] == 1)
@@ -25,7 +25,7 @@
 	<meta name="twitter:url" content="{{ url()->current() }}">
 	<meta name="twitter:title" content="{{ $data->og_title ? $data->og_title : $data->title }}">
 	<meta name="twitter:description" content="{{ $data->og_description }}">
-	<meta name="twitter:image" content="{{ $data->og_image ? asset('public/media/'.$data->og_image) : asset('public/media/'.$data->thumbnail) }}">
+	<meta name="twitter:image" content="{{ $data->og_image ? asset('media/'.$data->og_image) : asset('media/'.$data->thumbnail) }}">
 @endsection
 
 @section('header')
@@ -64,7 +64,7 @@
 				<div class="col-lg-8">
 					<div class="blog-details">
 						<div class="blog-img">
-							<img src="{{ asset('public/media/'.$data->thumbnail) }}" alt="{{ $data->title }}" />
+							<img src="{{ asset('media/'.$data->thumbnail) }}" alt="{{ $data->title }}" />
 						</div>
 						<div class="blog-content">
 							<div class="blog-meta">
