@@ -158,6 +158,12 @@
 											</select>
 										</div>
 									</div>
+									<div class="col-lg-6">
+										<div class="form-group">
+											<label for="exdate">{{ __('Expire Date') }}</label>
+											<input value="{{ $datalist['exdate'] }}" name="exdate" id="exdate" type="date" class="form-control parsley-validated" min="{{ date('Y-m-d') }}">
+										</div>
+									</div>
 								</div>
 								
 								<div class="row">

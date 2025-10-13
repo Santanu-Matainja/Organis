@@ -151,8 +151,14 @@
 									</div>
 								</div>
 								<div class="col-md-3"></div>
+								<div class="col-md-3">
+									<div class="form-group">
+										<label for="exdate">{{ __('Expire Date') }}</label>
+										<input type="date"  name="exdate" id="exdate" class="form-control parsley-validated" min="{{ date('Y-m-d') }}">
+
+									</div>
+								</div>
 							</div>
-								
 							<input type="text" name="user_id" id="user_id" class="dnone" value="{{ Auth::user()->id }}">
 							<input type="text" name="RecordId" id="RecordId" class="dnone">
 							<div class="row tabs-footer mt-15">

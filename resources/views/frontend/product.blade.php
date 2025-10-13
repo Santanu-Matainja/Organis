@@ -145,6 +145,9 @@
 							<div class="pr_extra"><strong>{{ __('SKU') }}:</strong>  {{ $data->sku }}</div>
 							@endif
 						@endif
+						@if($data->exdate != '') 
+						<div class="pr_extra"><strong>{{ __('Expire Date') }}: </strong>{{ $data->exdate }}</div>
+						@endif
 						@if($data->brandname != '')
 						<div class="pr_extra"><strong>{{ __('Brand') }}: </strong><a href="{{ route('frontend.brand', [$data->brand_id, str_slug($data->brandname)]) }}"> {{ $data->brandname }}</a></div>
 						@endif

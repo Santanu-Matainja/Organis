@@ -43,5 +43,6 @@ class Product extends Model
         'og_image',
         'og_description',
         'og_keywords',
+        'exdate',
     ];
 }

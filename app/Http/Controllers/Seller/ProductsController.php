@@ -119,7 +119,8 @@ class ProductsController extends Controller
 		$cat_id = $request->input('categoryid');
 		$brand_id = $request->input('brandid');
 		$user_id = $request->input('user_id');
-		
+		$exdate = $request->input('exdate');
+
 		$validator_array = array(
 			'product_name' => $request->input('title'),
 			'slug' => $slug,
@@ -184,7 +185,8 @@ class ProductsController extends Controller
 			'brand_id' => $brand_id,
 			'lan' => $lan,
 			'user_id' => $user_id,
-			'is_publish' => $is_publish
+			'is_publish' => $is_publish,
+			'exdate' => $exdate
 		);
 
 		if($id ==''){
@@ -341,6 +343,8 @@ class ProductsController extends Controller
 		
 		$variation_size = $request->input('variation_size');
 		$sale_price = $request->input('sale_price');
+
+		$exdate = $request->input('exdate');
 		
 		$validator_array = array(
 			'product_name' => $request->input('title'),
@@ -421,7 +425,8 @@ class ProductsController extends Controller
 			'is_featured' => $is_featured,
 			'variation_size' => $variation_size,
 			'sale_price' => $sale_price,
-			'lan' => $lan
+			'lan' => $lan,
+			'exdate' => $exdate
 		);
 		
 		$response = Product::where('id', $id)->update($data);
