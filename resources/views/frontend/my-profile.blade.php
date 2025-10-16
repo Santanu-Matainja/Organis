@@ -120,6 +120,33 @@
 									</div>
 									<div class="row">
 										<div class="col-md-12">
+											<div class="mb-3">
+												<label for="description">{{ __('Description') }}</label>
+												<textarea id="description" name="description" class="form-control" placeholder="{{ __('Description') }}" rows="3">@if(isset(Auth::user()->address)) {{ Auth::user()->description }} @endif</textarea>
+											</div>
+										</div>
+									</div>
+									<div class="row">
+										<div class="col-md-12">
+											<div class="mb-3">
+												<label for="logo">{{ __('Logo') }}</label>
+												<div class="tp-body">
+													<div class="tp-file-upload">
+														<input type="file" name="load_attachment" id="load_attachment" class="tp-upload">
+														<label for="load_attachment" class="tp-uploader" id="file-uploader">
+															<span class="icon-upload"><i class="fa fa-cloud-upload"></i></span>
+															{{-- <div class="select_file">{{ __('Select File') }}</div> --}}
+														</label>
+														<div id="upload-loader" class="upload-loader dnone">
+															<div class="tp-loader"></div>
+														</div>
+													</div>
+												</div>
+											</div>
+										</div>
+									</div>
+									<div class="row">
+										<div class="col-md-12">
 											@if($gtext['is_recaptcha'] == 1)
 											<div class="mb-3">
 												<div class="g-recaptcha" data-sitekey="{{ $gtext['sitekey'] }}"></div>

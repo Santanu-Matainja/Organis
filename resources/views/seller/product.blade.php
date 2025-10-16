@@ -164,8 +164,13 @@
 											<input value="{{ $datalist['exdate'] }}" name="exdate" id="exdate" type="date" class="form-control parsley-validated" min="{{ date('Y-m-d') }}">
 										</div>
 									</div>
+									<div class="col-lg-6">
+										<div class="form-check mt-4">
+											<input value="1"  name="perisible" id="perisible" type="checkbox" class="form-check-input parsley-validated" {{ old('perisible', $datalist['perisible']) ? 'checked' : '' }}>
+											<label for="perisible">{{ __('Perisible') }}</label>
+										</div>
+									</div>
 								</div>
-								
 								<div class="row">
 									<div class="col-lg-6">
 										<div class="form-group">

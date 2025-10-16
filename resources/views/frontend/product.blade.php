@@ -148,6 +148,16 @@
 						@if($data->exdate != '') 
 						<div class="pr_extra"><strong>{{ __('Expire Date') }}: </strong>{{ $data->exdate }}</div>
 						@endif
+						@if($data->perisible == 1)
+							<div class="pr_extra">
+								<strong>{{ __('Perishable Product') }}:</strong> Yes
+							</div>
+						@else
+							<div class="pr_extra">
+								<strong>{{ __('Perishable Product') }}:</strong> No
+							</div>
+						@endif
+
 						@if($data->brandname != '')
 						<div class="pr_extra"><strong>{{ __('Brand') }}: </strong><a href="{{ route('frontend.brand', [$data->brand_id, str_slug($data->brandname)]) }}"> {{ $data->brandname }}</a></div>
 						@endif

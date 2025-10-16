@@ -166,7 +166,8 @@ class MyDashboardController extends Controller
 		$data = array(
 			'name' => $request->input('name'),
 			'phone' => $request->input('phone'),
-			'address' => $request->input('address')
+			'address' => $request->input('address'),
+			'description' => $request->input('description'),
 		);
 
 		$response = User::where('id', $id)->update($data);

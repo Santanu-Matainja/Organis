@@ -158,6 +158,14 @@
 
 									</div>
 								</div>
+								<div class="col-md-3">
+									<div class="form-check mt-4">
+										<input type="checkbox" name="perisible" id="perisible" class="form-check-input" value="1">
+										<label for="perisible" class="form-check-label">
+											{{ __('Perishable') }}
+										</label>
+									</div>
+								</div>
 							</div>
 							<input type="text" name="user_id" id="user_id" class="dnone" value="{{ Auth::user()->id }}">
 							<input type="text" name="RecordId" id="RecordId" class="dnone">
