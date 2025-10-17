@@ -118,6 +118,7 @@
 											</div>
 										</div>
 									</div>
+									@if(Auth::user()->role_id == 3)
 									<div class="row">
 										<div class="col-md-12">
 											<div class="mb-3">
@@ -145,6 +146,7 @@
 											</div>
 										</div>
 									</div>
+									@endif
 									<div class="row">
 										<div class="col-md-12">
 											@if($gtext['is_recaptcha'] == 1)

@@ -150,7 +150,6 @@
 										</select>
 									</div>
 								</div>
-								<div class="col-md-3"></div>
 								<div class="col-md-3">
 									<div class="form-group">
 										<label for="exdate">{{ __('Expire Date') }}</label>
@@ -159,9 +158,22 @@
 									</div>
 								</div>
 								<div class="col-md-3">
+									<div class="form-group">
+										<label for="delivarytypeid">{{ __('Delivary Type') }}<span class="red">*</span></label>
+										<select name="delivarytypeid" id="delivarytypeid" class="chosen-select form-control">
+											<option value="0">Select Delivary Type</option>
+											@foreach($delivarytypes as $delivarytype)
+												<option value="{{ $delivarytype->id }}">
+													{{ $delivarytype->lable }}
+												</option>
+											@endforeach
+										</select>
+									</div>
+								</div>
+								<div class="col-md-3">
 									<div class="form-check mt-4">
-										<input type="checkbox" name="perisible" id="perisible" class="form-check-input" value="1">
-										<label for="perisible" class="form-check-label">
+										<input type="checkbox" name="perisible" id="perisible" class="form-check-input" value="1" style="height: 50px;width: 18px;"> 
+										<label for="perisible" class="form-check-label" style="margin: 18px 7px;">
 											{{ __('Perishable') }}
 										</label>
 									</div>

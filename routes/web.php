@@ -169,6 +169,22 @@ Route::prefix('backend')->group(function(){
 	Route::post('/bulkActionSellers', [App\Http\Controllers\Backend\SellerController::class, 'bulkActionSellers'])->name('backend.bulkActionSellers')->middleware(['auth','is_admin']);
 	Route::post('/saveBankInformationData', [App\Http\Controllers\Backend\SellerController::class, 'saveBankInformationData'])->name('backend.saveBankInformationData')->middleware(['auth','is_admin']);
 	
+	// Delivary Partner 
+	Route::get('/delivarypartner', [App\Http\Controllers\Backend\DelivaryPartnerController::class, 'getdelivarypartnerPageLoad'])->name('backend.delivarypartner')->middleware(['auth','is_admin']);
+	Route::get('/getDelivaryPartnersTableData', [App\Http\Controllers\Backend\DelivaryPartnerController::class, 'getDelivaryPartnersTableData'])->name('backend.getDelivaryPartnersTableData')->middleware(['auth','is_admin']);
+	Route::post('/bulkActiondelivarypartners', [App\Http\Controllers\Backend\DelivaryPartnerController::class, 'bulkActiondelivarypartners'])->name('backend.bulkActiondelivarypartners')->middleware(['auth','is_admin']);
+	Route::post('/saveDelivaryPartnersData', [App\Http\Controllers\Backend\DelivaryPartnerController::class, 'saveDelivaryPartnersData'])->name('backend.saveDelivaryPartnersData')->middleware(['auth','is_admin']);
+	Route::post('/getDelivaryPatnersById', [App\Http\Controllers\Backend\DelivaryPartnerController::class, 'getDelivaryPatnersById'])->name('backend.getDelivaryPatnersById')->middleware(['auth','is_admin']);
+	Route::post('/deletedelivarypartners', [App\Http\Controllers\Backend\DelivaryPartnerController::class, 'deletedelivarypartners'])->name('backend.deletedelivarypartners')->middleware(['auth','is_admin']);
+
+	// Delivary Type
+	Route::get('/delivarytype', [App\Http\Controllers\Backend\DeliveryTypeController::class, 'getdelivarytypePageLoad'])->name('backend.delivarytype')->middleware(['auth','is_admin']);
+	Route::get('/getDelivarytypeTableData', [App\Http\Controllers\Backend\DeliveryTypeController::class, 'getDelivarytypeTableData'])->name('backend.getDelivarytypeTableData')->middleware(['auth','is_admin']);
+	Route::post('/bulkActiondelivarytype', [App\Http\Controllers\Backend\DeliveryTypeController::class, 'bulkActiondelivarytype'])->name('backend.bulkActiondelivarytype')->middleware(['auth','is_admin']);
+	Route::post('/saveDelivarytypeData', [App\Http\Controllers\Backend\DeliveryTypeController::class, 'saveDelivarytypeData'])->name('backend.saveDelivarytypeData')->middleware(['auth','is_admin']);
+	Route::post('/getDelivarytypeById', [App\Http\Controllers\Backend\DeliveryTypeController::class, 'getDelivarytypeById'])->name('backend.getDelivarytypeById')->middleware(['auth','is_admin']);
+	Route::post('/deletedelivarytype', [App\Http\Controllers\Backend\DeliveryTypeController::class, 'deletedelivarytype'])->name('backend.deletedelivarytype')->middleware(['auth','is_admin']);
+
 	//Users Page
 	Route::get('/users', [App\Http\Controllers\Backend\UsersController::class, 'getUsersPageLoad'])->name('backend.users')->middleware(['auth','is_admin']);
 	Route::get('/getUsersTableData', [App\Http\Controllers\Backend\UsersController::class, 'getUsersTableData'])->name('backend.getUsersTableData')->middleware(['auth','is_admin']);
@@ -539,6 +555,8 @@ Route::prefix('backend')->group(function(){
 	Route::post('/saveScreenshot', [App\Http\Controllers\Backend\WithdrawalController::class, 'saveScreenshot'])->name('backend.saveScreenshot')->middleware(['auth','is_admin']);
 	Route::post('/getScreenshotById', [App\Http\Controllers\Backend\WithdrawalController::class, 'getScreenshotById'])->name('backend.getScreenshotById')->middleware(['auth','is_admin']);
 	Route::post('/deleteScreenshotById', [App\Http\Controllers\Backend\WithdrawalController::class, 'deleteScreenshotById'])->name('backend.deleteScreenshotById')->middleware(['auth','is_admin']);
+
+	
 
 	//Seller Settings
 	Route::get('/seller-settings', [App\Http\Controllers\Backend\SellerSettingsController::class, 'getSellerSettingsPageLoad'])->name('backend.seller-settings')->middleware(['auth','is_admin']);

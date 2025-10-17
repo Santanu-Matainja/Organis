@@ -14,6 +14,7 @@ use App\Models\Attribute;
 use App\Models\Pro_image;
 use App\Models\Related_product;
 use Illuminate\Support\Facades\Auth;
+use App\Models\DeliveryType;
 
 class ProductsController extends Controller
 {
@@ -25,6 +26,7 @@ class ProductsController extends Controller
 
 		$languageslist = DB::table('languages')->where('status', 1)->orderBy('language_name', 'asc')->get();
 		$brandlist = Brand::where('is_publish', 1)->orderBy('name','asc')->get();
+		$delivarytypes = DeliveryType::orderBy('lable','asc')->get();
 		$categorylist = Pro_category::where('is_publish', 1)->orderBy('name','asc')->get();
 
 		$datalist = DB::table('products')
@@ -37,7 +39,7 @@ class ProductsController extends Controller
 			->orderBy('products.id','desc')
 			->paginate(20);
 
-        return view('seller.products', compact('languageslist', 'categorylist', 'brandlist', 'datalist'));		
+        return view('seller.products', compact('languageslist', 'categorylist', 'brandlist', 'datalist', 'delivarytypes'));		
 	}
 	
 	//Get data for Products Pagination
@@ -120,6 +122,7 @@ class ProductsController extends Controller
 		$brand_id = $request->input('brandid');
 		$user_id = $request->input('user_id');
 		$exdate = $request->input('exdate');
+		// $delivarytypeid = $request->input('delivarytypeid');
 		$perisible = $request->has('perisible') ? 1 : 0;
 
 		$validator_array = array(

@@ -48,6 +48,8 @@
 			<ul class="dropdown-menu">
 				<li><a href="{{ route('backend.sellers') }}">{{ __('Sellers') }}</a></li>
 				<li><a href="{{ route('backend.withdrawals') }}">{{ __('Withdrawals') }}</a></li>
+				<li><a href="{{ route('backend.delivarytype') }}">{{ __('Delivary Type') }}</a></li>
+				<li><a href="{{ route('backend.delivarypartner') }}">{{ __('Delivary Partner') }}</a></li>
 				<li><a href="{{ route('backend.seller-settings') }}">{{ __('Settings') }}</a></li>
 			</ul>
 		</li>
