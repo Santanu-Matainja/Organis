@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::table('products', function (Blueprint $table) {
             $table->date('exdate')->nullable()->after('og_keywords');
             $table->boolean('perisible')->default(0)->after('exdate');
+            $table->string('delivarytypeid')->nullable()->after('perisible'); 
         });
     }
 
@@ -23,7 +24,7 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('products', function (Blueprint $table) {
-             $table->dropColumn(['exdate', 'perisible']);
+             $table->dropColumn(['exdate', 'perisible', 'delivarytypeid']);
         });
     }
 };

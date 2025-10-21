@@ -76,19 +76,45 @@ $(function () {
 		$("#pay_bank").removeClass("hideclass");
     });
 	
-    $(".shipping_method").on("click", function () {
-		var totalWithComma = $(this).data('total');
-		var shipping_fee = $(this).data('shippingfee');
-		var seller_count = $(this).data('seller_count');
-		var shippingfee = shipping_fee*seller_count;
+    // $(".shipping_method").on("click", function () {
+	// 	var totalWithComma = $(this).data('total');
+	// 	var shipping_fee = $(this).data('shippingfee');
+	// 	var seller_count = $(this).data('seller_count');
+	// 	var shippingfee = shipping_fee*seller_count;
 		
-		var total = removeCommas(totalWithComma);
+	// 	var total = removeCommas(totalWithComma);
 		
-		var TotalShippingfee = addCommas(parseFloat(total) + parseFloat(shippingfee));
+	// 	var TotalShippingfee = addCommas(parseFloat(total) + parseFloat(shippingfee));
 		
-		$(".shipping_fee").text(shippingfee);
-		$(".total_amount").text(TotalShippingfee);
-    });
+	// 	$(".shipping_fee").text(shippingfee);
+	// 	$(".total_amount").text(TotalShippingfee);
+    // });
+	// Trigger shipping fee calculation on page load
+    $(".shipping_method:checked").trigger("click");
+
+	$(".shipping_method").on("click", function () {
+		var shipping_fee = parseFloat($(this).data('shippingfee')) || 0;
+		var totalWithoutShipping = parseFloat(removeCommas($(this).data('total'))) || 0;
+
+		var productRow = $(this).closest("tr").prevAll("tr").has(".total-price").first();
+
+		productRow.find(".shipping_fee").text("$" + addCommas(shipping_fee.toFixed(2)));
+
+		var newTotal = totalWithoutShipping + shipping_fee;
+		productRow.find(".total-price").text("$" + addCommas(newTotal.toFixed(2)));
+
+		var grandTotal = 0;
+		$(".total-price").each(function () {
+			var val = parseFloat(removeCommas($(this).text().replace('$',''))) || 0;
+			grandTotal += val;
+		});
+		$(".grand_total_value").text("$" + addCommas(grandTotal.toFixed(2)));
+	});
+
+
+
+
+
 
 	$("#checkout_submit_form").on("click", function () {
 		payment_method = $('input[name="payment_method"]:checked').val();

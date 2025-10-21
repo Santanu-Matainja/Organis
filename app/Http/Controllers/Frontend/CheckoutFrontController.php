@@ -14,6 +14,7 @@ use App\Models\Order_master;
 use App\Models\Order_item;
 use App\Models\Country;
 use App\Models\Shipping;
+use App\Models\DeliveryType;
 
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\SMTP;
@@ -39,7 +40,8 @@ class CheckoutFrontController extends Controller
     public function LoadCheckout()
     {
 		$country_list = Country::where('is_publish', '=', 1)->orderBy('country_name', 'ASC')->get();
-		$shipping_list = Shipping::where('is_publish', '=', 1)->get();
+		// $shipping_list = Shipping::where('is_publish', '=', 1)->get(); 
+		$shipping_list = DeliveryType::where('status_id', '=', 1)->get(); 
 				
         return view('frontend.checkout', compact('country_list', 'shipping_list'));
     }

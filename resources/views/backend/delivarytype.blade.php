@@ -121,6 +121,13 @@
                                                     </div>
                                                 </div>
 
+                                                <div class="col-md-6">
+                                                    <div class="form-group">
+                                                        <label for="shipping_fee">{{ __('Shipping Fee') }} <span class="red">*</span></label>
+                                                        <input type="number" name="shipping_fee" id="shipping_fee" class="form-control parsley-validated" data-required="true" placeholder="Enter Shipping Fee">
+                                                    </div>
+                                                </div>
+
 												<div class="col-md-6">
 													<div class="form-group">
 														<label for="status_id">{{ __('Active/Inactive') }}<span class="red">*</span></label>

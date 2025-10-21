@@ -256,7 +256,7 @@ $tax_rate = $gtax['percentage'];
 						</div>
 					</div>
 					
-					<div class="col-lg-5">
+					{{-- <div class="col-lg-5">
 						<div class="carttotals-card">
 							<div class="carttotals-head">{{ __('Order Summary') }}</div>
 							<div class="carttotals-body">
@@ -288,7 +288,10 @@ $tax_rate = $gtax['percentage'];
 												'store_url' => $row['store_url'],
 												'seller_email' => $row['seller_email'],
 												'seller_phone' => $row['seller_phone'],
-												'seller_address' => $row['seller_address']
+												'seller_address' => $row['seller_address'],
+												"exdate" => $row['exdate'],
+												"perisible" => $row['perisible'],
+												"delivarytypeid" => $row['delivarytypeid'],
 											);
 											
 											$CartDataArr[$row['seller_id']][] = $data;
@@ -305,6 +308,7 @@ $tax_rate = $gtax['percentage'];
 										@php 
 										$tempSellerId = ''; 
 										$SellerCount = 0; 
+										$delivaryTypeId = '';
 										@endphp
 		
 										@foreach($CartData_Arr as $row)
@@ -314,6 +318,8 @@ $tax_rate = $gtax['percentage'];
 											}else{
 												$unit = '<strong>'.$row['qty'].' '.$row['unit'].'</strong>';
 											}
+										
+											$delivaryTypeId = $row['delivarytypeid']; 
 											@endphp
 											
 											@if($tempSellerId != $row['seller_id'])
@@ -391,18 +397,20 @@ $tax_rate = $gtax['percentage'];
 									<div class="col-md-12">
 										<span class="text-danger error-text shipping_method_error"></span>
 										@foreach($shipping_list as $row)
-											@php
-												if($gtext['currency_position'] == 'left'){
-													$shipping_fee = $gtext['currency_icon'].$row->shipping_fee;
-												}else{
-													$shipping_fee = $row->shipping_fee.$gtext['currency_icon'];
-												}
-											@endphp
-											<div class="checkboxlist">
-												<label class="checkbox-title">
-													<input data-seller_count="{{ $SellerCount }}" data-shippingfee="{{ $row->shipping_fee }}" data-total="{{ NumberFormat($TotalPrice) }}" class="shipping_method" name="shipping_method" type="radio" value="{{ $row->id }}">{{ $row->title }} : {{ $shipping_fee }}
-												</label>
-											</div>
+										    @if($delivaryTypeId == $row->id) 
+												@php
+													if($gtext['currency_position'] == 'left'){
+														$shipping_fee = $gtext['currency_icon'].$row->shipping_fee;
+													}else{
+														$shipping_fee = $row->shipping_fee.$gtext['currency_icon'];
+													}
+												@endphp
+												<div class="checkboxlist">
+													<label class="checkbox-title">
+														<input data-seller_count="{{ $SellerCount }}" data-shippingfee="{{ $row->shipping_fee }}" data-total="{{ NumberFormat($TotalPrice) }}" class="shipping_method" name="shipping_method" type="radio" value="{{ $row->id }}">{{ $row->lable }} : {{ $shipping_fee }}
+													</label>
+												</div>
+											@endif	
 										@endforeach
 									</div>
 								</div>
@@ -419,7 +427,231 @@ $tax_rate = $gtax['percentage'];
 							@endif
 							</div>
 						</div>
+					</div> --}}
+					<div class="col-lg-5">
+	<div class="carttotals-card">
+		<div class="carttotals-head">{{ __('Order Summary') }}</div>
+		<div class="carttotals-body">
+			@if(session('shopping_cart'))
+				<table class="table">
+					<tbody>
+						@php 
+							$CartDataArr = [];
+							$Total_Price = 0;
+							$GrandTotal = 0;
+						@endphp
+
+						{{-- ✅ Group cart data by seller --}}
+						@foreach(session('shopping_cart') as $row)
+							@php
+								$Total_Price += $row['price'] * $row['qty'];
+								$data = [
+									'rowId' => $row['id'], 
+									'id' => $row['id'], 
+									'qty' => $row['qty'], 
+									'name' => $row['name'], 
+									'price' => $row['price'], 
+									'weight' => $row['weight'], 
+									'thumbnail' => $row['thumbnail'], 
+									'unit' => $row['unit'],
+									'seller_id' => $row['seller_id'],
+									'seller_name' => $row['seller_name'],
+									'store_name' => $row['store_name'],
+									'store_logo' => $row['store_logo'],
+									'store_url' => $row['store_url'],
+									'seller_email' => $row['seller_email'],
+									'seller_phone' => $row['seller_phone'],
+									'seller_address' => $row['seller_address'],
+									'exdate' => $row['exdate'],
+									'perisible' => $row['perisible'],
+									'delivarytypeid' => $row['delivarytypeid'],
+								];
+								$CartDataArr[$row['seller_id']][] = $data;
+							@endphp
+						@endforeach
+						
+						@php 
+							$CartData_Arr = [];
+							foreach($CartDataArr as $aRows) {
+								foreach($aRows as $row) {
+									$CartData_Arr[] = $row;
+								}
+							}
+							
+							$tempSellerId = ''; 
+							$SellerCount = 0;
+						@endphp
+
+						{{-- ✅ Display each product with its own totals --}}
+						@foreach($CartData_Arr as $row)
+							@php
+								$unit = $row['unit'] == '0' ? '' : '<strong>'.$row['qty'].' '.$row['unit'].'</strong>';
+								$delivaryTypeId = $row['delivarytypeid'];
+
+								// Calculate individual totals
+								$priceTotal = $row['price'] * $row['qty'];
+								$TaxCal = ($priceTotal * $tax_rate) / 100;
+								$TotalPrice = $priceTotal + $TaxCal;
+								// Add default shipping for this product if shipping type is selected
+								$defaultShippingFee = 0;
+								foreach($shipping_list as $ship){
+									if($delivaryTypeId == $ship->id){
+										$defaultShippingFee = $ship->shipping_fee;
+										break;
+									}
+								}
+
+								// Total price including default shipping
+								$TotalPriceWithShipping = $TotalPrice + $defaultShippingFee;
+
+								// Add to grand total
+								$GrandTotal += $TotalPriceWithShipping;
+
+
+								if($gtext['currency_position'] == 'left'){
+									$ShippingFee = $gtext['currency_icon'].'0'; 
+									$tax = $gtext['currency_icon'].NumberFormat($TaxCal);
+									$total = $gtext['currency_icon'].NumberFormat($TotalPrice);
+								}else{
+									$ShippingFee = '0'.$gtext['currency_icon'];
+									$tax = NumberFormat($TaxCal).$gtext['currency_icon'];
+									$total = NumberFormat($TotalPrice).$gtext['currency_icon'];
+								}
+							@endphp
+
+							{{-- Seller info --}}
+							@if($tempSellerId != $row['seller_id'])
+								<tr>
+									<td colspan="2" class="tp_group">
+										<div class="store_logo">
+											<a href="{{ route('frontend.stores', [$row['seller_id'], str_slug($row['store_name'])]) }}">
+												<img src="{{ asset('media/'.$row['store_logo']) }}" alt="{{ $row['store_name'] }}" />
+											</a>
+										</div>
+										<div class="store_name">
+											<p><strong>{{ __('Sold By') }}</strong></p>
+											<p><a href="{{ route('frontend.stores', [$row['seller_id'], str_slug($row['store_url'])]) }}">{{ $row['store_name'] }}</a></p>
+										</div>
+									</td>
+								</tr>
+								@php 
+									$tempSellerId = $row['seller_id']; 
+									$SellerCount++;
+								@endphp
+							@endif
+
+							{{-- Product row --}}
+							<tr>
+								<td>
+									<p class="title">
+										<a href="{{ route('frontend.product', [$row['id'], str_slug($row['name'])]) }}">{{ $row['name'] }}</a>
+									</p>
+									<p class="sub-title">{!! $unit !!}</p>
+								</td>
+								<td>
+									@if($gtext['currency_position'] == 'left')
+										<p class="price">{{ $gtext['currency_icon'] }}{{ NumberFormat($priceTotal) }}</p>
+										<p class="sub-price">{{ $gtext['currency_icon'] }}{{ $row['price'] }} x {{ $row['qty'] }}</p>
+									@else
+										<p class="price">{{ NumberFormat($priceTotal) }}{{ $gtext['currency_icon'] }}</p>
+										<p class="sub-price">{{ $row['price'] }}{{ $gtext['currency_icon'] }} x {{ $row['qty'] }}</p>
+									@endif
+								</td>
+							</tr>
+
+							{{-- Individual totals per product --}}
+							@php
+								$defaultShippingFee = 0;
+								foreach($shipping_list as $ship){
+									if($delivaryTypeId == $ship->id){
+										$defaultShippingFee = $ship->shipping_fee;
+										break;
+									}
+								}
+								$totalWithShipping = $TotalPrice + $defaultShippingFee;
+							@endphp
+
+							<tr>
+								<td colspan="2">
+									<span class="title">{{ __('Shipping Fee') }}</span>
+									<span class="price shipping_fee">{{ $gtext['currency_icon'] . NumberFormat($defaultShippingFee) }}</span>
+								</td>
+							</tr>
+							<tr><td colspan="2"><span class="title">{{ __('Tax') }}</span><span class="price">{{ $tax }}</span></td></tr>
+							<tr>
+								<td colspan="2">
+									<span class="total">{{ __('Total') }}</span>
+									<span class="total-price">{{ $gtext['currency_icon'] . NumberFormat($TotalPriceWithShipping) }}</span>
+								</td>
+							</tr>
+							
+
+
+							{{-- Shipping Method per product --}}
+							@if(count($shipping_list) > 0)
+								<tr>
+									<td colspan="2">
+										<h6>{{ __('Shipping Method') }}</h6>
+										@foreach($shipping_list as $ship)
+											@if($delivaryTypeId == $ship->id)
+												@php
+													if($gtext['currency_position'] == 'left'){
+														$shipping_fee = $gtext['currency_icon'].$ship->shipping_fee;
+													}else{
+														$shipping_fee = $ship->shipping_fee.$gtext['currency_icon'];
+													}
+												@endphp
+												<div class="checkboxlist">
+													<label class="checkbox-title">
+														<input 
+															data-productid="{{ $row['id'] }}"
+															data-seller_count="{{ $SellerCount }}" 
+															data-shippingfee="{{ $ship->shipping_fee }}" 
+															data-total="{{ NumberFormat($TotalPrice) }}" 
+															class="shipping_method" 
+															name="shipping_method_{{ $row['id'] }}" 
+															type="radio" 
+															value="{{ $ship->id }}" 
+															checked >
+														{{ $ship->lable }} : {{ $shipping_fee }}
+													</label>
+												</div>
+											@endif
+										@endforeach
+									</td>
+								</tr>
+							@endif
+						@endforeach
+
+						{{-- 🧾 Grand total at the end --}}
+						<tr>
+							<td colspan="2" style="border-top:2px solid #ccc;">
+								<strong>{{ __('Grand Total') }}</strong>
+								<span class="price">
+									{{ $gtext['currency_icon'] }}<span class="grand_total_value">{{ NumberFormat($GrandTotal) }}</span>
+								</span>
+							</td>
+						</tr>
+
+
+					</tbody>
+				</table>
+
+				{{-- Checkout Section --}}
+				<input name="customer_id" type="hidden" value="@if(isset(Auth::user()->id)) {{ Auth::user()->id }} @endif" />
+				<input name="razorpay_payment_id" id="razorpay_payment_id" type="hidden" />
+				<a id="checkout_submit_form" href="javascript:void(0);" class="btn theme-btn mt10 checkout_btn">{{ __('Checkout') }}</a>
+
+				@if(Session::has('pt_payment_error'))
+					<div class="alert alert-danger">
+						{{ Session::get('pt_payment_error') }}
 					</div>
+				@endif
+			@endif
+		</div>
+	</div>
+</div>
+
 				</div>
 			</form>
 		</div>

@@ -14,5 +14,6 @@ class DeliveryType extends Model
         'slug',
         'perisible',
         'status_id',
+        'shipping_fee',
     ];
 }

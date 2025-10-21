@@ -158,16 +158,28 @@
 											</select>
 										</div>
 									</div>
-									<div class="col-lg-6">
+									<div class="col-lg-4">
 										<div class="form-group">
 											<label for="exdate">{{ __('Expire Date') }}</label>
 											<input value="{{ $datalist['exdate'] }}" name="exdate" id="exdate" type="date" class="form-control parsley-validated" min="{{ date('Y-m-d') }}">
 										</div>
 									</div>
-									<div class="col-lg-6">
+									<div class="col-lg-4">
 										<div class="form-check mt-4">
-											<input value="1"  name="perisible" id="perisible" type="checkbox" class="form-check-input parsley-validated" {{ old('perisible', $datalist['perisible']) ? 'checked' : '' }}>
-											<label for="perisible">{{ __('Perisible') }}</label>
+											<input value="1"  name="perisible" id="perisible" type="checkbox" class="form-check-input parsley-validated" {{ old('perisible', $datalist['perisible']) ? 'checked' : '' }}  style="height: 50px;width: 18px;">
+											<label for="perisible"  style="margin: 18px 7px;">{{ __('Perisible') }}</label>
+										</div>
+									</div>
+									<div class="col-lg-4">
+										<div class="form-group">
+											<label for="delivarytypeid">{{ __('Delivary Type') }}<span class="red">*</span></label>
+											<select name="delivarytypeid" id="delivarytypeid" class="chosen-select form-control">
+											@foreach($delivarytypes as $row)
+												<option {{ $row->id == $datalist['delivarytypeid'] ? "selected=selected" : '' }} value="{{ $row->id }}">
+													{{ $row->lable }}
+												</option>
+											@endforeach
+											</select>
 										</div>
 									</div>
 								</div>

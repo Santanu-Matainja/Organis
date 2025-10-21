@@ -122,15 +122,16 @@ class ProductsController extends Controller
 		$brand_id = $request->input('brandid');
 		$user_id = $request->input('user_id');
 		$exdate = $request->input('exdate');
-		// $delivarytypeid = $request->input('delivarytypeid');
 		$perisible = $request->has('perisible') ? 1 : 0;
+		$delivarytypeid = $request->input('delivarytypeid');
 
 		$validator_array = array(
 			'product_name' => $request->input('title'),
 			'slug' => $slug,
 			'language' => $request->input('lan'),
 			'category' => $request->input('categoryid'),
-			'brand' => $request->input('brandid')
+			'brand' => $request->input('brandid'),
+			'delivarytypeid' => $request->input('delivarytypeid')
 		);
 		
 		$rId = $id == '' ? '' : ','.$id;
@@ -139,7 +140,8 @@ class ProductsController extends Controller
 			'slug' => 'required|max:191|unique:products,slug' . $rId,
 			'language' => 'required',
 			'category' => 'required',
-			'brand' => 'required'
+			'brand' => 'required',
+			'delivarytypeid' => 'required',
 		]);
 
 		$errors = $validator->errors();
@@ -180,6 +182,12 @@ class ProductsController extends Controller
 		}else{
 			$is_publish = 2;
 		}
+
+		if($errors->has('delivarytypeid')){
+			$res['msgType'] = 'error';
+			$res['msg'] = $errors->first('delivarytypeid');
+			return response()->json($res);
+		}
 		
 		$data = array(
 			'title' => $title,
@@ -191,7 +199,8 @@ class ProductsController extends Controller
 			'user_id' => $user_id,
 			'is_publish' => $is_publish,
 			'exdate' => $exdate,
-			'perisible' => $perisible
+			'perisible' => $perisible,
+			'delivarytypeid' => $delivarytypeid,
 		);
 
 		if($id ==''){
@@ -324,8 +333,9 @@ class ProductsController extends Controller
 		
 		$unitlist = Attribute::orderBy('name','asc')->get();
 		$taxlist = Tax::orderBy('title','asc')->get();
+		$delivarytypes = DeliveryType::orderBy('lable','asc')->get();
 
-        return view('seller.product', compact('datalist', 'statuslist', 'languageslist', 'brandlist', 'categorylist', 'unitlist', 'taxlist'));
+        return view('seller.product', compact('datalist', 'delivarytypes', 'statuslist', 'languageslist', 'brandlist', 'categorylist', 'unitlist', 'taxlist'));
     }
 	
 	//Update data for Products
@@ -351,6 +361,7 @@ class ProductsController extends Controller
 
 		$exdate = $request->input('exdate');
 		$perisible = $request->has('perisible') ? 1 : 0;
+		$delivarytypeid = $request->input('delivarytypeid');
 
 		
 		$validator_array = array(
@@ -360,7 +371,8 @@ class ProductsController extends Controller
 			'category' => $request->input('cat_id'),
 			'language' => $request->input('lan'),
 			'variation_size' => $request->input('variation_size'),
-			'sale_price' => $request->input('sale_price')
+			'sale_price' => $request->input('sale_price'),
+			'delivarytypeid' => $request->input('delivarytypeid')
 		);
 		
 		$rId = $id == '' ? '' : ','.$id;
@@ -371,7 +383,8 @@ class ProductsController extends Controller
 			'language' => 'required',
 			'category' => 'required',
 			'variation_size' => 'required',
-			'sale_price' => 'required'
+			'sale_price' => 'required',
+			'delivarytypeid' => 'required',
 		]);
 
 		$errors = $validator->errors();
@@ -418,6 +431,12 @@ class ProductsController extends Controller
 			return response()->json($res);
 		}
 
+		if($errors->has('delivarytypeid')){
+			$res['msgType'] = 'error';
+			$res['msg'] = $errors->first('delivarytypeid');
+			return response()->json($res);
+		}
+
 		$data = array(
 			'title' => $title,
 			'slug' => $slug,
@@ -434,7 +453,8 @@ class ProductsController extends Controller
 			'sale_price' => $sale_price,
 			'lan' => $lan,
 			'exdate' => $exdate,
-			'perisible' => $perisible
+			'perisible' => $perisible,
+			'delivarytypeid' => $delivarytypeid,
 		);
 		
 		$response = Product::where('id', $id)->update($data);

@@ -236,6 +236,7 @@ function onLoadEditData() {
 			$("#RecordId").val(delivarytype_data.id);
 			$("#lable").val(delivarytype_data.lable);
 			$("#slug").val(delivarytype_data.slug);
+			$("#shipping_fee").val(delivarytype_data.shipping_fee);
 			$("#perisible").val(delivarytype_data.perisible).trigger("chosen:updated");
 			$("#status_id").val(delivarytype_data.status_id).trigger("chosen:updated");
 
