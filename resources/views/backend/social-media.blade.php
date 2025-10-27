@@ -128,7 +128,7 @@
 
 @push('scripts')
 <!-- css/js -->
-<link rel="stylesheet" href="{{asset('backend/css/bootstrap-icons.css')}}">
+<link rel="stylesheet" href="{{asset_path('backend/css/bootstrap-icons.css')}}">
 <!-- css/js -->
 <script type="text/javascript">
 var TEXT = [];
@@ -140,5 +140,5 @@ var TEXT = [];
 	TEXT['Please select action'] = "{{ __('Please select action') }}";
 	TEXT['Please select record'] = "{{ __('Please select record') }}";
 </script>
-<script src="{{asset('backend/pages/social_media.js')}}"></script>
+<script src="{{asset_path('backend/pages/social_media.js')}}"></script>
 @endpush

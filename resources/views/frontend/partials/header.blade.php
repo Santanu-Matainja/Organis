@@ -64,7 +64,7 @@
 					<div class="col-lg-3">
 						<div class="logo">
 							<a href="{{ url('/') }}">
-								<img src="{{ $gtext['front_logo'] ? asset('media/'.$gtext['front_logo']) : asset('frontend/images/logo.png') }}" alt="logo">
+								<img src="{{ $gtext['front_logo'] ? asset_path('media/'.$gtext['front_logo']) : asset_path('frontend/images/logo.png') }}" alt="logo">
 							</a>
 						</div>
 					</div>
@@ -102,7 +102,7 @@
 								<div class="shoping-cart-card headerShopingCart">
 									<div class="empty_card has_item_empty">
 										<div class="empty_img">
-											<img src="{{ asset('frontend/images/empty.png') }}" />
+											<img src="{{ asset_path('frontend/images/empty.png') }}" />
 										</div>
 										<h3>{{ __('Your cart is empty!') }}</h3>
 									</div>
@@ -146,7 +146,7 @@
 							<div class="logo-card">
 								<div class="logo">
 									<a href="{{ url('/') }}">
-										<img src="{{ $gtext['front_logo'] ? asset('media/'.$gtext['front_logo']) : asset('frontend/images/logo.png') }}" alt="logo">
+										<img src="{{ $gtext['front_logo'] ? asset_path('media/'.$gtext['front_logo']) : asset_path('frontend/images/logo.png') }}" alt="logo">
 									</a>
 								</div>
 							</div>
@@ -167,7 +167,7 @@
 											
 											<div class="empty_card has_item_empty">
 												<div class="empty_img">
-													<img src="{{ asset('frontend/images/empty.png') }}" />
+													<img src="{{ asset_path('frontend/images/empty.png') }}" />
 												</div>
 												<h3>{{ __('Your cart is empty!') }}</h3>
 											</div>

@@ -14,7 +14,7 @@ $gtext = gtext();
 	<meta property="og:description" content="{{ $gtext['og_description'] }}" />
 	<meta property="og:type" content="website" />
 	<meta property="og:url" content="{{ url()->current() }}" />
-	<meta property="og:image" content="{{ asset('media/'.$gtext['og_image']) }}" />
+	<meta property="og:image" content="{{ asset_path('media/'.$gtext['og_image']) }}" />
 	<meta property="og:image:width" content="600" />
 	<meta property="og:image:height" content="315" />
 	@if($gtext['fb_publish'] == 1)
@@ -28,7 +28,7 @@ $gtext = gtext();
 	<meta name="twitter:url" content="{{ url()->current() }}">
 	<meta name="twitter:title" content="{{ $gtext['og_title'] }}">
 	<meta name="twitter:description" content="{{ $gtext['og_description'] }}">
-	<meta name="twitter:image" content="{{ asset('media/'.$gtext['og_image']) }}">
+	<meta name="twitter:image" content="{{ asset_path('media/'.$gtext['og_image']) }}">
 @endsection
 
 @section('header')
@@ -50,7 +50,7 @@ $gtext = gtext();
 <!-- Start of Modal -->
 <div class="modal fade modal_newsletter_card" id="subscribe_popup" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
 	<div class="modal-dialog modal-dialog-centered">
-		<div class="modal-content" style="background-image: url({{ asset('media/'.$gtext['bg_image_popup']) }});">
+		<div class="modal-content" style="background-image: url({{ asset_path('media/'.$gtext['bg_image_popup']) }});">
 			<button onclick="popup_modal_close()" type="button" class="modal-close" data-bs-dismiss="modal" aria-label="Close"><i class="bi bi-x-lg"></i></button>
 			
 			<div class="modal-body">

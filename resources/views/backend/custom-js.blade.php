@@ -47,5 +47,5 @@
 @endsection
 
 @push('scripts')
-<script src="{{asset('backend/pages/custom-js.js')}}"></script>
+<script src="{{asset_path('backend/pages/custom-js.js')}}"></script>
 @endpush

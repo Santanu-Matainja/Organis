@@ -105,5 +105,5 @@ var TEXT = [];
 	TEXT['Do you really want to edit this record'] = "{{ __('Do you really want to edit this record') }}";
 	TEXT['Do you really want to delete this record'] = "{{ __('Do you really want to delete this record') }}";
 </script>
-<script src="{{asset('backend/pages/languages-keywords.js')}}"></script>
+<script src="{{asset_path('backend/pages/languages-keywords.js')}}"></script>
 @endpush

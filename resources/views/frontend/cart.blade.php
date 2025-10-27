@@ -14,7 +14,7 @@ $gtax = getTax();
 	<meta property="og:description" content="{{ $gtext['og_description'] }}" />
 	<meta property="og:type" content="website" />
 	<meta property="og:url" content="{{ url()->current() }}" />
-	<meta property="og:image" content="{{ asset('media/'.$gtext['og_image']) }}" />
+	<meta property="og:image" content="{{ asset_path('media/'.$gtext['og_image']) }}" />
 	<meta property="og:image:width" content="600" />
 	<meta property="og:image:height" content="315" />
 	@if($gtext['fb_publish'] == 1)
@@ -28,7 +28,7 @@ $gtax = getTax();
 	<meta name="twitter:url" content="{{ url()->current() }}">
 	<meta name="twitter:title" content="{{ $gtext['og_title'] }}">
 	<meta name="twitter:description" content="{{ $gtext['og_description'] }}">
-	<meta name="twitter:image" content="{{ asset('media/'.$gtext['og_image']) }}">
+	<meta name="twitter:image" content="{{ asset_path('media/'.$gtext['og_image']) }}">
 @endsection
 
 @section('header')
@@ -105,7 +105,7 @@ $gtax = getTax();
 									<td class="pro-image-w">
 										<div class="pro-image">
 											<a href="{{ route('frontend.product', [$row['id'], str_slug($row['name'])]) }}">
-												<img src="{{ asset('media/'.$row['thumbnail']) }}" alt="{{ $row['name'] }}">
+												<img src="{{ asset_path('media/'.$row['thumbnail']) }}" alt="{{ $row['name'] }}">
 											</a>
 										</div>
 									</td>
@@ -162,7 +162,7 @@ $gtax = getTax();
 				<div class="col-sm-8 offset-sm-2 col-md-6 offset-md-3 col-lg-4 offset-lg-4 col-xl-4 offset-xl-4 col-xxl-4 offset-xxl-4">
 					<div class="empty_card">
 						<div class="empty_img">
-							<img src="{{ asset('frontend/images/empty.png') }}" />
+							<img src="{{ asset_path('frontend/images/empty.png') }}" />
 						</div>
 						<h3>{{ __('Your cart is empty!') }}</h3>
 					</div>
@@ -177,5 +177,5 @@ $gtax = getTax();
 @endsection
 
 @push('scripts')
-<script src="{{asset('frontend/pages/view_cart.js')}}"></script>
+<script src="{{asset_path('frontend/pages/view_cart.js')}}"></script>
 @endpush	

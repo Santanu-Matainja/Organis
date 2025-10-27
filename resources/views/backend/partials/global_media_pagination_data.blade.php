@@ -5,7 +5,7 @@
 			<li id="media_item_{{ $row->id }}">
 				<a onClick="onMediaDelete({{ $row->id }})" class="media-delete" title="{{ __('Delete') }}" href="javascript:void(0);"><i class="fa fa-remove"></i></a>
 				<div class="media-preview">
-					<a onClick="onMediaModalView({{ $row->id }})" href="javascript:void(0);"><img src="{{ asset('media/'.$row->thumbnail) }}" alt="{{ $row->alt_title }}" /></a>
+					<a onClick="onMediaModalView({{ $row->id }})" href="javascript:void(0);"><img src="{{ asset_path('media/'.$row->thumbnail) }}" alt="{{ $row->alt_title }}" /></a>
 				</div>
 			</li>
 			@endforeach

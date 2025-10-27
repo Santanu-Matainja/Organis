@@ -160,7 +160,7 @@ var TEXT = [];
 	TEXT['Please select action'] = "{{ __('Please select action') }}";
 	TEXT['Please select record'] = "{{ __('Please select record') }}";
 </script>
-<link href="{{asset('backend/editor/summernote-lite.min.css')}}" rel="stylesheet">
-<script src="{{asset('backend/editor/summernote-lite.min.js')}}"></script>
-<script src="{{asset('backend/pages/page.js')}}"></script>
+<link href="{{asset_path('backend/editor/summernote-lite.min.css')}}" rel="stylesheet">
+<script src="{{asset_path('backend/editor/summernote-lite.min.js')}}"></script>
+<script src="{{asset_path('backend/pages/page.js')}}"></script>
 @endpush

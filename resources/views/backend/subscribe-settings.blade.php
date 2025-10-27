@@ -136,6 +136,6 @@ if(background_image != ''){
 	$("#view_background_image").html('<img src="'+public_path+'/media/'+background_image+'">');
 }
 </script>
-<script src="{{asset('backend/pages/newsletters.js')}}"></script>
-<script src="{{asset('backend/pages/global-media.js')}}"></script>
+<script src="{{asset_path('backend/pages/newsletters.js')}}"></script>
+<script src="{{asset_path('backend/pages/global-media.js')}}"></script>
 @endpush

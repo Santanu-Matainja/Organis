@@ -11,7 +11,7 @@
 	<meta property="og:description" content="{{ $gtext['og_description'] }}" />
 	<meta property="og:type" content="website" />
 	<meta property="og:url" content="{{ url()->current() }}" />
-	<meta property="og:image" content="{{ asset('media/'.$gtext['og_image']) }}" />
+	<meta property="og:image" content="{{ asset_path('media/'.$gtext['og_image']) }}" />
 	<meta property="og:image:width" content="600" />
 	<meta property="og:image:height" content="315" />
 	@if($gtext['fb_publish'] == 1)
@@ -25,7 +25,7 @@
 	<meta name="twitter:url" content="{{ url()->current() }}">
 	<meta name="twitter:title" content="{{ $gtext['og_title'] }}">
 	<meta name="twitter:description" content="{{ $gtext['og_description'] }}">
-	<meta name="twitter:image" content="{{ asset('media/'.$gtext['og_image']) }}">
+	<meta name="twitter:image" content="{{ asset_path('media/'.$gtext['og_image']) }}">
 @endsection
 
 @section('header')
@@ -64,7 +64,7 @@
 				<div class="col-md-6 offset-md-3">
 					<div class="error_card">
 						<div class="error_img">
-							<img src="{{ asset('frontend/images/404.png') }}" />
+							<img src="{{ asset_path('frontend/images/404.png') }}" />
 						</div>
 						<p>{{ __('This page you are looking for could not be found!') }}</p>
 						<a class="btn theme-btn" href="{{ url('/') }}">{{ __('Back to Home Page') }}</a>

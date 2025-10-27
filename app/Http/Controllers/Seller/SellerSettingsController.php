@@ -67,7 +67,9 @@ class SellerSettingsController extends Controller
 			$bank_information['description'] = $row->description;
 		}
 
-        return view('seller.settings', compact('countrylist', 'seller_data', 'bank_information'));
+		$shippingfee = DB::table('sellerdelivaryfees')->where('seller_id', $id)->first();
+
+        return view('seller.settings', compact('countrylist', 'seller_data', 'bank_information', 'shippingfee'));
     }
 	
 	//Save data for Sellers
@@ -84,6 +86,7 @@ class SellerSettingsController extends Controller
 		$zip_code = $request->input('zip_code');
 		$country_id = $request->input('country_id');
 		$photo = $request->input('photo');
+		$shipping_fee = $request->input('shipping_fee');
 		
 		$validator_array = array(
 			'shop_name' => $request->input('shop_name'),
@@ -93,7 +96,8 @@ class SellerSettingsController extends Controller
 			'city' => $request->input('city'),
 			'state' => $request->input('state'),
 			'zip_code' => $request->input('zip_code'),
-			'country_id' => $request->input('country_id')
+			'country_id' => $request->input('country_id'),
+			'shipping_fee' => $request->input('shipping_fee')
 		);
 		$rId = $id == '' ? '' : ','.$id;
 		$validator = Validator::make($validator_array, [
@@ -104,7 +108,8 @@ class SellerSettingsController extends Controller
 			'city' => 'required',
 			'state' => 'required',
 			'zip_code' => 'required',
-			'country_id' => 'required'
+			'country_id' => 'required',
+			'shipping_fee' => 'required',
 		]);
 
 		$errors = $validator->errors();
@@ -163,7 +168,26 @@ class SellerSettingsController extends Controller
 			$res['msg'] = $errors->first('country_id');
 			$res['id'] = '';
 			return response()->json($res);
-		}
+		} 
+
+		if($errors->has('shipping_fee')){
+			$res['msgType'] = 'error';
+			$res['msg'] = $errors->first('shipping_fee');
+			$res['id'] = '';
+			return response()->json($res);
+		} 
+
+		$shippingfee = [
+			'seller_id' => $id,
+			'shipping_fee' => $shipping_fee,
+			'created_at' => now(),
+			'updated_at' => now()
+		];
+
+		$shippingfeeinsert = DB::table('sellerdelivaryfees')->updateOrInsert(
+			['seller_id' => $id],  
+			$shippingfee           
+		);
 
 		$data = array(
 			'shop_name' => $shop_name,
@@ -178,7 +202,7 @@ class SellerSettingsController extends Controller
 		);
 
 		$response = User::where('id', $id)->update($data);
-		if($response){
+		if($response && $shippingfeeinsert){
 			$res['msgType'] = 'success';
 			$res['msg'] = __('Data Updated Successfully');
 			$res['id'] = $id;
@@ -187,7 +211,7 @@ class SellerSettingsController extends Controller
 			$res['msg'] = __('Data update failed');
 			$res['id'] = '';
 		}
-		
+
 		return response()->json($res);
     }
 	

@@ -272,6 +272,6 @@ var TEXT = [];
 	TEXT['Active'] = "{{ __('Active') }}";
 	TEXT['Inactive'] = "{{ __('Inactive') }}";
 </script>
-<script src="{{asset('backend/pages/delivarypartner.js')}}"></script>
-<script src="{{asset('backend/pages/global-media.js')}}"></script>
+<script src="{{asset_path('backend/pages/delivarypartner.js')}}"></script>
+<script src="{{asset_path('backend/pages/global-media.js')}}"></script>
 @endpush

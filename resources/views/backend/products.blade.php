@@ -222,5 +222,5 @@ var TEXT = [];
 	TEXT['All Category'] = "{{ __('All Category') }}";
 	TEXT['All Brand'] = "{{ __('All Brand') }}";
 </script>
-<script src="{{asset('public/backend/pages/products.js')}}"></script>
+<script src="{{asset_path('backend/pages/products.js')}}"></script>
 @endpush

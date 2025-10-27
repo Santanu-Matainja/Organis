@@ -74,5 +74,5 @@
 
 @push('scripts')
 <!-- css/js -->
-<script src="{{asset('backend/pages/seller-settings.js')}}"></script>
+<script src="{{asset_path('backend/pages/seller-settings.js')}}"></script>
 @endpush

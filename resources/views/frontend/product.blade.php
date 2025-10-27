@@ -11,7 +11,7 @@
 	<meta property="og:description" content="{{ $data->og_description ? $data->og_description : $data->short_desc }}" />
 	<meta property="og:type" content="article" />
 	<meta property="og:url" content="{{ url()->current() }}" />
-	<meta property="og:image" content="{{ $data->og_image ? asset('media/'.$data->og_image) : asset('media/'.$data->f_thumbnail) }}" />
+	<meta property="og:image" content="{{ $data->og_image ? asset_path('media/'.$data->og_image) : asset_path('media/'.$data->f_thumbnail) }}" />
 	<meta property="og:image:width" content="600" />
 	<meta property="og:image:height" content="315" />
 	@if($gtext['fb_publish'] == 1)
@@ -25,7 +25,7 @@
 	<meta name="twitter:url" content="{{ url()->current() }}">
 	<meta name="twitter:title" content="{{ $data->og_title ? $data->og_title : $data->title }}">
 	<meta name="twitter:description" content="{{ $data->og_description ? $data->og_description : $data->short_desc }}">
-	<meta name="twitter:image" content="{{ $data->og_image ? asset('media/'.$data->og_image) : asset('media/'.$data->f_thumbnail) }}">
+	<meta name="twitter:image" content="{{ $data->og_image ? asset_path('media/'.$data->og_image) : asset_path('media/'.$data->f_thumbnail) }}">
 @endsection
 
 @section('header')
@@ -66,22 +66,22 @@
 						@if(count($pro_images)>0)
 						@foreach ($pro_images as $key => $row)
 						<div class="item">
-							<img src="{{ asset('media/'.$row->thumbnail) }}" alt="{{ $key }}" />
+							<img src="{{ asset_path('media/'.$row->thumbnail) }}" alt="{{ $key }}" />
 						</div>
 						@endforeach
 						@else
 						<div class="item">
-							<img src="{{ asset('media/'.$data->f_thumbnail) }}" alt="{{ $data->title }}" />
+							<img src="{{ asset_path('media/'.$data->f_thumbnail) }}" alt="{{ $data->title }}" />
 						</div>
 						@endif
 					</div>
 					<div class="thumbnail-card pd-slider-nav">
 						@if(count($pro_images)>0)
 						@foreach ($pro_images as $key => $row)
-						<img src="{{ asset('media/'.$row->thumbnail) }}" alt="{{ $key }}" />
+						<img src="{{ asset_path('media/'.$row->thumbnail) }}" alt="{{ $key }}" />
 						@endforeach
 						@else
-						<img src="{{ asset('media/'.$data->f_thumbnail) }}" alt="{{ $data->title }}" />
+						<img src="{{ asset_path('media/'.$data->f_thumbnail) }}" alt="{{ $data->title }}" />
 						@endif
 					</div>
 				</div>
@@ -288,7 +288,7 @@
 													@if($seller_data->photo == '')
 													<span class="text">{{ sub_str($seller_data->shop_name, 0,1) }}</span>
 													@else
-													<img src="{{ asset('media/'.$seller_data->photo) }}" alt="{{ $seller_data->shop_name }}"/>
+													<img src="{{ asset_path('media/'.$seller_data->photo) }}" alt="{{ $seller_data->shop_name }}"/>
 													@endif
 												</div>
 												<div class="desc">
@@ -345,7 +345,7 @@
 								@if(($row->is_discount == 1) && ($row->old_price !=''))
 								<span class="item-label">{{ $discount }}% {{ __('Off') }}</span>
 								@endif
-								<a href="{{ route('frontend.product', [$row->id, $row->slug]) }}"><img src="{{ asset('media/'.$row->f_thumbnail) }}" alt="{{ $row->title }}" /></a>
+								<a href="{{ route('frontend.product', [$row->id, $row->slug]) }}"><img src="{{ asset_path('media/'.$row->f_thumbnail) }}" alt="{{ $row->title }}" /></a>
 							</div>
 							<div class="item-title">
 								<a href="{{ route('frontend.product', [$row->id, $row->slug]) }}">{{ str_limit($row->title) }}</a>
@@ -398,7 +398,7 @@
 								@if(($row->is_discount == 1) && ($row->old_price !=''))
 								<span class="item-label">{{ $discount }}% {{ __('Off') }}</span>
 								@endif
-								<a href="{{ route('frontend.product', [$row->id, $row->slug]) }}"><img src="{{ asset('media/'.$row->f_thumbnail) }}" alt="{{ $row->title }}" /></a>
+								<a href="{{ route('frontend.product', [$row->id, $row->slug]) }}"><img src="{{ asset_path('media/'.$row->f_thumbnail) }}" alt="{{ $row->title }}" /></a>
 							</div>
 							<div class="item-title">
 								<a href="{{ route('frontend.product', [$row->id, $row->slug]) }}">{{ str_limit($row->title) }}</a>
@@ -458,5 +458,5 @@ var TEXT = [];
 	TEXT['The value must be less than or equal to'] = "{{ __('The value must be less than or equal to') }} {{ $data->is_stock == 1 ? $data->stock_qty : '' }}";	
 	TEXT['This product out of stock.'] = "{{ __('This product out of stock.') }}";	
 </script>
-<script src="{{asset('frontend/pages/product.js')}}"></script>
+<script src="{{asset_path('frontend/pages/product.js')}}"></script>
 @endpush	

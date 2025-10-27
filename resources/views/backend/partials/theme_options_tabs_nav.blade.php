@@ -4,7 +4,7 @@
 	<li><a href="{{ route('backend.section-manage') }}"><i class="fa fa-cog"></i>{{ __('Section Manage') }}</a></li>
 	<li><a href="{{ route('backend.theme-options-header') }}"><i class="fa fa-cog"></i>{{ __('Header') }}</a></li>
 	<li><a href="{{ route('backend.theme-options-footer') }}"><i class="fa fa-cog"></i>{{ __('Footer') }}</a></li>
-	<li><a href="{{ route('backend.language-switcher') }}"><i class="fa fa-cog"></i>{{ __('Language Switcher') }}</a></li>	
+	{{-- <li><a href="{{ route('backend.language-switcher') }}"><i class="fa fa-cog"></i>{{ __('Language Switcher') }}</a></li>	 --}}
 	<li><a href="{{ route('backend.theme-options-color') }}"><i class="fa fa-cog"></i>{{ __('Color') }}</a></li>
 	<li><a href="{{ route('backend.social-media') }}"><i class="fa fa-cog"></i>{{ __('Social Media') }}</a></li>
 	<li><a href="{{ route('backend.theme-options-seo') }}"><i class="fa fa-cog"></i>{{ __('SEO') }}</a></li>

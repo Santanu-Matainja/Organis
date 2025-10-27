@@ -29,9 +29,9 @@
 				<td class="text-center">{{ $row->language_name }}</td>
 				
 				@if ($row->f_thumbnail != '')
-				<td class="text-center"><div class="table_col_image"><img src="{{ asset('public') }}/media/{{ $row->f_thumbnail }}" /></div></td>
+				<td class="text-center"><div class="table_col_image"><img src="{{ asset_path('') }}/media/{{ $row->f_thumbnail }}" /></div></td>
 				@else
-				<td class="text-center"><div class="table_col_image"><img src="{{ asset('public') }}/backend/images/album_icon.png" /></div></td>
+				<td class="text-center"><div class="table_col_image"><img src="{{ asset_path('') }}/backend/images/album_icon.png" /></div></td>
 				@endif
 				
 				@if ($row->is_publish == 1)

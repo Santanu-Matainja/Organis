@@ -12,7 +12,8 @@ return [
     | any other location as required by the application or its packages.
     |
     */
-
+    'public_path' => env('APP_PUBLIC_PATH', ''),
+    
     'name' => env('APP_NAME', 'Laravel'),
 
     /*

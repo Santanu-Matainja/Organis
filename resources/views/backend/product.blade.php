@@ -252,8 +252,8 @@ var TEXT = [];
 	TEXT['Select Category'] = "{{ __('Select Category') }}";
 
 </script>
-<link href="{{asset('backend/editor/summernote-lite.min.css')}}" rel="stylesheet">
-<script src="{{asset('backend/editor/summernote-lite.min.js')}}"></script>
-<script src="{{asset('backend/pages/product.js')}}"></script>
-<script src="{{asset('backend/pages/global-media.js')}}"></script>
+<link href="{{asset_path('backend/editor/summernote-lite.min.css')}}" rel="stylesheet">
+<script src="{{asset_path('backend/editor/summernote-lite.min.js')}}"></script>
+<script src="{{asset_path('backend/pages/product.js')}}"></script>
+<script src="{{asset_path('backend/pages/global-media.js')}}"></script>
 @endpush

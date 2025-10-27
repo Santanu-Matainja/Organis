@@ -193,8 +193,8 @@ var TEXT = [];
 	TEXT['Please select action'] = "{{ __('Please select action') }}";
 	TEXT['Please select record'] = "{{ __('Please select record') }}";
 </script>
-<link rel="stylesheet" href="{{asset('backend/bootstrap-colorpicker/bootstrap-colorpicker.min.css')}}">
-<script src="{{asset('backend/bootstrap-colorpicker/bootstrap-colorpicker.min.js')}}"></script>
-<script src="{{asset('backend/pages/offer-ads.js')}}"></script>
-<script src="{{asset('backend/pages/global-media.js')}}"></script>
+<link rel="stylesheet" href="{{asset_path('backend/bootstrap-colorpicker/bootstrap-colorpicker.min.css')}}">
+<script src="{{asset_path('backend/bootstrap-colorpicker/bootstrap-colorpicker.min.js')}}"></script>
+<script src="{{asset_path('backend/pages/offer-ads.js')}}"></script>
+<script src="{{asset_path('backend/pages/global-media.js')}}"></script>
 @endpush

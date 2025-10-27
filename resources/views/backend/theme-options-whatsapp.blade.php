@@ -91,5 +91,5 @@
 
 @push('scripts')
 <!-- css/js -->
-<script src="{{asset('backend/pages/theme_option_whatsapp.js')}}"></script>
+<script src="{{asset_path('backend/pages/theme_option_whatsapp.js')}}"></script>
 @endpush

@@ -149,7 +149,7 @@
 var TEXT = [];
 	TEXT['Do you really want to edit this record'] = "{{ __('Do you really want to edit this record') }}";
 </script>
-<link rel="stylesheet" href="{{asset('backend/css/magnific-popup.css')}}" />
-<script src="{{asset('backend/js/jquery.magnific-popup.min.js')}}"></script>
-<script src="{{asset('backend/pages/withdrawals_seller.js')}}"></script>
+<link rel="stylesheet" href="{{asset_path('backend/css/magnific-popup.css')}}" />
+<script src="{{asset_path('backend/js/jquery.magnific-popup.min.js')}}"></script>
+<script src="{{asset_path('backend/pages/withdrawals_seller.js')}}"></script>
 @endpush

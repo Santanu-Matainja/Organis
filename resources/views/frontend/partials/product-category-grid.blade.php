@@ -17,7 +17,7 @@
 					<span class="item-label">{{ $discount }}% {{ __('Off') }}</span>
 					@endif
 					<a href="{{ route('frontend.product', [$row->id, $row->slug]) }}">
-						<img src="{{ asset('media/'.$row->f_thumbnail) }}" alt="{{ $row->title }}" />
+						<img src="{{ asset_path('media/'.$row->f_thumbnail) }}" alt="{{ $row->title }}" />
 					</a>
 				</div>
 				<div class="item-title">
@@ -62,7 +62,7 @@
 	<div class="col-sm-8 offset-sm-2 col-md-6 offset-md-3 col-lg-4 offset-lg-4 col-xl-4 offset-xl-4 col-xxl-4 offset-xxl-4">
 		<div class="empty_card">
 			<div class="empty_img">
-				<img src="{{ asset('frontend/images/empty.png') }}" />
+				<img src="{{ asset_path('frontend/images/empty.png') }}" />
 			</div>
 			<h3>{{ __('Oops! No product found.') }}</h3>
 		</div>

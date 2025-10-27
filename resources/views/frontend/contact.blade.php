@@ -11,7 +11,7 @@
 	<meta property="og:description" content="{{ $gtext['og_description'] }}" />
 	<meta property="og:type" content="website" />
 	<meta property="og:url" content="{{ url()->current() }}" />
-	<meta property="og:image" content="{{ asset('media/'.$gtext['og_image']) }}" />
+	<meta property="og:image" content="{{ asset_path('media/'.$gtext['og_image']) }}" />
 	<meta property="og:image:width" content="600" />
 	<meta property="og:image:height" content="315" />
 	@if($gtext['fb_publish'] == 1)
@@ -25,7 +25,7 @@
 	<meta name="twitter:url" content="{{ url()->current() }}">
 	<meta name="twitter:title" content="{{ $gtext['og_title'] }}">
 	<meta name="twitter:description" content="{{ $gtext['og_description'] }}">
-	<meta name="twitter:image" content="{{ asset('media/'.$gtext['og_image']) }}">
+	<meta name="twitter:image" content="{{ asset_path('media/'.$gtext['og_image']) }}">
 @endsection
 
 @section('header')
@@ -192,7 +192,7 @@
 @endsection
 
 @push('scripts')
-<script src="{{asset('frontend/js/parsley.min.js')}}"></script>
+<script src="{{asset_path('frontend/js/parsley.min.js')}}"></script>
 @if($data['is_publish'] == 1)
 @if($gtext['is_googlemap'] == 1)
 @if($contact_map->is_google_map == 1)
@@ -251,5 +251,5 @@ function initMap(){
 <script type="text/javascript">
 var isreCaptcha = "{{ $data['is_recaptcha'] }}";
 </script>
-<script src="{{asset('frontend/pages/contact_us.js')}}"></script>
+<script src="{{asset_path('frontend/pages/contact_us.js')}}"></script>
 @endpush	

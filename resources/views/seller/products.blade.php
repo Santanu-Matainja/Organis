@@ -158,6 +158,14 @@
 									</div>
 								</div>
 								<div class="col-md-3">
+									<div class="form-check mt-4">
+										<input type="checkbox" name="perisible" id="perisible" class="form-check-input" value="1" style="height: 50px;width: 18px;"> 
+										<label for="perisible" class="form-check-label" style="margin: 18px 7px;">
+											{{ __('Perishable') }}
+										</label>
+									</div>
+								</div>
+								<div class="col-md-3">
 									<div class="form-group">
 										<label for="delivarytypeid">{{ __('Delivary Type') }}<span class="red">*</span></label>
 										<select name="delivarytypeid" id="delivarytypeid" class="chosen-select form-control">
@@ -168,14 +176,6 @@
 												</option>
 											@endforeach
 										</select>
-									</div>
-								</div>
-								<div class="col-md-3">
-									<div class="form-check mt-4">
-										<input type="checkbox" name="perisible" id="perisible" class="form-check-input" value="1" style="height: 50px;width: 18px;"> 
-										<label for="perisible" class="form-check-label" style="margin: 18px 7px;">
-											{{ __('Perishable') }}
-										</label>
 									</div>
 								</div>
 							</div>
@@ -213,5 +213,5 @@ var TEXT = [];
 	TEXT['All Category'] = "{{ __('All Category') }}";
 	TEXT['All Brand'] = "{{ __('All Brand') }}";
 </script>
-<script src="{{asset('backend/pages/products_seller.js')}}"></script>
+<script src="{{asset_path('backend/pages/products_seller.js')}}"></script>
 @endpush

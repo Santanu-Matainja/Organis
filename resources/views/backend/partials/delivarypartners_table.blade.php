@@ -21,9 +21,9 @@
 				<td class="checkboxlist text-center"><input name="item_ids[]" value="{{ $row->id }}" class="tp-checkbox selected_item" type="checkbox"></td> 
 				
 				@if ($row->photo != '')
-				<td class="text-center"><div class="table_col_image"><img src="{{ asset('') }}media/{{ $row->photo }}" /></div></td>
+				<td class="text-center"><div class="table_col_image"><img src="{{ asset_path('') }}/media/{{ $row->photo }}" /></div></td>
 				@else
-				<td class="text-center"><div class="table_col_image"><img src="{{ asset('') }}backend/images/album_icon.png" /></div></td>
+				<td class="text-center"><div class="table_col_image"><img src="{{ asset_path('') }}backend/images/album_icon.png" /></div></td>
 				@endif
 				<td class="text-left">{{ $row->name }}</td> 
 				<td class="text-left">{{ $row->phone }}</td>

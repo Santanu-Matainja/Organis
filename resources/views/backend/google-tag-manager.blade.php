@@ -69,5 +69,5 @@
 
 @push('scripts')
 <!-- css/js -->
-<script src="{{asset('backend/pages/google_tag_manager.js')}}"></script>
+<script src="{{asset_path('backend/pages/google_tag_manager.js')}}"></script>
 @endpush

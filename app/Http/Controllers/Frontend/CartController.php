@@ -58,7 +58,7 @@ class CartController extends Controller
 		$gtext = gtext();
 		$gtax = getTax();
 		$taxRate = $gtax['percentage'];
-		$Path = asset('media');
+		$Path = asset_path('media');
 
 		$ShoppingCartData = session()->get('shopping_cart');
 		$count = 0;

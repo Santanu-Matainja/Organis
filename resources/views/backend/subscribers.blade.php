@@ -89,5 +89,5 @@ var TEXT = [];
 	TEXT['Do you really want to edit this record'] = "{{ __('Do you really want to edit this record') }}";
 	TEXT['Do you really want to delete this record'] = "{{ __('Do you really want to delete this record') }}";
 </script>
-<script src="{{asset('backend/pages/newsletters.js')}}"></script>
+<script src="{{asset_path('backend/pages/newsletters.js')}}"></script>
 @endpush

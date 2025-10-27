@@ -1,10 +1,10 @@
 <div class="sidebar-wrapper">
 	<div class="logo">
 		<a href="{{ route('backend.dashboard') }}">
-			<img src="{{ $gtext['back_logo'] ? asset('media/'.$gtext['back_logo']) : asset('backend/images/backend-logo.png') }}" alt="logo">
+			<img src="{{ $gtext['back_logo'] ? asset_path('media/'.$gtext['back_logo']) : asset_path('backend/images/backend-logo.png') }}" alt="logo">
 		</a>
 	</div>
-	<div class="version">Theme V {{config('custom.version')}}</div>
+	{{-- <div class="version">Theme V {{config('custom.version')}}</div> --}}
 	<ul class="left-navbar">
 		@if (Auth::user()->role_id == 1)
 		<li><a href="{{ route('backend.dashboard') }}"><i class="fa fa-tachometer"></i>{{ __('Dashboard') }}</a></li>
@@ -63,12 +63,12 @@
 				<li><a href="{{ route('backend.mailchimp-settings') }}">{{ __('MailChimp Settings') }}</a></li>
 			</ul>
 		</li>
-		<li class="dropdown"><a class="nav-link has-dropdown" href="#" data-toggle="dropdown"><i class="fa fa-language"></i>{{ __('Languages') }}</a>
+		{{-- <li class="dropdown"><a class="nav-link has-dropdown" href="#" data-toggle="dropdown"><i class="fa fa-language"></i>{{ __('Languages') }}</a>
 			<ul class="dropdown-menu">
 				<li><a href="{{ route('backend.languages') }}">{{ __('Languages') }}</a></li>
 				<li><a href="{{ route('backend.language-keywords') }}">{{ __('Language Keywords') }}</a></li>
 			</ul>
-		</li>
+		</li> --}}
 		<li><a id="active-settings" href="{{ route('backend.general') }}"><i class="fa fa-cogs"></i>{{ __('Settings') }}</a></li>
 		<li><a href="{{ route('backend.users') }}"><i class="fa fa-user-plus"></i>{{ __('Users') }}</a></li>
 		@elseif (Auth::user()->role_id == 3)

@@ -11,7 +11,7 @@
 	<meta property="og:description" content="{{ $metadata['name'] }}" />
 	<meta property="og:type" content="website" />
 	<meta property="og:url" content="{{ url()->current() }}" />
-	<meta property="og:image" content="{{ asset('media/'.$metadata['thumbnail']) }}" />
+	<meta property="og:image" content="{{ asset_path('media/'.$metadata['thumbnail']) }}" />
 	<meta property="og:image:width" content="600" />
 	<meta property="og:image:height" content="315" />
 	@if($gtext['fb_publish'] == 1)
@@ -25,7 +25,7 @@
 	<meta name="twitter:url" content="{{ url()->current() }}">
 	<meta name="twitter:title" content="{{ $metadata['name'] }}">
 	<meta name="twitter:description" content="{{ $metadata['name'] }}">
-	<meta name="twitter:image" content="{{ asset('media/'.$metadata['thumbnail']) }}">
+	<meta name="twitter:image" content="{{ asset_path('media/'.$metadata['thumbnail']) }}">
 @endsection
 
 @section('header')
@@ -128,5 +128,5 @@
 <script type="text/javascript">
 var brand_id = "{{ isset($params) ? $params['brand_id'] : 0 }}";
 </script>
-<script src="{{asset('frontend/pages/brand.js')}}"></script>
+<script src="{{asset_path('frontend/pages/brand.js')}}"></script>
 @endpush	

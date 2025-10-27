@@ -60,5 +60,5 @@
 
 @push('scripts')
 <!-- css/js -->
-<script src="{{asset('backend/pages/language_switcher.js')}}"></script>
+<script src="{{asset_path('backend/pages/language_switcher.js')}}"></script>
 @endpush

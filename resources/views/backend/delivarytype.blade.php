@@ -196,6 +196,6 @@ var TEXT = [];
 	TEXT['Active'] = "{{ __('Active') }}";
 	TEXT['Inactive'] = "{{ __('Inactive') }}";
 </script>
-<script src="{{asset('backend/pages/delivarytype.js')}}"></script>
+<script src="{{asset_path('backend/pages/delivarytype.js')}}"></script>
 
 @endpush

@@ -127,5 +127,5 @@
 
 @push('scripts')
 <!-- css/js -->
-<script src="{{asset('backend/pages/cookie_consent.js')}}"></script>
+<script src="{{asset_path('backend/pages/cookie_consent.js')}}"></script>
 @endpush

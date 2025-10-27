@@ -96,5 +96,5 @@ if(colors !=''){
 }
 
 </script>
-<script src="{{asset('backend/pages/variations.js')}}"></script>
+<script src="{{asset_path('backend/pages/variations.js')}}"></script>
 @endpush

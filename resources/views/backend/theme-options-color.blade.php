@@ -123,7 +123,7 @@
 
 @push('scripts')
 <!-- css/js -->
-<link rel="stylesheet" href="{{asset('backend/bootstrap-colorpicker/bootstrap-colorpicker.min.css')}}">
-<script src="{{asset('backend/bootstrap-colorpicker/bootstrap-colorpicker.min.js')}}"></script>
-<script src="{{asset('backend/pages/theme_option_color.js')}}"></script>
+<link rel="stylesheet" href="{{asset_path('backend/bootstrap-colorpicker/bootstrap-colorpicker.min.css')}}">
+<script src="{{asset_path('backend/bootstrap-colorpicker/bootstrap-colorpicker.min.js')}}"></script>
+<script src="{{asset_path('backend/pages/theme_option_color.js')}}"></script>
 @endpush

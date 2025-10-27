@@ -8,7 +8,7 @@
 			<div class="col-lg-6">
 				<div class="banner_card">
 					<div class="banner_image">
-						<img src="{{ asset('media/'.$row->image) }}" alt="{{ $row->title }}" />
+						<img src="{{ asset_path('media/'.$row->image) }}" alt="{{ $row->title }}" />
 					</div>
 					<div class="banner_desc">
 						<h3>{{ $row->title }}</h3>
@@ -29,7 +29,7 @@
 					<div class="col-lg-6">
 						<div class="banner_card">
 							<div class="banner_image">
-								<img src="{{ asset('media/'.$row->image) }}" alt="{{ $row->title }}" />
+								<img src="{{ asset_path('media/'.$row->image) }}" alt="{{ $row->title }}" />
 							</div>
 							<div class="banner_desc">
 								<h3>{{ $row->title }}</h3>
@@ -73,7 +73,7 @@
 					<div class="featured-card">
 						<div class="featured-image">
 							<a href="{{ route('frontend.product-category', [$row->id, $row->slug]) }}">
-								<img src="{{ asset('media/'.$row->thumbnail) }}" alt="{{ $row->name }}" />
+								<img src="{{ asset_path('media/'.$row->thumbnail) }}" alt="{{ $row->name }}" />
 							</a>
 						</div>
 						<div class="featured-title">
@@ -91,7 +91,7 @@
 	<!-- Offer Section -->
 	@if($section3->is_publish == 1)
 	@if(count($offer_ad_position1)>0)
-	<section class="section offer-section" style="background-image: url({{ $section3->image ? asset('media/'.$section3->image) : '' }});">
+	<section class="section offer-section" style="background-image: url({{ $section3->image ? asset_path('media/'.$section3->image) : '' }});">
 		<div class="container">
 			<div class="row">
 				<div class="col-md-12">
@@ -127,7 +127,7 @@
 							<a href="{{ $row->url }}" class="btn theme-btn" {{ $aRow->target =='' ? '' : "target=".$aRow->target }}>{{ $aRow->button_text }}</a>
 							@endif
 							<div class="offer-image">
-								<img src="{{ asset('media/'.$row->image) }}" alt="{{ $aRow->text_1 }}" />
+								<img src="{{ asset_path('media/'.$row->image) }}" alt="{{ $aRow->text_1 }}" />
 							</div>
 						</div>
 					</div>
@@ -171,7 +171,7 @@
 									<span class="item-label">{{ $discount }}% {{ __('Off') }}</span>
 									@endif
 									<a href="{{ route('frontend.product', [$row->id, $row->slug]) }}">
-										<img src="{{ asset('media/'.$row->f_thumbnail) }}" alt="{{ $row->title }}" />
+										<img src="{{ asset_path('media/'.$row->f_thumbnail) }}" alt="{{ $row->title }}" />
 									</a>
 									@if(($row->is_discount == 1) && ($row->end_date !=''))
 									<div class="deals-countdown-card">
@@ -254,7 +254,7 @@
 							<span class="item-label">{{ $discount }}% {{ __('Off') }}</span>
 							@endif
 							<a href="{{ route('frontend.product', [$row->id, $row->slug]) }}">
-								<img src="{{ asset('media/'.$row->f_thumbnail) }}" alt="{{ $row->title }}" />
+								<img src="{{ asset_path('media/'.$row->f_thumbnail) }}" alt="{{ $row->title }}" />
 							</a>
 						</div>
 						<div class="item-title">
@@ -331,7 +331,7 @@
 							<span class="item-label">{{ $discount }}% {{ __('Off') }}</span>
 							@endif
 							<a href="{{ route('frontend.product', [$row->id, $row->slug]) }}">
-								<img src="{{ asset('media/'.$row->f_thumbnail) }}" alt="{{ $row->title }}" />
+								<img src="{{ asset_path('media/'.$row->f_thumbnail) }}" alt="{{ $row->title }}" />
 							</a>
 						</div>
 						<div class="item-title">
@@ -407,7 +407,7 @@
 							<span class="item-label">{{ $discount }}% {{ __('Off') }}</span>
 							@endif
 							<a href="{{ route('frontend.product', [$row->id, $row->slug]) }}">
-								<img src="{{ asset('media/'.$row->f_thumbnail) }}" alt="{{ $row->title }}" />
+								<img src="{{ asset_path('media/'.$row->f_thumbnail) }}" alt="{{ $row->title }}" />
 							</a>
 						</div>
 						<div class="item-title">
@@ -483,7 +483,7 @@
 							<span class="item-label">{{ $discount }}% {{ __('Off') }}</span>
 							@endif
 							<a href="{{ route('frontend.product', [$row->id, $row->slug]) }}">
-								<img src="{{ asset('media/'.$row->f_thumbnail) }}" alt="{{ $row->title }}" />
+								<img src="{{ asset_path('media/'.$row->f_thumbnail) }}" alt="{{ $row->title }}" />
 							</a>
 						</div>
 						<div class="item-title">
@@ -547,7 +547,7 @@
 				@foreach($brand as $row)
 				<div class="col-lg-12">
 					<div class="brand-card">
-						<a href="{{ route('frontend.brand', [$row->id, str_slug($row->name)]) }}"><img src="{{ asset('media/'.$row->thumbnail) }}" alt="{{ $row->name }}" /></a>
+						<a href="{{ route('frontend.brand', [$row->id, str_slug($row->name)]) }}"><img src="{{ asset_path('media/'.$row->thumbnail) }}" alt="{{ $row->name }}" /></a>
 					</div>
 				</div>
 				@endforeach
@@ -559,7 +559,7 @@
 	
 	<!-- Video Section -->
 	@if($home_video['is_publish'] == 1)
-	<section class="section video-section" style="background-image: url({{ asset('media/'.$home_video['image']) }});">
+	<section class="section video-section" style="background-image: url({{ asset_path('media/'.$home_video['image']) }});">
 		<div class="container">
 			<div class="row justify-content-start">
 				<div class="col-xl-7 text-center">
@@ -613,7 +613,7 @@
 							<span class="item-label">{{ $discount }}% {{ __('Off') }}</span>
 							@endif
 							<a href="{{ route('frontend.product', [$row->id, $row->slug]) }}">
-								<img src="{{ asset('media/'.$row->f_thumbnail) }}" alt="{{ $row->title }}" />
+								<img src="{{ asset_path('media/'.$row->f_thumbnail) }}" alt="{{ $row->title }}" />
 							</a>
 						</div>
 						<div class="item-title">

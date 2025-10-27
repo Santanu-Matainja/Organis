@@ -11,7 +11,7 @@
 	<meta property="og:description" content="{{ $gtext['og_description'] }}" />
 	<meta property="og:type" content="website" />
 	<meta property="og:url" content="{{ url()->current() }}" />
-	<meta property="og:image" content="{{ asset('media/'.$gtext['og_image']) }}" />
+	<meta property="og:image" content="{{ asset_path('media/'.$gtext['og_image']) }}" />
 	<meta property="og:image:width" content="600" />
 	<meta property="og:image:height" content="315" />
 	@if($gtext['fb_publish'] == 1)
@@ -25,7 +25,7 @@
 	<meta name="twitter:url" content="{{ url()->current() }}">
 	<meta name="twitter:title" content="{{ $gtext['og_title'] }}">
 	<meta name="twitter:description" content="{{ $gtext['og_description'] }}">
-	<meta name="twitter:image" content="{{ asset('media/'.$gtext['og_image']) }}">
+	<meta name="twitter:image" content="{{ asset_path('media/'.$gtext['og_image']) }}">
 @endsection
 
 @section('header')
@@ -118,35 +118,60 @@
 											</div>
 										</div>
 									</div>
-									@if(Auth::user()->role_id == 3)
 									<div class="row">
 										<div class="col-md-12">
 											<div class="mb-3">
 												<label for="description">{{ __('Description') }}</label>
-												<textarea id="description" name="description" class="form-control" placeholder="{{ __('Description') }}" rows="3">@if(isset(Auth::user()->address)) {{ Auth::user()->description }} @endif</textarea>
+												<textarea id="description" name="description" class="form-control" placeholder="{{ __('Description') }}" rows="3">@if(isset(Auth::user()->description)) {{ Auth::user()->description }} @endif</textarea>
+											</div>
+										</div>
+									</div>
+
+									<div class="row">
+										<div class="col-md-12">
+											<div class="mb-3">
+												<label for="city">{{ __('City') }}</label>
+												<input type="text" id="city" name="city" class="form-control" placeholder="{{ __('City') }}"
+													value="@if(isset(Auth::user()->city)) {{ Auth::user()->city }} @endif">
+											</div>
+										</div>
+									</div>
+
+									<div class="row">
+										<div class="col-md-12">
+											<div class="mb-3">
+												<label for="state">{{ __('State') }}</label>
+												<input type="text" id="state" name="state" class="form-control" placeholder="{{ __('State') }}"
+													value="@if(isset(Auth::user()->state)) {{ Auth::user()->state }} @endif">
 											</div>
 										</div>
 									</div>
 									<div class="row">
 										<div class="col-md-12">
 											<div class="mb-3">
-												<label for="logo">{{ __('Logo') }}</label>
-												<div class="tp-body">
-													<div class="tp-file-upload">
-														<input type="file" name="load_attachment" id="load_attachment" class="tp-upload">
-														<label for="load_attachment" class="tp-uploader" id="file-uploader">
-															<span class="icon-upload"><i class="fa fa-cloud-upload"></i></span>
-															{{-- <div class="select_file">{{ __('Select File') }}</div> --}}
-														</label>
-														<div id="upload-loader" class="upload-loader dnone">
-															<div class="tp-loader"></div>
-														</div>
-													</div>
-												</div>
+												<label for="zip_code">{{ __('Zip Code') }}</label>
+												<input type="text" id="zip_code" name="zip_code" class="form-control" placeholder="{{ __('Zip Code') }}"
+													value="@if(isset(Auth::user()->zip_code)) {{ Auth::user()->zip_code }} @endif">
 											</div>
 										</div>
 									</div>
-									@endif
+									<div class="row">
+										<div class="col-md-12">
+											<div class="mb-3">
+												<label for="country_id">{{ __('Country') }}</label>
+												<select id="country_id" name="country_id" class="form-control" data-required="true">
+													<option value="">{{ __('-- Select Country --') }}</option>
+													@foreach($countries as $country)
+														<option value="{{ $country->id }}"
+															@if(isset(Auth::user()->country_id) && Auth::user()->country_id == $country->id) selected @endif>
+															{{ $country->country_name }}
+														</option>
+													@endforeach
+												</select>
+											</div>
+										</div>
+									</div>
+
 									<div class="row">
 										<div class="col-md-12">
 											@if($gtext['is_recaptcha'] == 1)

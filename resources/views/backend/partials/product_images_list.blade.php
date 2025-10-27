@@ -5,7 +5,7 @@
 		@foreach($imagelist as $row)
 		<div class="select-image tp_thumb">
 			<div class="inner-image">
-				<img src="{{ asset('public') }}/media/{{ $row->thumbnail }}" />
+				<img src="{{ asset_path('') }}/media/{{ $row->thumbnail }}" />
 			</div>
 			<a onClick="onDelete({{ $row->id }})" class="media-image-remove" href="javascript:void(0);"><i class="fa fa-remove"></i></a>
 		</div>

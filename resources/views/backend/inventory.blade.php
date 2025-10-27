@@ -86,5 +86,5 @@
 
 @push('scripts')
 <!-- css/js -->
-<script src="{{asset('backend/pages/inventory.js')}}"></script>
+<script src="{{asset_path('backend/pages/inventory.js')}}"></script>
 @endpush

@@ -184,13 +184,14 @@ function HeaderMenuList($MenuType){
 			}elseif($row->menu_type == 'product_category'){
 				$MenuList .= '<li '.$full_width.'><a'.$upDownClass.$target_window.' href="'.route('frontend.product-category', [$item_id, $custom_url]).'">'.$row->item_label.'</a>'.$MegaDropdownMenuList.'</li>';
 			
-			}elseif($row->menu_type == 'blog'){
-				if($item_id == 0){
-					$MenuList .= '<li '.$full_width.'><a'.$upDownClass.$target_window.' href="'.route('frontend.blog').'">'.$row->item_label.'</a>'.$MegaDropdownMenuList.'</li>';
-				}else{
-					$MenuList .= '<li '.$full_width.'><a'.$upDownClass.$target_window.' href="'.route('frontend.blog-category', [$item_id, $custom_url]).'">'.$row->item_label.'</a>'.$MegaDropdownMenuList.'</li>';
-				}
 			}
+			// elseif($row->menu_type == 'blog'){
+			// 	if($item_id == 0){
+			// 		$MenuList .= '<li '.$full_width.'><a'.$upDownClass.$target_window.' href="'.route('frontend.blog').'">'.$row->item_label.'</a>'.$MegaDropdownMenuList.'</li>';
+			// 	}else{
+			// 		$MenuList .= '<li '.$full_width.'><a'.$upDownClass.$target_window.' href="'.route('frontend.blog-category', [$item_id, $custom_url]).'">'.$row->item_label.'</a>'.$MegaDropdownMenuList.'</li>';
+			// 	}
+			// }
 			
 		//Menu list for Mobile
 		}else{
@@ -221,13 +222,14 @@ function HeaderMenuList($MenuType){
 			}elseif($row->menu_type == 'product_category'){
 				$MenuList .= '<li '.$hasChildrenMenu.'><a'.$target_window.' href="'.route('frontend.product-category', [$item_id, $custom_url]).'">'.$row->item_label.'</a>'.$MegaDropdownMenuList.'</li>';
 			
-			}elseif($row->menu_type == 'blog'){
-				if($item_id == 0){
-					$MenuList .= '<li '.$hasChildrenMenu.'><a'.$target_window.' href="'.route('frontend.blog').'">'.$row->item_label.'</a>'.$MegaDropdownMenuList.'</li>';
-				}else{
-					$MenuList .= '<li '.$hasChildrenMenu.'><a'.$target_window.' href="'.route('frontend.blog-category', [$item_id, $custom_url]).'">'.$row->item_label.'</a>'.$MegaDropdownMenuList.'</li>';
-				}
 			}
+			// elseif($row->menu_type == 'blog'){
+			// 	if($item_id == 0){
+			// 		$MenuList .= '<li '.$hasChildrenMenu.'><a'.$target_window.' href="'.route('frontend.blog').'">'.$row->item_label.'</a>'.$MegaDropdownMenuList.'</li>';
+			// 	}else{
+			// 		$MenuList .= '<li '.$hasChildrenMenu.'><a'.$target_window.' href="'.route('frontend.blog-category', [$item_id, $custom_url]).'">'.$row->item_label.'</a>'.$MegaDropdownMenuList.'</li>';
+			// 	}
+			// }
 		}
 	}
 
@@ -355,13 +357,14 @@ function mega_liList($menu_id, $menu_parent_id, $mega_menu_id, $MenuType){
 		}elseif($row->menu_type == 'product_category'){
 			$li_List .= '<li><a'.$target_window.' href="'.route('frontend.product-category', [$item_id, $custom_url]).'">'.$row->item_label.'</a></li>';
 		
-		}elseif($row->menu_type == 'blog'){
-			if($item_id == 0){
-				$li_List .= '<li><a'.$target_window.' href="'.route('frontend.blog').'">'.$row->item_label.'</a></li>';
-			}else{
-				$li_List .= '<li><a'.$target_window.' href="'.route('frontend.blog-category', [$item_id, $custom_url]).'">'.$row->item_label.'</a></li>';
-			}
 		}
+		// elseif($row->menu_type == 'blog'){
+		// 	if($item_id == 0){
+		// 		$li_List .= '<li><a'.$target_window.' href="'.route('frontend.blog').'">'.$row->item_label.'</a></li>';
+		// 	}else{
+		// 		$li_List .= '<li><a'.$target_window.' href="'.route('frontend.blog-category', [$item_id, $custom_url]).'">'.$row->item_label.'</a></li>';
+		// 	}
+		// }
 	}
 
 	return $li_List;
@@ -401,13 +404,14 @@ function makeDropdownMenu($menu_id, $menu_parent_id, $MenuType){
 		}elseif($row->menu_type == 'product_category'){
 			$li_List .= '<li><a'.$target_window.' href="'.route('frontend.product-category', [$item_id, $custom_url]).'">'.$row->item_label.'</a></li>';
 			
-		}elseif($row->menu_type == 'blog'){
-			if($item_id == 0){
-				$li_List .= '<li><a'.$target_window.' href="'.route('frontend.blog').'">'.$row->item_label.'</a></li>';
-			}else{
-				$li_List .= '<li><a'.$target_window.' href="'.route('frontend.blog-category', [$item_id, $custom_url]).'">'.$row->item_label.'</a></li>';
-			}
 		}
+		// elseif($row->menu_type == 'blog'){
+		// 	if($item_id == 0){
+		// 		$li_List .= '<li><a'.$target_window.' href="'.route('frontend.blog').'">'.$row->item_label.'</a></li>';
+		// 	}else{
+		// 		$li_List .= '<li><a'.$target_window.' href="'.route('frontend.blog-category', [$item_id, $custom_url]).'">'.$row->item_label.'</a></li>';
+		// 	}
+		// }
 	}
 	
 	//Menu list for Desktop
@@ -462,13 +466,14 @@ function FooterMenuList($MenuType){
 		}elseif($row->menu_type == 'product_category'){
 			$li_List .= '<li><a'.$target_window.' href="'.route('frontend.product-category', [$item_id, $custom_url]).'">'.$row->item_label.'</a></li>';
 			
-		}elseif($row->menu_type == 'blog'){
-			if($item_id == 0){
-				$li_List .= '<li><a'.$target_window.' href="'.route('frontend.blog').'">'.$row->item_label.'</a></li>';
-			}else{
-				$li_List .= '<li><a'.$target_window.' href="'.route('frontend.blog-category', [$item_id, $custom_url]).'">'.$row->item_label.'</a></li>';
-			}
 		}
+		// elseif($row->menu_type == 'blog'){
+		// 	if($item_id == 0){
+		// 		$li_List .= '<li><a'.$target_window.' href="'.route('frontend.blog').'">'.$row->item_label.'</a></li>';
+		// 	}else{
+		// 		$li_List .= '<li><a'.$target_window.' href="'.route('frontend.blog-category', [$item_id, $custom_url]).'">'.$row->item_label.'</a></li>';
+		// 	}
+		// }
 	}
 
 	return $li_List;
@@ -1205,7 +1210,7 @@ function vipc(){
 
 function verifyPurchase($code) {
 	
-	$itemCode = 39645166; //Item Code for organis
+	$itemCode = 39645166; 
 	
 	$protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') || $_SERVER['SERVER_PORT'] == 443 ? "https" : "http";
 	$domain = $_SERVER['HTTP_HOST'];
@@ -1217,7 +1222,7 @@ function verifyPurchase($code) {
 		"domain" => $url
 	];
 	
-	$url = 'https://themeposh.net/api/verifycode';
+	$url = '';
 	
 	$ch = curl_init($url);
 	curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
@@ -1240,7 +1245,7 @@ function deleteLog($id, $pcode) {
 
 	$data = ["id" => $id, "pcode" => $pcode];
 	
-	$url = 'https://themeposh.net/api/deletelog';
+	$url = '';
 	
 	$ch = curl_init($url);
 	curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
@@ -1538,3 +1543,16 @@ function FooterSection(){
 	return $section15;
 }
 
+// if (! function_exists('asset_path')) {
+//     function asset_path($path) {
+//         $public = config('app.public_path');
+//         return asset($public . ltrim($path, '/'));
+//     }
+// }
+if (! function_exists('asset_path')) {
+    function asset_path($path = '') {
+        $public = config('app.public_path');
+        $url = asset($public . ltrim($path, '/'));
+        return rtrim($url, '/'); 
+    }
+}

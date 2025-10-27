@@ -7,7 +7,7 @@
 			@foreach ($slider as $row)
 			@php $aRow = json_decode($row->desc); @endphp
 			<div class="single-slider">
-				<div class="slider-screen h1-height" style="background-image: url({{ asset('media/'.$row->image) }});">
+				<div class="slider-screen h1-height" style="background-image: url({{ asset_path('media/'.$row->image) }});">
 					<div class="container">
 						<div class="row">
 							<div class="col-sm-12 col-md-12 col-lg-5">
@@ -72,7 +72,7 @@
 							<a href="{{ $row->url }}" class="btn theme-btn" {{ $aRow->target =='' ? '' : "target=".$aRow->target }}>{{ $aRow->button_text }}</a>
 							@endif
 							<div class="offer-image">
-								<img src="{{ asset('media/'.$row->image) }}" alt="{{ $aRow->text_1 }}" />
+								<img src="{{ asset_path('media/'.$row->image) }}" alt="{{ $aRow->text_1 }}" />
 							</div>
 						</div>
 					</div>
@@ -108,7 +108,7 @@
 					<div class="featured-card">
 						<div class="featured-image">
 							<a href="{{ route('frontend.product-category', [$row->id, $row->slug]) }}">
-								<img src="{{ asset('media/'.$row->thumbnail) }}" alt="{{ $row->name }}" />
+								<img src="{{ asset_path('media/'.$row->thumbnail) }}" alt="{{ $row->name }}" />
 							</a>
 						</div>
 						<div class="featured-title">
@@ -154,7 +154,7 @@
 									<span class="item-label">{{ $discount }}% {{ __('Off') }}</span>
 									@endif
 									<a href="{{ route('frontend.product', [$row->id, $row->slug]) }}">
-										<img src="{{ asset('media/'.$row->f_thumbnail) }}" alt="{{ $row->title }}" />
+										<img src="{{ asset_path('media/'.$row->f_thumbnail) }}" alt="{{ $row->title }}" />
 									</a>
 									@if(($row->is_discount == 1) && ($row->end_date !=''))
 									<div class="deals-countdown-card">
@@ -237,7 +237,7 @@
 							<span class="item-label">{{ $discount }}% {{ __('Off') }}</span>
 							@endif
 							<a href="{{ route('frontend.product', [$row->id, $row->slug]) }}">
-								<img src="{{ asset('media/'.$row->f_thumbnail) }}" alt="{{ $row->title }}" />
+								<img src="{{ asset_path('media/'.$row->f_thumbnail) }}" alt="{{ $row->title }}" />
 							</a>
 						</div>
 						<div class="item-title">
@@ -313,7 +313,7 @@
 							<span class="item-label">{{ $discount }}% {{ __('Off') }}</span>
 							@endif
 							<a href="{{ route('frontend.product', [$row->id, $row->slug]) }}">
-								<img src="{{ asset('media/'.$row->f_thumbnail) }}" alt="{{ $row->title }}" />
+								<img src="{{ asset_path('media/'.$row->f_thumbnail) }}" alt="{{ $row->title }}" />
 							</a>
 						</div>
 						<div class="item-title">
@@ -389,7 +389,7 @@
 							<span class="item-label">{{ $discount }}% {{ __('Off') }}</span>
 							@endif
 							<a href="{{ route('frontend.product', [$row->id, $row->slug]) }}">
-								<img src="{{ asset('media/'.$row->f_thumbnail) }}" alt="{{ $row->title }}" />
+								<img src="{{ asset_path('media/'.$row->f_thumbnail) }}" alt="{{ $row->title }}" />
 							</a>
 						</div>
 						<div class="item-title">
@@ -465,7 +465,7 @@
 							<span class="item-label">{{ $discount }}% {{ __('Off') }}</span>
 							@endif
 							<a href="{{ route('frontend.product', [$row->id, $row->slug]) }}">
-								<img src="{{ asset('media/'.$row->f_thumbnail) }}" alt="{{ $row->title }}" />
+								<img src="{{ asset_path('media/'.$row->f_thumbnail) }}" alt="{{ $row->title }}" />
 							</a>
 						</div>
 						<div class="item-title">
@@ -514,7 +514,7 @@
 	
 	<!-- Video Section -->
 	@if($home_video['is_publish'] == 1)
-	<section class="section video-section" style="background-image: url({{ asset('media/'.$home_video['image']) }});">
+	<section class="section video-section" style="background-image: url({{ asset_path('media/'.$home_video['image']) }});">
 		<div class="container">
 			<div class="row justify-content-start">
 				<div class="col-xl-7 text-center">
@@ -568,7 +568,7 @@
 							<span class="item-label">{{ $discount }}% {{ __('Off') }}</span>
 							@endif
 							<a href="{{ route('frontend.product', [$row->id, $row->slug]) }}">
-								<img src="{{ asset('media/'.$row->f_thumbnail) }}" alt="{{ $row->title }}" />
+								<img src="{{ asset_path('media/'.$row->f_thumbnail) }}" alt="{{ $row->title }}" />
 							</a>
 						</div>
 						<div class="item-title">

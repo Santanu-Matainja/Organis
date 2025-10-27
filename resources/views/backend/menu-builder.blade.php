@@ -302,6 +302,6 @@ var TEXT = [];
 	TEXT['Please select record'] = "{{ __('Please select record') }}";
 	TEXT['Please fill out required field'] = "{{ __('Please fill out required field') }}";
 </script>
-<script src="{{asset('backend/pages/menu-builder.js')}}"></script>
-<script src="{{asset('backend/pages/global-media.js')}}"></script>
+<script src="{{asset_path('backend/pages/menu-builder.js')}}"></script>
+<script src="{{asset_path('backend/pages/global-media.js')}}"></script>
 @endpush

@@ -96,6 +96,12 @@
 								<div class="row">
 									<div class="col-md-6">
 										<div class="form-group">
+											<label for="shipping_fee">{{ __('Shipping Fee') }}<span class="red">*</span></label>
+											<input type="text" name="shipping_fee" id="shipping_fee" value="{{ $shippingfee->shipping_fee ?? 0 }}" class="form-control parsley-validated" data-required="true">
+										</div>
+									</div>
+									<div class="col-md-6">
+										<div class="form-group">
 											<label for="f_thumbnail_thumbnail"><span class="red">*</span> {{ __('Logo') }}</label>
 											<div class="file_up">
 												<input type="text" name="photo" id="f_thumbnail_thumbnail" value="{{ $seller_data['photo'] }}" class="form-control parsley-validated" data-required="true" readonly>
@@ -224,5 +230,5 @@ var TEXT = [];
 	TEXT['Active'] = "{{ __('Active') }}";
 	TEXT['Inactive'] = "{{ __('Inactive') }}";
 </script>
-<script src="{{asset('backend/pages/settings-seller.js')}}"></script>
+<script src="{{asset_path('backend/pages/settings-seller.js')}}"></script>
 @endpush

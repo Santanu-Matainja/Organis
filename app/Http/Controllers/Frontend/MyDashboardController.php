@@ -129,7 +129,8 @@ class MyDashboardController extends Controller
 	
     public function LoadMyProfile()
     {
-        return view('frontend.my-profile');
+		$countries = DB::table('countries')->get();
+        return view('frontend.my-profile', compact('countries'));
     }
 	
 	public function UpdateProfile(Request $request)
@@ -168,6 +169,10 @@ class MyDashboardController extends Controller
 			'phone' => $request->input('phone'),
 			'address' => $request->input('address'),
 			'description' => $request->input('description'),
+			'city' => $request->input('city'),
+			'state' => $request->input('state'),
+			'zip_code' => $request->input('zip_code'),
+			'country_id' => $request->input('country_id'),
 		);
 
 		$response = User::where('id', $id)->update($data);

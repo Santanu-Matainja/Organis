@@ -11,7 +11,7 @@
 	<meta property="og:description" content="{{ $gtext['og_description'] }}" />
 	<meta property="og:type" content="website" />
 	<meta property="og:url" content="{{ url()->current() }}" />
-	<meta property="og:image" content="{{ asset('media/'.$gtext['og_image']) }}" />
+	<meta property="og:image" content="{{ asset_path('media/'.$gtext['og_image']) }}" />
 	<meta property="og:image:width" content="600" />
 	<meta property="og:image:height" content="315" />
 	@if($gtext['fb_publish'] == 1)
@@ -25,7 +25,7 @@
 	<meta name="twitter:url" content="{{ url()->current() }}">
 	<meta name="twitter:title" content="{{ $gtext['og_title'] }}">
 	<meta name="twitter:description" content="{{ $gtext['og_description'] }}">
-	<meta name="twitter:image" content="{{ asset('media/'.$gtext['og_image']) }}">
+	<meta name="twitter:image" content="{{ asset_path('media/'.$gtext['og_image']) }}">
 @endsection
 
 @section('header')
@@ -67,7 +67,7 @@
 							@if($seller_data->photo == '')
 							<span class="text">{{ sub_str($seller_data->shop_name, 0,1) }}</span>
 							@else
-							<img src="{{ asset('media/'.$seller_data->photo) }}" alt="{{ $seller_data->shop_name }}"/>
+							<img src="{{ asset_path('media/'.$seller_data->photo) }}" alt="{{ $seller_data->shop_name }}"/>
 							@endif
 							
 						</div>
@@ -158,5 +158,5 @@
 <script type="text/javascript">
 var seller_id = "{{ isset($params) ? $params['seller_id'] : 0 }}";
 </script>
-<script src="{{asset('frontend/pages/stores.js')}}"></script>
+<script src="{{asset_path('frontend/pages/stores.js')}}"></script>
 @endpush	

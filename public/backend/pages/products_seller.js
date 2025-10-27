@@ -366,3 +366,16 @@ function onBrandListForform() {
 		}
 	});
 }
+
+$(document).ready(function() {
+    let option4 = $('#delivarytypeid option[value="4"]');
+
+    $('#perisible').on('change', function() {
+        if ($(this).is(':checked')) {
+            option4.hide(); // completely hide the option
+        } else {
+            option4.show(); // show it again if unchecked
+        }
+        $('#delivarytypeid').trigger("chosen:updated"); // refresh chosen dropdown
+    });
+});

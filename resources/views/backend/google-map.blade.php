@@ -54,5 +54,5 @@
 @endsection
 
 @push('scripts')
-<script src="{{asset('backend/pages/google-map.js')}}"></script>
+<script src="{{asset_path('backend/pages/google-map.js')}}"></script>
 @endpush

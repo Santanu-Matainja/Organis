@@ -94,7 +94,9 @@ class CheckoutFrontController extends Controller
 		}
 
 		$payment_method_id = $request->input('payment_method');
-		$shipping_method_id = $request->input('shipping_method');
+		// $shipping_method_id = $request->input('shipping_method');
+		
+		$shipping_methods_by_product = $request->input('shipping_method', []); // key => product_id
 
 		if($new_account == 1){
 			
@@ -164,13 +166,13 @@ class CheckoutFrontController extends Controller
 			$customer_id = $CustomerId;
 		}
 		
-		$shipping_list = Shipping::where('id', '=', $shipping_method_id)->where('is_publish', '=', 1)->get();
-		$shipping_title = NULL;
-		$shipping_fee = NULL;
-		foreach ($shipping_list as $row){
-			$shipping_title = $row->title;
-			$shipping_fee = comma_remove($row->shipping_fee);
-		}
+		// $shipping_list = DeliveryType::where('id', '=', $shipping_method_id)->get();
+		// $shipping_title = NULL;
+		// $shipping_fee = NULL;
+		// foreach ($shipping_list as $row){
+		// 	$shipping_title = $row->lable;
+		// 	$shipping_fee = comma_remove($row->shipping_fee);
+		// }
 
 		$UniqueDataArray = array();
 		$key = 0;
@@ -182,6 +184,65 @@ class CheckoutFrontController extends Controller
 		}
 		
 		$UniqueDataList = array_unique($UniqueDataArray);
+		
+		$perSellerShippingFee = [];
+		$perSellerShippingTitle = [];
+		$perSellerTotals = [];
+
+		foreach ($UniqueDataList as $seller_id) {
+			$seller_fee = 0;
+			$titles = []; 
+			$seller_total_qty = 0;
+			$seller_total_price = 0;
+			$seller_tax = 0;
+			$seller_discount = 0; 
+			$seller_subtotal = 0;
+
+			foreach ($CartDataList as $cartRow) {
+				if ($cartRow['seller_id'] == $seller_id) {
+					$pId = $cartRow['id'];
+					$shipid = $shipping_methods_by_product[$pId] ?? null;
+
+					if ($shipid) {
+						$ship = DeliveryType::find($shipid);
+
+						if ($ship) {
+							$fee = comma_remove($ship->shipping_fee);
+							$seller_fee += $fee;
+
+							// store title for reference (e.g. "Standard - ₹50")
+							$titles[] = $ship->lable ;
+						}
+					}
+
+					$qty = comma_remove($cartRow['qty']);
+					$price = comma_remove($cartRow['price']);
+					$total_price = $qty * $price;
+
+					$tax = ($total_price * $tax_rate) / 100;
+
+					$seller_total_qty += $qty;
+					$seller_total_price += $total_price;
+					$seller_tax += $tax;
+
+				}
+			}
+
+			$perSellerShippingFee[$seller_id] = $seller_fee;
+			$perSellerShippingTitle[$seller_id] = implode(', ', $titles);
+
+			$seller_subtotal = $seller_total_price + $seller_tax;
+			$seller_total_amount = $seller_subtotal + ($perSellerShippingFee[$seller_id] ?? 0) - $seller_discount;
+
+			$perSellerTotals[$seller_id] = [
+				'total_qty' => $seller_total_qty,
+				'total_price' => $seller_total_price,
+				'discount' => $seller_discount,
+				'tax' => $seller_tax,
+				'subtotal' => $seller_subtotal,
+				'total_amount' => $seller_total_amount,
+			];
+		}
 		
 		$MasterData = array();
 		$OrderNoArr = array();
@@ -195,6 +256,12 @@ class CheckoutFrontController extends Controller
 			$OrderNoArr[] = $order_no;
 			
 			$seller_id = $row;
+			
+			$shipping_title = $perSellerShippingTitle[$seller_id] ?? null;
+			$shipping_fee = $perSellerShippingFee[$seller_id] ?? 0;
+
+			$totals = $perSellerTotals[$seller_id];
+
 			$data = array(
 				'order_no' => $order_no,
 				'customer_id' => $customer_id,
@@ -212,7 +279,14 @@ class CheckoutFrontController extends Controller
 				'zip_code' => $request->input('zip_code'),
 				'city' => $request->input('city'),
 				'address' => $request->input('address'),
-				'comments' => $request->input('comments')
+				'comments' => $request->input('comments'),
+
+				'total_qty' => $totals['total_qty'],
+				'total_price' => $totals['total_price'],
+				'discount' => $totals['discount'],
+				'tax' => $totals['tax'],
+				'subtotal' => $totals['subtotal'],
+				'total_amount' => $totals['total_amount'],
 			);
 			
 			$order_master_id = Order_master::create($data)->id;
@@ -270,9 +344,13 @@ class CheckoutFrontController extends Controller
 				$shippingFee = $sellerCount * $shipping_fee;
 			}
 			
+				// sum per-seller shipping fees
+			$shippingFeeTotal = array_sum($perSellerShippingFee);
 			$t_amount = comma_remove($total_amount);
 			
-			$totalAmount = $t_amount + $shippingFee;
+			// $totalAmount = $t_amount + $shippingFee;
+			
+			$totalAmount = $t_amount + $shippingFeeTotal;
 
 			//Stripe
 			if($payment_method_id == 3){
@@ -682,8 +760,6 @@ class CheckoutFrontController extends Controller
 		
 		if($gtext['ismail'] == 1){
 			try {
-
-				require 'vendor/autoload.php';
 				$mail = new PHPMailer(true);
 				$mail->CharSet = "UTF-8";
 
