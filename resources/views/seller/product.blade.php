@@ -31,7 +31,7 @@
 							<!--Data Entry Form-->
 							<form novalidate="" data-validate="parsley" id="DataEntry_formId">
 								<div class="row">	
-									<div class="col-lg-6">
+									<div class="col-lg-6 d-none">
 										<div class="form-group">
 											<label for="lan">{{ __('Language') }}<span class="red">*</span></label>
 											<select name="lan" id="lan" class="chosen-select form-control">

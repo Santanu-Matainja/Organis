@@ -30,7 +30,7 @@
 					<!--Data grid-->
 					<div id="list-panel" class="card-body">
 						<div class="row mb-10">
-							<div class="col-md-3">
+							<div class="col-md-3 d-none">
 								<div class="form-group mb-10">
 									<select name="language_code" id="language_code" class="chosen-select form-control">
 										<option value="0" selected="selected">{{ __('All Language') }}</option>
@@ -67,7 +67,28 @@
 									</select>
 								</div>
 							</div>
-							<div class="col-md-3"></div>
+							<div class="col-md-3">
+								<div class="form-group mb-10">
+									<select name="is_publish" id="is_publish" class="chosen-select form-control">
+										<option value="all" selected="selected">{{ __('Product Status') }}</option>
+										@foreach($publishstatus as $row)
+											<option value="{{ $row->id }}">
+												{{ $row->status }}
+											</option>
+										@endforeach
+									</select>
+								</div>
+							</div>
+							<div class="col-md-3">
+								<div class="form-group mb-10">
+									<select name="stock_status_id" id="stock_status_id" class="chosen-select form-control">
+										<option value="all" selected="selected">{{ __('Stock Status') }}</option>
+										<option value="1" selected="selected">{{ __('Instock') }}</option>
+										<option value="0" selected="selected">{{ __('Out of Stock') }}</option>
+									</select>
+								</div>
+							</div>
+							
 						</div>
 						
 						<div class="row">

@@ -15,6 +15,7 @@ use App\Models\Pro_image;
 use App\Models\Related_product;
 use Illuminate\Support\Facades\Auth;
 use App\Models\DeliveryType;
+use App\Models\Tp_status;
 
 class ProductsController extends Controller
 {
@@ -28,6 +29,7 @@ class ProductsController extends Controller
 		$brandlist = Brand::where('is_publish', 1)->orderBy('name','asc')->get();
 		$delivarytypes = DeliveryType::orderBy('lable','asc')->get();
 		$categorylist = Pro_category::where('is_publish', 1)->orderBy('name','asc')->get();
+		$publishstatus = Tp_status::get();
 
 		$datalist = DB::table('products')
 			->join('tp_status', 'products.is_publish', '=', 'tp_status.id')
@@ -39,7 +41,7 @@ class ProductsController extends Controller
 			->orderBy('products.id','desc')
 			->paginate(20);
 
-        return view('seller.products', compact('languageslist', 'categorylist', 'brandlist', 'datalist', 'delivarytypes'));		
+        return view('seller.products', compact('languageslist', 'categorylist', 'brandlist', 'datalist', 'delivarytypes', 'publishstatus'));		
 	}
 	
 	//Get data for Products Pagination
@@ -51,6 +53,8 @@ class ProductsController extends Controller
 		$language_code = $request->language_code;
 		$category_id = $request->category_id;
 		$brand_id = $request->brand_id;
+		$is_publish = $request->is_publish;
+		$stock_status_id = $request->stock_status_id;
 
 		if($request->ajax()){
 
@@ -77,6 +81,20 @@ class ProductsController extends Controller
 					->where(function ($query) use ($brand_id){
 						$query->whereRaw("products.brand_id = '".$brand_id."' OR '".$brand_id."' = 'all'");
 					})
+					->where(function ($query) use ($is_publish){
+						$query->whereRaw("products.is_publish = '".$is_publish."' OR '".$is_publish."' = 'all'");
+					})
+					->where(function ($query) use ($stock_status_id) {
+						if ($stock_status_id === 'all') {
+						} elseif ($stock_status_id == 0 || is_null($stock_status_id)) {
+							$query->where(function ($q) {
+								$q->where('products.stock_status_id', 0)
+								->orWhereNull('products.stock_status_id');
+							});
+						} else {
+							$query->where('products.stock_status_id', $stock_status_id);
+						}
+					})
 					->where(function ($query) use ($user_id){
 						$query->whereRaw("products.user_id = '".$user_id."'");
 					})
@@ -99,6 +117,21 @@ class ProductsController extends Controller
 					->where(function ($query) use ($brand_id){
 						$query->whereRaw("products.brand_id = '".$brand_id."' OR '".$brand_id."' = 'all'");
 					})
+					->where(function ($query) use ($is_publish){
+						$query->whereRaw("products.is_publish = '".$is_publish."' OR '".$is_publish."' = 'all'");
+					})
+					->where(function ($query) use ($stock_status_id) {
+						if ($stock_status_id === 'all') {
+						} elseif ($stock_status_id == 0 || is_null($stock_status_id)) {
+							$query->where(function ($q) {
+								$q->where('products.stock_status_id', 0)
+								->orWhereNull('products.stock_status_id');
+							});
+						} else {
+							$query->where('products.stock_status_id', $stock_status_id);
+						}
+					})
+
 					->where(function ($query) use ($user_id){
 						$query->whereRaw("products.user_id = '".$user_id."'");
 					})
@@ -281,6 +314,16 @@ class ProductsController extends Controller
 				$title = esc($data['title'] ?? '');
 				$slug = esc(str_slug($title));
 
+				if($data['stock_qty'])
+				{
+					$stock_status_id = 1;
+					$is_stock = 1;
+				}
+				else{
+					$stock_status_id = 0;
+					$is_stock = 0;
+				}	
+
 				$productData = [
 					'title' => $title,
 					'slug' => $slug,
@@ -298,6 +341,8 @@ class ProductsController extends Controller
 					'user_id' => $user_id,
 					'lan' => $lan,
 					'is_publish' => $is_publish,
+					'stock_status_id' => $stock_status_id,
+					'is_stock' => $is_stock,
 					'brand_id' => $brand_id,
 				];
 			

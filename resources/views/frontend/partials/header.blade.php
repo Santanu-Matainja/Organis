@@ -27,6 +27,12 @@
 									</a>
 									<ul class="dropdown-menu dropdown-menu-end">
 										<li><a class="dropdown-item" href="{{ route('frontend.my-dashboard') }}">{{ __('My Dashboard') }}</a></li>
+										@if(Auth::user()->role_id == 3)
+										<li><a class="dropdown-item" href="{{ route('seller.dashboard') }}">{{ __('Seller Dashboard') }}</a></li>
+										@endif
+										@if(Auth::user()->role_id == 1)
+										<li><a class="dropdown-item" href="{{ route('backend.dashboard') }}">{{ __('Admin Dashboard') }}</a></li>
+										@endif
 										<li><a class="dropdown-item" href="{{ route('logout') }}"
 										onclick="event.preventDefault();
 										document.getElementById('logout-form').submit();">{{ __('Logout') }}</a>

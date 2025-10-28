@@ -58,6 +58,16 @@ $(function () {
 		onRefreshData();
 	});
 	
+	$("#is_publish").val('all').trigger("chosen:updated");
+	$("#is_publish").on("change", function () {
+		onRefreshData();
+	});
+	
+	$("#stock_status_id").val('all').trigger("chosen:updated");
+	$("#stock_status_id").on("change", function () {
+		onRefreshData();
+	});
+	
 	$("#lan").chosen();
 	$("#lan").trigger("chosen:updated");
 	$("#lan").on("change", function () {
@@ -94,7 +104,9 @@ function onRefreshData() {
 		url:base_url + "/seller/getProductsTableData?search="+$("#search").val()
 		+"&language_code="+$('#language_code').val()
 		+"&category_id="+$('#category_id').val()
-		+"&brand_id="+$('#brand_id').val(),
+		+"&brand_id="+$('#brand_id').val()
+		+"&is_publish="+$('#is_publish').val()
+		+"&stock_status_id="+$('#stock_status_id').val(),
 		success:function(data){
 			$('#tp_datalist').html(data);
 			onCheckAll();
