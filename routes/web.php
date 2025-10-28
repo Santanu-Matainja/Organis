@@ -605,6 +605,7 @@ Route::prefix('seller')->group(function(){
 	Route::get('/products', [App\Http\Controllers\Seller\ProductsController::class, 'getProductsPageLoad'])->name('seller.products')->middleware(['auth','is_seller']);
 	Route::get('/getProductsTableData', [App\Http\Controllers\Seller\ProductsController::class, 'getProductsTableData'])->name('seller.getProductsTableData')->middleware(['auth','is_seller']);
 	Route::post('/saveProductsData', [App\Http\Controllers\Seller\ProductsController::class, 'saveProductsData'])->name('seller.saveProductsData')->middleware(['auth','is_seller']);
+	Route::post('/bulksaveProductsData', [App\Http\Controllers\Seller\ProductsController::class, 'bulksaveProductsData'])->name('seller.bulksaveProductsData')->middleware(['auth','is_seller']);
 	Route::post('/deleteProducts', [App\Http\Controllers\Seller\ProductsController::class, 'deleteProducts'])->name('seller.deleteProducts')->middleware(['auth','is_seller']);
 	Route::post('/bulkActionProducts', [App\Http\Controllers\Seller\ProductsController::class, 'bulkActionProducts'])->name('seller.bulkActionProducts')->middleware(['auth','is_seller']);
 	Route::post('/hasProductSlug', [App\Http\Controllers\Seller\ProductsController::class, 'hasProductSlug'])->name('seller.hasProductSlug')->middleware(['auth','is_seller']);

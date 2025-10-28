@@ -229,6 +229,111 @@ class ProductsController extends Controller
 		
 		return response()->json($res);
     }
+
+	// Bulk Save 
+
+	public function bulksaveProductsData(Request $request)
+	{
+		$res = array();
+		$lan = 'en';
+		$cat_id = $request->categoryid;
+		$user_id = Auth::id() ?? $request->user_id;
+		$excelData = $request->excelData ?? [];
+		$brand_id = $request->brand_id2;
+
+		if (empty($excelData)) {
+			$res['msgType'] = 'error';
+			$res['msg'] = __('No data found in Excel file');
+			return response()->json($res);
+		}
+
+		// Validate top-level
+		$validator_array = [
+			'language' => $lan,
+			'category' => $cat_id,
+		];
+
+		$validator = Validator::make($validator_array, [
+			'language' => 'required',
+			'category' => 'required',
+		]);
+
+		$errors = $validator->errors();
+		if ($errors->has('category')) {
+			$res['msgType'] = 'error';
+			$res['msg'] = $errors->first('category');
+			return response()->json($res);
+		}
+
+		// Seller publish settings
+		$SellerSettings = gSellerSettings();
+		$is_publish = ($SellerSettings['product_auto_publish'] == 1) ? 1 : 2;
+
+		DB::beginTransaction();
+		try {
+			$insertCount = 0;
+			$updateCount = 0;
+
+			foreach ($excelData as $data) {
+				if (empty($data['sku'])) continue;
+
+				$sku = trim($data['sku']);
+				$title = esc($data['title'] ?? '');
+				$slug = esc(str_slug($title));
+
+				$productData = [
+					'title' => $title,
+					'slug' => $slug,
+					'short_desc' => $data['short_desc'] ?? '',
+					'description' => $data['description'] ?? '',
+					'extra_desc' => $data['extra_desc'] ?? '',
+					'cost_price' => $data['cost_price'] ?? 0,
+					'sale_price' => $data['sale_price'] ?? 0,
+					'old_price' => $data['old_price'] ?? 0,
+					'stock_qty' => $data['stock_qty'] ?? 0,
+					'f_thumbnail' => $data['image'] ?? '',
+					'category_ids' => $cat_id,
+					'cat_id' => $cat_id,
+					'tax_id' => 38,
+					'user_id' => $user_id,
+					'lan' => $lan,
+					'is_publish' => $is_publish,
+					'brand_id' => $brand_id,
+				];
+			
+				$existing = Product::where('sku', $sku)->first();
+				if ($existing) {
+					$existing->update($productData);
+					$updateCount++;
+				} else {
+					$productData['sku'] = $sku;
+					Product::create($productData);
+					$insertCount++;
+				}
+			}
+
+			DB::commit();
+
+			if ($insertCount > 0 || $updateCount > 0) {
+				$res['msgType'] = 'success';
+				$res['msg'] = __(
+					':insert new and :update updated products processed successfully.',
+					['insert' => $insertCount, 'update' => $updateCount]
+				);
+			} else {
+				$res['msgType'] = 'error';
+				$res['msg'] = __('No valid rows found or SKU missing.');
+			}
+		} catch (\Exception $e) {
+			DB::rollBack();
+			$res['msgType'] = 'error';
+			$res['msg'] = __('Error: ') . $e->getMessage();
+		}
+
+		return response()->json($res);
+	}
+
+
 	
 	//Delete data for Products
 	public function deleteProducts(Request $request){

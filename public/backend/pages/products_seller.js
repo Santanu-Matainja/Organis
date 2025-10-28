@@ -13,9 +13,14 @@ $(function () {
 	});
 
 	resetForm("DataEntry_formId");
+	resetForm("BulkDataEntry_formId");
 	
 	$("#submit-form").on("click", function () {
         $("#DataEntry_formId").submit();
+    });
+
+	$("#bulksubmit-form").on("click", function () {
+        $("#BulkDataEntry_formId").submit();
     });
 
 	$(document).on('click', '.pagination a', function(event){
@@ -121,8 +126,9 @@ function resetForm(id) {
 
 function onListPanel() {
 	$('.parsley-error-list').hide();
-    $('#list-panel, .btn-form').show();
+    $('#list-panel, .btn-form, .btn-bulkform').show();
     $('#form-panel, .btn-list').hide();
+	$('#bulk-form-panel').hide();
 }
 
 function onFormPanel() {
@@ -133,9 +139,24 @@ function onFormPanel() {
 	
     $('#list-panel, .btn-form').hide();
     $('#form-panel, .btn-list').show();
+	$('#bulk-form-panel, .btn-bulkform').hide();
 	
 	onCategoryListForform();
 	onBrandListForform();
+}
+
+function onBulkFormPanel() {
+    resetForm("BulkDataEntry_formId");
+	RecordId = '';
+
+	$("#lan").trigger("chosen:updated");
+	
+    $('#list-panel, .btn-form').hide();
+    $('#form-panel, .btn-bulkform').hide();
+    $('#bulk-form-panel, .btn-list').show();
+	
+	// onCategoryListForform();
+	// onBrandListForformbulk();
 }
 
 function onEditPanel() {
@@ -191,6 +212,148 @@ function onConfirmWhenAddEdit() {
 		}
 	});
 }
+
+jQuery('#BulkDataEntry_formId').parsley({
+    listeners: {
+        onFieldValidate: function (elem) {
+            if (!$(elem).is(':visible')) {
+                return true;
+            } else {
+                showPerslyError();
+                return false;
+            }
+        },
+        onFormSubmit: function (isFormValid, event) {
+            if (isFormValid) {
+                bulkupload();
+                return false;
+            }
+        }
+    }
+});
+
+// Excel upload + preview logic
+let excelData = [];
+
+$('#excelFile').on('change', function (e) {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = function (event) {
+        const data = new Uint8Array(event.target.result);
+        const workbook = XLSX.read(data, { type: 'array' });
+        const sheet = workbook.Sheets[workbook.SheetNames[0]];
+        const rows = XLSX.utils.sheet_to_json(sheet, { defval: '' }); 
+
+        if (rows.length === 0) {
+            onErrorMsg("No data found in Excel file.");
+            return;
+        }
+
+      
+        if (rows.length > 100) {
+			$('#maxlenMsg').remove();
+			$('#excelPreviewTable').before(`
+				<p id="maxlenMsg" class="text-danger">
+					<strong>Note:</strong> Maximum Upload Limit Crossed. 
+					You can upload a Maximum of 100 rows at a time.
+				</p>
+			`);
+
+			setTimeout(() => {
+				$('#maxlenMsg').fadeOut(500, function() { $(this).remove(); });
+			}, 2000);
+
+			$('#excelFile').val(''); // reset file input
+			$('#excelPreviewTable thead, #excelPreviewTable tbody').empty();
+			return;
+		}
+
+
+        // Build table headers dynamically
+        const headers = Object.keys(rows[0]);
+        const thead = $('#excelPreviewTable thead');
+        const tbody = $('#excelPreviewTable tbody');
+        thead.empty();
+        tbody.empty();
+
+        let headerHtml = '<tr>';
+        headers.forEach(h => headerHtml += `<th>${h}</th>`);
+        headerHtml += '</tr>';
+        thead.html(headerHtml);
+
+        // Fill preview + prepare JSON
+        excelData = [];
+        rows.forEach(row => {
+            excelData.push({
+                title: row['Title'] || '',
+                short_desc: row['Short Description'] || '',
+                description: row['Description'] || '',
+                extra_desc: row['Extra Description'] || '',
+                cost_price: row['Cost Price'] || '',
+                sale_price: row['Sale Price'] || '',
+                old_price: row['Old Price'] || '',
+                sku: row['SKU'] || '',
+                stock_qty: row['Stock Qty'] || '',
+                image: row['Image'] || ''
+            });
+
+            let rowHtml = '<tr>';
+            headers.forEach(h => {
+                rowHtml += `<td>${row[h] ?? ''}</td>`;
+            });
+            rowHtml += '</tr>';
+            tbody.append(rowHtml);
+        });
+
+        // Add a message about SKU rule
+        $('#skuInfoMsg').remove();
+        $('#excelPreviewTable').before(`
+            <p id="skuInfoMsg" class="text-info">
+                <strong>Note:</strong> SKU must be unique. 
+                If the same SKU is found, product details will be updated instead of creating a new one.
+            </p>
+        `);
+    };
+    reader.readAsArrayBuffer(file);
+});
+
+function bulkupload() {
+
+    if (excelData.length === 0) {
+        onErrorMsg("Please upload a valid Excel file first.");
+        return;
+    }
+
+    const formData = {
+        _token: $('meta[name="csrf-token"]').attr('content'),
+        categoryid: $('#categoryid2').val(),
+        user_id: $('#user_id2').val(),
+        brand_id2: $('#brandid2').val(),
+        excelData: excelData
+    };
+
+    $.ajax({
+        type: 'POST',
+        url: base_url + '/seller/bulksaveProductsData',
+        data: formData,
+        success: function (response) {
+            if (response.msgType === "success") {
+                resetForm("BulkDataEntry_formId");
+                $('#excelPreviewTable thead, #excelPreviewTable tbody').empty();
+                onSuccessMsg(response.msg);
+                window.location.href = base_url + '/seller/products';
+            } else {
+                onErrorMsg(response.msg);
+            }
+        },
+        error: function () {
+            onErrorMsg("Something went wrong while saving data.");
+        }
+    });
+}
+
 
 function onDelete(id) {
 	RecordId = id;

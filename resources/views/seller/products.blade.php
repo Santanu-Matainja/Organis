@@ -20,6 +20,7 @@
 							</div>
 							<div class="col-lg-6">
 								<div class="float-right">
+									<a onClick="onBulkFormPanel()" href="javascript:void(0);" class="btn blue-btn btn-bulkform float-left mr-2"><i class="fa fa-plus"></i> {{ __('Bluk Add') }}</a>
 									<a onClick="onFormPanel()" href="javascript:void(0);" class="btn blue-btn btn-form float-right"><i class="fa fa-plus"></i> {{ __('Add New') }}</a>
 									<a onClick="onListPanel()" href="javascript:void(0);" class="btn warning-btn btn-list float-right dnone"><i class="fa fa-reply"></i> {{ __('Back to List') }}</a>
 								</div>
@@ -190,6 +191,80 @@
 						</form>
 					</div>
 					<!--/Data Entry Form/-->
+					
+					<!--Bulk Upload Form-->
+					<div id="bulk-form-panel" class="card-body dnone">
+						<form novalidate="" data-validate="parsley" id="BulkDataEntry_formId">
+							
+							<div class="row">	
+								{{-- <div class="col-md-3 d-none">
+									<div class="form-group">
+										<label for="lan">{{ __('Language') }}<span class="red">*</span></label>
+										<select name="lan" id="lan2" class="chosen-select form-control">
+										@foreach($languageslist as $row)
+											<option value="{{ $row->language_code }}">
+												{{ $row->language_name }}
+											</option>
+										@endforeach
+										</select>
+									</div>
+								</div> --}}
+								<div class="col-md-3">
+									<div class="form-group">
+										<label for="categoryid">{{ __('Category') }}<span class="red">*</span></label>
+										<select name="categoryid2" id="categoryid2" class="chosen-select form-control">
+											@foreach($categorylist as $row)
+												<option value="{{ $row->id }}">
+													{{ $row->name }}
+												</option>
+											@endforeach
+										</select>
+									</div>
+								</div>	
+								<div class="col-md-3">
+									<div class="form-group">
+										<label for="brandid">{{ __('Brand') }}<span class="red">*</span></label>
+										<select name="brandid2" id="brandid2" class="chosen-select form-control">
+											<option value="0" >No Brand</option>
+											@foreach($brandlist as $row)
+												<option value="{{ $row->id }}">
+													{{ $row->name }}
+												</option>
+											@endforeach
+										</select>
+									</div>
+								</div>
+							</div>
+							<div class="row">
+								<div class="col-md-4">
+									<div class="form-group">
+										<label for="excelFile">{{ __('Upload Excel File') }}<span class="red">*</span></label>
+										<input type="file" id="excelFile" name="excelFile" accept=".xls,.xlsx" class="form-control">
+									</div>
+								</div>
+							</div>
+
+							<!-- Excel Preview -->
+							<div class="row mt-3">
+								<div class="col-md-12" style="overflow: scroll;">
+									<table class="table table-bordered" id="excelPreviewTable">
+										<thead></thead>
+										<tbody></tbody>
+									</table>
+								</div>
+							</div>
+
+							<input type="text" name="user_id2" id="user_id" class="dnone" value="{{ Auth::user()->id }}">
+							<input type="text" name="RecordId" id="RecordId" class="dnone">
+							<div class="row tabs-footer mt-15">
+								<div class="col-lg-12">
+									<a id="bulksubmit-form" href="javascript:void(0);" class="btn blue-btn mr-10">{{ __('Save') }}</a>
+									<a onClick="onListPanel()" href="javascript:void(0);" class="btn danger-btn">{{ __('Cancel') }}</a>
+								</div>
+							</div>
+						</form>
+					</div>
+					<!--/Bulk Upload Form/-->
 				</div>
 			</div>
 		</div>
@@ -213,5 +288,6 @@ var TEXT = [];
 	TEXT['All Category'] = "{{ __('All Category') }}";
 	TEXT['All Brand'] = "{{ __('All Brand') }}";
 </script>
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <script src="{{asset_path('backend/pages/products_seller.js')}}"></script>
 @endpush
