@@ -30,7 +30,8 @@ class SellerSettingsController extends Controller
 			'state' => '',
 			'zip_code' => '',
 			'country_id' => '',
-			'photo' => ''
+			'photo' => '',
+			'background_image' => ''
 		);
 		
 		foreach ($sellerData as $row){
@@ -44,6 +45,7 @@ class SellerSettingsController extends Controller
 			$seller_data['zip_code'] = $row->zip_code;
 			$seller_data['country_id'] = $row->country_id;
 			$seller_data['photo'] = $row->photo;
+			$seller_data['background_image'] = $row->background_image;
 		}
 		
 		$bankInformation = DB::table('bank_informations')->where('seller_id', $id)->get();
@@ -87,6 +89,7 @@ class SellerSettingsController extends Controller
 		$country_id = $request->input('country_id');
 		$photo = $request->input('photo');
 		$shipping_fee = $request->input('shipping_fee');
+		$background_image = $request->input('background_image');
 		
 		$validator_array = array(
 			'shop_name' => $request->input('shop_name'),
@@ -198,7 +201,8 @@ class SellerSettingsController extends Controller
 			'state' => $state,
 			'zip_code' => $zip_code,
 			'country_id' => $country_id,
-			'photo' => $photo
+			'photo' => $photo,
+			'background_image' => $background_image,
 		);
 
 		$response = User::where('id', $id)->update($data);

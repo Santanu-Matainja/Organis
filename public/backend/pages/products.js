@@ -30,9 +30,14 @@ $(function () {
         $("input:checkbox").not(this).prop("checked", this.checked);
     });
 
-	$("#title").on("blur", function () {
+	$("#title").on("keyup", function () {
 		if(RecordId ==''){
-			onProductSlug();
+			let title = $(this).val().trim();
+			if (title === '') {
+				$("#slug").val('');
+			} else {
+				onProductSlug();
+			}
 		}
 	});
 	

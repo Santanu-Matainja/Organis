@@ -15,5 +15,6 @@ class Media_option extends Model
 		'thumbnail', 
 		'large_image', 
 		'option_value', 
+        'background_image',
     ];	
 }

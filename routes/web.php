@@ -619,6 +619,7 @@ Route::prefix('seller')->group(function(){
 	
 	//Inventory
 	Route::get('/inventory/{id}', [App\Http\Controllers\Seller\ProductsController::class, 'getInventoryPageData'])->name('seller.inventory')->middleware(['auth','is_seller']);
+	Route::get('/check-sku', [App\Http\Controllers\Seller\ProductsController::class, 'checkSku'])->name('seller.checksku')->middleware(['auth','is_seller']);
 	Route::post('/saveInventoryData', [App\Http\Controllers\Seller\ProductsController::class, 'saveInventoryData'])->name('seller.saveInventoryData')->middleware(['auth','is_seller']);
 	
 	//Product Images
@@ -644,6 +645,7 @@ Route::prefix('seller')->group(function(){
 
 	//All File Upload
 	Route::post('/MediaUpload', [App\Http\Controllers\Backend\UploadController::class, 'MediaUpload'])->name('seller.MediaUpload')->middleware(['auth','is_seller']);
+	Route::post('/BackgroundUpload', [App\Http\Controllers\Backend\UploadController::class, 'BackgroundUpload'])->name('seller.BackgroundUpload')->middleware(['auth','is_seller']);
 
 	//All Combo
 	Route::post('/getTimezoneList', [App\Http\Controllers\Backend\ComboController::class, 'getTimezoneList'])->name('seller.getTimezoneList')->middleware(['auth','is_seller']);

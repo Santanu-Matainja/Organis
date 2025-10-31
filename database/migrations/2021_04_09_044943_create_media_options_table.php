@@ -19,6 +19,7 @@ class CreateMediaOptionsTable extends Migration
 			$table->text('alt_title')->nullable();
 			$table->text('thumbnail')->nullable();
 			$table->text('large_image')->nullable();
+			$table->text('background_image')->nullable();
 			$table->longText('option_value')->nullable();
             $table->timestamps();
         });

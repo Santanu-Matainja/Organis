@@ -60,7 +60,7 @@
 	<!-- Inner Section -->
 	<section class="inner-section inner-section-bg">
 		<div class="container">
-			<div class="row">
+			{{-- <div class="row">
 				<div class="col-sm-10 offset-sm-1 col-md-8 offset-md-2 col-lg-8 offset-lg-2 col-xl-8 offset-xl-2 col-xxl-8 offset-xxl-2">
 					<div class="stores-card">
 						<div class="store-logo">
@@ -88,8 +88,58 @@
 						</div>
 					</div>
 				</div>
+			</div> --}}
+			<div class="container-fluid px-0">
+				<!-- Banner -->
+				<div class="position-relative" style="height:180px;">
+					<img src="{{ asset_path('media/'. ($seller_data->background_image ? $seller_data->background_image : 'https://t4.ftcdn.net/jpg/09/27/94/25/360_F_927942593_12DExYYYYu346HNyzeqsaJwKGUzvTAgD.jpg')) }}" class="w-100 h-100 object-fit-cover" alt="Banner">
+				</div> 
+
+				<!-- Profile Section -->
+				<div style="margin-bottom: 40px;">
+					<div class="row">
+						<div>
+							<div class="bg-white rounded-4 shadow-sm p-4 mt-n5 position-relative d-flex align-items-center">
+								
+								<!-- Profile Image -->
+								<div class="me-4">
+									@if($seller_data->photo == '')
+										<span class="d-inline-flex align-items-center justify-content-center bg-primary text-white rounded-circle fs-1 fw-bold shadow" style="width:120px; height:120px; margin-top:-140px;">
+											{{ substr($seller_data->shop_name,0,1) }}
+										</span>
+									@else
+										<img src="{{ asset_path('media/'.$seller_data->photo) }}" 
+											alt="{{ $seller_data->shop_name }}" 
+											class="rounded-circle border border-3 border-white shadow" 
+											style="width:120px; height:120px; object-fit:cover; margin-top:-140px;">
+									@endif
+								</div>
+
+								<!-- Seller Details -->
+								<div class="flex-grow-1">
+									<h3 class="fw-bold mb-1">{{ $seller_data->shop_name }}</h3>
+									<p class="text-muted mb-2">{{ __('Since') }} {{ date('Y', strtotime($seller_data->created_at)) }}</p>
+
+									<div class="rating-wrap mb-3">
+										<div class="stars-outer">
+											<div class="stars-inner" style="width:{{ $SellerReview['ReviewPercentage'] }}%;"></div>
+										</div>
+										<span class="rating-count">({{ $SellerReview['TotalReview'] }})</span>
+									</div>
+
+									<ul class="list-inline small mb-0">
+										<li class="list-inline-item me-3"><i class="bi bi-telephone text-primary me-1"></i>{{ $seller_data->phone }}</li>
+										<li class="list-inline-item me-3"><i class="bi bi-envelope text-primary me-1"></i>{{ $seller_data->email }}</li>
+										<li class="list-inline-item"><i class="bi bi-geo-alt text-primary me-1"></i>{{ $seller_data->address }}</li>
+									</ul>
+								</div>
+
+							</div>
+						</div>
+					</div>
+				</div>
 			</div>
-			
+
 			@if($seller_variation == 'left_sidebar')
 			<div class="row">
 				<div class="col-lg-3">

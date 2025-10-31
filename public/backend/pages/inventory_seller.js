@@ -59,3 +59,26 @@ function onConfirmWhenAddEdit() {
 		}
 	});
 }
+$('#sku').on('keyup', function() {
+    let sku = $(this).val().trim();
+
+    if (sku === '') {
+        $('#sku-message').text('');
+        return;
+    }
+
+    $.ajax({
+        url: base_url + '/seller/check-sku',
+        method: 'GET',
+        data: { sku: sku },
+        success: function(response) {
+            if (response.exists) {
+                $('#sku-message').text('This SKU is not available. Enter Another One.');
+				$('#submit-form').addClass('disabled');
+            } else {
+                $('#sku-message').text('');
+				$('#submit-form').removeClass('disabled');
+            }
+        }
+    });
+});

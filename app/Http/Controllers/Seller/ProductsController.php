@@ -155,6 +155,7 @@ class ProductsController extends Controller
 		$brand_id = $request->input('brandid');
 		$user_id = $request->input('user_id');
 		$exdate = $request->input('exdate');
+		$manufacture_date = $request->input('manufacture_date');
 		$perisible = $request->has('perisible') ? 1 : 0;
 		$delivarytypeid = $request->input('delivarytypeid');
 
@@ -232,6 +233,7 @@ class ProductsController extends Controller
 			'user_id' => $user_id,
 			'is_publish' => $is_publish,
 			'exdate' => $exdate,
+			'manufacture_date' => $manufacture_date,
 			'perisible' => $perisible,
 			'delivarytypeid' => $delivarytypeid,
 		);
@@ -307,12 +309,33 @@ class ProductsController extends Controller
 			$insertCount = 0;
 			$updateCount = 0;
 
+		$existingSlugs = DB::table('products')->pluck('slug')->toArray();
+		$existingSkus  = DB::table('products')->pluck('sku')->toArray();
+
 			foreach ($excelData as $data) {
 				if (empty($data['sku'])) continue;
 
 				$sku = trim($data['sku']);
 				$title = esc($data['title'] ?? '');
 				$slug = esc(str_slug($title));
+
+				// Slug Uniq
+				$originalSlug = $slug;
+				$i = 2;
+				while (in_array($slug, $existingSlugs)) {
+					$slug = $originalSlug . '-' . $i;
+					$i++;
+				}
+				$existingSlugs[] = $slug;
+
+				// SKU Uniq
+				$originalSku = $sku;
+				$j = 2;
+				while (in_array($sku, $existingSkus)) {
+					$sku = $originalSku . '-' . $j;
+					$j++;
+				}
+				$existingSkus[] = $sku;
 
 				if($data['stock_qty'])
 				{
@@ -512,7 +535,7 @@ class ProductsController extends Controller
 		$exdate = $request->input('exdate');
 		$perisible = $request->has('perisible') ? 1 : 0;
 		$delivarytypeid = $request->input('delivarytypeid');
-
+		$manufacture_date = $request->input('manufacture_date');
 		
 		$validator_array = array(
 			'product_name' => $request->input('title'),
@@ -605,6 +628,7 @@ class ProductsController extends Controller
 			'exdate' => $exdate,
 			'perisible' => $perisible,
 			'delivarytypeid' => $delivarytypeid,
+			'manufacture_date' => $manufacture_date,
 		);
 		
 		$response = Product::where('id', $id)->update($data);
@@ -694,6 +718,17 @@ class ProductsController extends Controller
 
         return view('seller.inventory', compact('datalist'));
     }
+
+	// Check SKU
+	public function checkSku(Request $request)
+	{
+		$sku = trim($request->get('sku'));
+
+		$exists = DB::table('products')->where('sku', $sku)->exists();
+
+		return response()->json(['exists' => $exists]);
+	}
+
 	
 	//Save data for Inventory
     public function saveInventoryData(Request $request){

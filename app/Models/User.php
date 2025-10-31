@@ -33,6 +33,7 @@ class User extends Authenticatable
         'bkey',
         'status_id',
         'role_id',
+        'background_image',
     ];
 
     /**

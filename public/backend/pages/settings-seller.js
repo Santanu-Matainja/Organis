@@ -21,6 +21,10 @@ $(function () {
     $("#load_image").on('change', function() {
 		upload_form();
     });
+
+	$("#background_image_file").on('change', function() {
+		upload_background_image();
+	});
 });
 
 function onDetailsBankInfo(id) {
@@ -180,6 +184,41 @@ function upload_form() {
 		});
 		
 	}else{
+		onErrorMsg(TEXT['Sorry only you can upload jpg, png and gif file type']);
+	}
+}
+
+function upload_background_image() {
+	var data = new FormData();
+	data.append('FileName', $('#background_image_file')[0].files[0]);
+	data.append('media_type', media_type);
+
+	var imgname = $('#background_image_file').val();
+	var ext = imgname.substr((imgname.lastIndexOf('.') +1));
+
+	if(ext=='jpg' || ext=='jpeg' || ext=='png' || ext=='gif' || ext=='ico' || ext=='svg'){
+		$.ajax({
+			url: base_url + '/seller/BackgroundUpload',
+			type: "POST",
+			dataType : "json",
+			data: data,
+			contentType: false,
+			processData:false,
+			enctype: 'multipart/form-data',
+			success: function(response){
+				if (response.msgType == "success") {
+					$("#background_image").val(response.background_image);
+					$("#view_background_image").html('<img src="'+public_path+'/media/'+response.background_image+'">');
+					$("#remove_background_image").show();
+				} else {
+					onErrorMsg(response.msg);
+				}
+			},
+			error: function(){
+				onErrorMsg("Error uploading file");
+			}				
+		});
+	} else {
 		onErrorMsg(TEXT['Sorry only you can upload jpg, png and gif file type']);
 	}
 }

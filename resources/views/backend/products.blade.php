@@ -20,7 +20,7 @@
 							</div>
 							<div class="col-lg-6">
 								<div class="float-right">
-									<a onClick="onFormPanel()" href="javascript:void(0);" class="btn blue-btn btn-form float-right"><i class="fa fa-plus"></i> {{ __('Add New') }}</a>
+									<a onClick="onFormPanel()" href="javascript:void(0);" class="btn blue-btn btn-form float-right d-none"><i class="fa fa-plus"></i> {{ __('Add New') }}</a>
 									<a onClick="onListPanel()" href="javascript:void(0);" class="btn warning-btn btn-list float-right dnone"><i class="fa fa-reply"></i> {{ __('Back to List') }}</a>
 								</div>
 							</div>
@@ -41,7 +41,7 @@
 						</div>
 						
 						<div class="row mb-10">
-							<div class="col-md-3">
+							<div class="col-md-3 d-none">
 								<div class="form-group mb-10">
 									<select name="language_code" id="language_code" class="chosen-select form-control">
 										<option value="0" selected="selected">{{ __('All Language') }}</option>
@@ -133,12 +133,12 @@
 								<div class="col-md-12">
 									<div class="form-group">
 										<label for="slug">{{ __('Slug') }}<span class="red">*</span></label>
-										<input type="text" name="slug" id="slug" class="form-control parsley-validated" data-required="true">
+										<input type="text" name="slug" id="slug" class="form-control parsley-validated" data-required="true" readonly>
 									</div>
 								</div>
 							</div>
 							<div class="row">
-								<div class="col-md-3">
+								<div class="col-md-3  d-none">
 									<div class="form-group">
 										<label for="lan">{{ __('Language') }}<span class="red">*</span></label>
 										<select name="lan" id="lan" class="chosen-select form-control">

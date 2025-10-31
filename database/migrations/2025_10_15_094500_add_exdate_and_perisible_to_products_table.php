@@ -12,7 +12,8 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('products', function (Blueprint $table) {
-            $table->date('exdate')->nullable()->after('og_keywords');
+            $table->date('manufacture_date')->nullable()->after('og_keywords');
+            $table->date('exdate')->nullable()->after('manufacture_date');
             $table->boolean('perisible')->default(0)->after('exdate');
             $table->string('delivarytypeid')->nullable()->after('perisible'); 
         });

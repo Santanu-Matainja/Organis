@@ -21,6 +21,8 @@ use App\Models\Related_product;
 use App\Models\Review;
 use App\Models\Order_item;
 use App\Models\Order_master;
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\Exception;
 
 class SellerController extends Controller
 {
@@ -87,36 +89,43 @@ class SellerController extends Controller
 		
 		$response = User::create($data);
 		
-		if($response){
+		if ($response) {
+			$this->registerNotify($response);
 
-			if($gtext['is_mailchimp'] == 1){
-				$name = $request->input('name');
-				$email_address = $request->input('email');
-
-				$HTTP_Status = self::MailChimpSubscriber($name, $email_address);
-				if($HTTP_Status == 200){
-					$SubscriberCount = Subscriber::where('email_address', '=', $email_address)->count();
-					if($SubscriberCount == 0){
-						$data = array(
-							'email_address' => $email_address,
-							'first_name' => $name,
-							'last_name' => $name,
-							'status' => 'subscribed'
-						);
-						Subscriber::create($data);
-					}
-				}
-			}
-			
-			if($status_id == 1){
-				return redirect()->back()->withSuccess(__('Thanks! You have register successfully. Please login.'));
-			}else{
-				return redirect()->back()->withSuccess(__('Thanks! You have register successfully. Your account is pending for review.'));
-			}
-
-		}else{
-			return redirect()->back()->withFail(__('Oops! You are failed registration. Please try again.'));
+			return redirect()->back()->withSuccess(__('Thanks! You have registered successfully. Please login.'));
+		} else {
+			return redirect()->back()->withFail(__('Oops! Registration failed. Please try again.'));
 		}
+		// if($response){
+
+		// 	if($gtext['is_mailchimp'] == 1){
+		// 		$name = $request->input('name');
+		// 		$email_address = $request->input('email');
+
+		// 		$HTTP_Status = self::MailChimpSubscriber($name, $email_address);
+		// 		if($HTTP_Status == 200){
+		// 			$SubscriberCount = Subscriber::where('email_address', '=', $email_address)->count();
+		// 			if($SubscriberCount == 0){
+		// 				$data = array(
+		// 					'email_address' => $email_address,
+		// 					'first_name' => $name,
+		// 					'last_name' => $name,
+		// 					'status' => 'subscribed'
+		// 				);
+		// 				Subscriber::create($data);
+		// 			}
+		// 		}
+		// 	}
+			
+		// 	if($status_id == 1){
+		// 		return redirect()->back()->withSuccess(__('Thanks! You have register successfully. Please login.'));
+		// 	}else{
+		// 		return redirect()->back()->withSuccess(__('Thanks! You have register successfully. Your account is pending for review.'));
+		// 	}
+
+		// }else{
+		// 	return redirect()->back()->withFail(__('Oops! You are failed registration. Please try again.'));
+		// }
     }
 	
 	//MailChimp Subscriber
@@ -158,6 +167,63 @@ class SellerController extends Controller
 		
 		return $httpCode;
     }
+
+	public function registerNotify($user)
+	{
+		$gtext = gtext();
+		$base_url = url('/');
+
+		if ($gtext['ismail'] == 1) {
+			try {
+				$mail = new PHPMailer(true);
+				$mail->CharSet = "UTF-8";
+
+				if ($gtext['mailer'] == 'smtp') {
+					$mail->SMTPDebug = 0;
+					$mail->isSMTP();
+					$mail->Host       = $gtext['smtp_host'];
+					$mail->SMTPAuth   = true;
+					$mail->Username   = $gtext['smtp_username'];
+					$mail->Password   = $gtext['smtp_password'];
+					$mail->SMTPSecure = $gtext['smtp_security'];
+					$mail->Port       = $gtext['smtp_port'];
+				}
+
+				$mail->setFrom($gtext['from_mail'], $gtext['from_name']);
+				$mail->addAddress($user->email, $user->name);
+				$mail->isHTML(true);
+				$mail->CharSet = "utf-8";
+				$mail->Subject = __('Welcome to ') . $gtext['company'];
+
+				$mail->Body = '
+				<table style="background-color:#edf2f7;color:#111;padding:40px 0;line-height:24px;font-size:14px;" border="0" cellpadding="0" cellspacing="0" width="100%">
+					<tr>
+						<td>
+							<table style="background-color:#fff;max-width:800px;margin:0 auto;padding:30px;" border="0" cellpadding="0" cellspacing="0" width="100%">
+								<tr><td style="font-size:35px;border-bottom:1px solid #ddd;padding-bottom:20px;font-weight:bold;text-align:center;">'.$gtext['company'].'</td></tr>
+								<tr><td style="font-size:22px;font-weight:bold;padding:30px 0 10px 0;">'.__('Hi').' '.$user->name.',</td></tr>
+								<tr><td>'.__('Welcome to').' '.$gtext['company'].'! '.__('Your account has been successfully created.').'</td></tr>
+								<tr><td style="padding-top:20px;">'.__('You can now log in and start exploring our platform.').'</td></tr>
+								<tr><td style="padding-top:30px;padding-bottom:40px;text-align:center;">
+									<a href="'.$base_url.'/login" style="background:'.$gtext['theme_color'].';color:#fff;padding:12px 25px;text-decoration:none;border-radius:5px;">'.__('Login Now').'</a>
+								</td></tr>
+								<tr><td style="border-top:1px solid #ddd;padding-top:15px;text-align:center;">'.__('If you have any questions, contact us at').' <a href="mailto:'.$gtext['invoice_email'].'">'.$gtext['invoice_email'].'</a></td></tr>
+								<tr><td style="padding-top:5px;text-align:center;"><a href="'.$base_url.'">'.$base_url.'</a></td></tr>
+							</table>
+						</td>
+					</tr>
+				</table>';
+
+				$mail->send();
+
+				return 1;
+			} catch (Exception $e) {
+				return 0;
+			}
+		}
+
+		return 0;
+	}
 	
 	//has shop url Slug
     public function hasShopSlug(Request $request){

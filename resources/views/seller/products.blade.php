@@ -130,12 +130,12 @@
 								<div class="col-md-12">
 									<div class="form-group">
 										<label for="slug">{{ __('Slug') }}<span class="red">*</span></label>
-										<input type="text" name="slug" id="slug" class="form-control parsley-validated" data-required="true">
+										<input type="text" name="slug" id="slug" class="form-control parsley-validated" data-required="true" readonly>
 									</div>
 								</div>
 							</div>
 							<div class="row">	
-								<div class="col-md-3">
+								<div class="col-md-3 d-none">
 									<div class="form-group">
 										<label for="lan">{{ __('Language') }}<span class="red">*</span></label>
 										<select name="lan" id="lan" class="chosen-select form-control">
@@ -170,6 +170,13 @@
 												</option>
 											@endforeach
 										</select>
+									</div>
+								</div>
+								<div class="col-md-3">
+									<div class="form-group">
+										<label for="manufacture_date">{{ __('Manufacture Date') }}</label>
+										<input type="date"  name="manufacture_date" id="manufacture_date" class="form-control parsley-validated" min="{{ date('Y-m-d') }}">
+
 									</div>
 								</div>
 								<div class="col-md-3">

@@ -12,12 +12,13 @@
 				<div class="item-image">
 					@if(($row->is_discount == 1) && ($row->old_price !=''))
 						@php 
-							$discount = number_format((($row->old_price - $row->sale_price)*100)/$row->old_price);
+							$discount = number_format((($row->old_price - $row->sale_price)*100)/$row->old_price , 2);
 						@endphp
 					<span class="item-label">{{ $discount }}% {{ __('Off') }}</span>
 					@endif
 					<a href="{{ route('frontend.product', [$row->id, $row->slug]) }}">
-						<img src="{{ asset_path('media/'.$row->f_thumbnail) }}" alt="{{ $row->title }}" />
+						{{-- <img src="{{ asset_path('media/'.$row->f_thumbnail) }}" alt="{{ $row->title }}" /> --}}
+						<img src="{{ asset_path('media/' . ($row->f_thumbnail ? $row->f_thumbnail : 'no-image.png')) }}" alt="{{ $row->title }}">
 					</a>
 				</div>
 				<div class="item-title">
@@ -49,7 +50,7 @@
 					@endif
 				</div>
 				<div class="item-card-bottom">
-					<a data-id="{{ $row->id }}" href="javascript:void(0);" class="btn add-to-cart addtocart">{{ __('Add To Cart') }}</a>
+					<a data-id="{{ $row->id }}" data-stockqty="{{ $row->stock_qty }}" data-costprice="{{ $row->cost_price }}" data-saleprice="{{ $row->sale_price }}"  data-oldprice="{{ $row->old_price }}"  data-isstock="{{$row->is_stock}}" data-isstockstatus="{{$row->stock_status_id}}"   href="javascript:void(0);" class="btn add-to-cart addtocart">{{ __('Add To Cart') }}</a>
 					<ul class="item-cart-list">
 						<li><a class="addtowishlist" data-id="{{ $row->id }}" href="javascript:void(0);"><i class="bi bi-heart"></i></a></li>
 						<li><a href="{{ route('frontend.product', [$row->id, $row->slug]) }}"><i class="bi bi-eye"></i></a></li>
@@ -74,3 +75,13 @@
 		{{ $datalist->links() }}
 	</div>
 </div>
+@push('scripts')
+<script type="text/javascript">
+
+var TEXT = [];
+	TEXT['Please enter quantity.'] = "{{ __('Please enter quantity.') }}";
+	TEXT['The value must be less than or equal to'] = "{{ __('The value must be less than or equal to Stock') }}";	
+	TEXT['This product out of stock.'] = "{{ __('This product out of stock.') }}";	
+	TEXT['This Product Dont Have Price.'] = "{{ __('This Product Dont Have Price.') }}";
+</script>
+@endpush

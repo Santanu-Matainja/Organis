@@ -188,7 +188,7 @@
 												<td class="pro-image-w">
 													<div class="pro-image">
 														<a href="{{ route('frontend.product', [$row->id, str_slug($row->title)]) }}">
-															<img src="{{ asset_path('media/'.$row->f_thumbnail) }}" alt="{{ $row->title }}" />
+															<img src="{{ asset_path('media/'.($row->f_thumbnail ? $row->f_thumbnail : 'no-image.png')) }}" alt="{{ $row->title }}" />
 														</a>
 													</div>
 												</td>

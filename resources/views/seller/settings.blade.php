@@ -117,6 +117,23 @@
 										</div>
 									</div>
 									<div class="col-md-6"></div>
+									<div class="col-md-6">
+										<div class="form-group">
+											<label for="background_image_file"><span class="red">*</span> {{ __('Background Image') }}</label>
+											<div class="file_up">
+												<input type="text" name="background_image" id="background_image" value="{{ $seller_data['background_image'] }}" class="form-control parsley-validated" readonly>
+												<div class="file_browse_box">
+													<input type="file" name="background_image_file" id="background_image_file" class="file_browse">
+													<label for="background_image_file" class="file_browse_icon"><i class="fa fa-window-restore"></i>{{ __('Browse') }}</label>
+												</div>
+											</div>
+											<small class="form-text text-muted">Recommended image size width: 940px and height: 180px.</small>
+											<div id="remove_background_image" class="select-image dnone">
+												<div class="inner-image" id="view_background_image"></div>
+											</div>
+										</div>
+									</div>
+									<div class="col-md-6"></div>
 								</div>
 								
 								<input type="text" id="RecordId" name="RecordId" class="dnone" value="{{ $seller_data['id'] }}"/>
@@ -217,6 +234,17 @@ if(f_thumbnail == ''){
 if(f_thumbnail != ''){
 	$("#remove_f_thumbnail").show();
 	$("#view_thumbnail_image").html('<img src="'+public_path+'/media/'+f_thumbnail+'">');
+}
+
+var media_type = 'Background';
+var bg_image = "{{ $seller_data['background_image'] }}";
+
+if(bg_image == ''){
+	$("#remove_background_image").hide();
+	$("#background_image").html('');
+} else {
+	$("#remove_background_image").show();
+	$("#view_background_image").html('<img src="'+public_path+'/media/'+bg_image+'">');
 }
 
 var TEXT = [];

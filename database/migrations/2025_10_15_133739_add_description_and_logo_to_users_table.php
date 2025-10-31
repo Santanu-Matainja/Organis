@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::table('users', function (Blueprint $table) {
             $table->text('description')->nullable()->after('address');
+            $table->text('background_image')->nullable()->after('photo');
         });
     }
 

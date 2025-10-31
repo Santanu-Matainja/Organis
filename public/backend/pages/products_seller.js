@@ -35,9 +35,14 @@ $(function () {
         $("input:checkbox").not(this).prop("checked", this.checked);
     });
 
-	$("#title").on("blur", function () {
+	$("#title").on("keyup", function () {
 		if(RecordId ==''){
-			onProductSlug();
+			let title = $(this).val().trim();
+			if (title === '') {
+				$("#slug").val('');
+			} else {
+				onProductSlug();
+			}
 		}
 	});
 	
@@ -90,7 +95,9 @@ function onPaginationDataLoad(page) {
 		+"&search="+$("#search").val()
 		+"&language_code="+$('#language_code').val()
 		+"&category_id="+$('#category_id').val()
-		+"&brand_id="+$('#brand_id').val(),
+		+"&brand_id="+$('#brand_id').val()
+		+"&is_publish="+$('#is_publish').val()
+		+"&stock_status_id="+$('#stock_status_id').val(),
 		success:function(data){
 			$('#tp_datalist').html(data);
 			onCheckAll();
@@ -106,6 +113,7 @@ function onRefreshData() {
 		+"&category_id="+$('#category_id').val()
 		+"&brand_id="+$('#brand_id').val()
 		+"&is_publish="+$('#is_publish').val()
+		+"&is_publish="+$('#is_publish').val()
 		+"&stock_status_id="+$('#stock_status_id').val(),
 		success:function(data){
 			$('#tp_datalist').html(data);
@@ -120,7 +128,9 @@ function onSearch() {
 		url: base_url + "/seller/getProductsTableData?search="+$("#search").val()
 		+"&language_code="+$('#language_code').val()
 		+"&category_id="+$('#category_id').val()
-		+"&brand_id="+$('#brand_id').val(),
+		+"&brand_id="+$('#brand_id').val()
+		+"&is_publish="+$('#is_publish').val()
+		+"&stock_status_id="+$('#stock_status_id').val(),
 		success:function(data){
 			$('#tp_datalist').html(data);
 			onCheckAll();

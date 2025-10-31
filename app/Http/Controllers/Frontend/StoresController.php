@@ -30,7 +30,7 @@ class StoresController extends Controller
 		}
 		
 		$seller_data = DB::table('users')
-			->select('id', 'email', 'shop_name', 'phone', 'address', 'photo', 'created_at')
+			->select('id', 'email', 'shop_name', 'phone', 'address', 'photo', 'created_at', 'background_image')
 			->where('status_id', '=', 1)
 			->where('id', '=', $seller_id)
 			->first();

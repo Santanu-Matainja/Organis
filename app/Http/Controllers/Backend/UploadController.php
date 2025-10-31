@@ -180,4 +180,74 @@ class UploadController extends Controller
 		
 		return response()->json($msgList);
 	}
+
+	public function BackgroundUpload(Request $request)
+	{
+		$destinationPath = public_path('media');
+		$dateTime = date('dmYHis');
+
+		$thumbnail = thumbnail($request['media_type']); // get size from helper
+		$width = $thumbnail['width'];
+		$height = $thumbnail['height'];
+
+		$file = $request->file('FileName');
+		$FileName = $dateTime . '-' . $file->getClientOriginalName();
+		$ThumFileName = $dateTime . '-' . $width . 'x' . $height . '-' . $file->getClientOriginalName();
+
+		$FileExt = $file->getClientOriginalExtension();
+		$Filetype = Str::lower($FileExt);
+		$FileRealPath = $file->getRealPath();
+		$FileSize = $file->getSize();
+		$OriginalFileName = basename($file->getClientOriginalName(), "." . $FileExt);
+
+		if (file_exists($destinationPath . '/' . $FileName)) {
+			unlink($destinationPath . '/' . $FileName);
+		}
+
+		$msgList = [];
+
+		if (in_array($Filetype, ['jpg', 'jpeg', 'png', 'gif', 'ico', 'svg'])) {
+			if (in_array($Filetype, ['gif', 'ico', 'svg'])) {
+				$ThumFileName = $FileName;
+			} else {
+				$manager = new ImageManager(new Driver());
+				$image = $manager->read($FileRealPath);
+				$image->scale($width, $height);
+				$image->save($destinationPath . '/' . $ThumFileName);
+			}
+
+			if ($file->move($destinationPath, $FileName)) {
+				$data = [
+					'title' => $OriginalFileName,
+					'alt_title' => $OriginalFileName,
+					'background_image' => $ThumFileName, 
+					'large_image' => $FileName,
+					'option_value' => $FileSize,
+				];
+
+				$response = Media_option::create($data)->id;
+
+				if ($response) {
+					$msgList["msgType"] = 'success';
+					$msgList['msg'] = __('Background image uploaded successfully');
+					$msgList["thumbnail"] = $ThumFileName;
+					$msgList["large_image"] = $FileName;
+					$msgList["background_image"] = $ThumFileName;
+					$msgList["id"] = $response;
+				} else {
+					$msgList['msgType'] = 'error';
+					$msgList['msg'] = __('Database insert failed');
+				}
+			} else {
+				$msgList["msgType"] = 'error';
+				$msgList['msg'] = __('File upload error');
+			}
+		} else {
+			$msgList["msgType"] = 'error';
+			$msgList['msg'] = __('Invalid file type');
+		}
+
+		return response()->json($msgList);
+	}
+
 }

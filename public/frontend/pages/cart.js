@@ -22,9 +22,25 @@ $(function () {
 			onErrorMsg(TEXT['Please enter quantity.']);
 			return;
 		}
+		var stockqty = $(this).data('stockqty');
+		if((qty > stockqty)){
+			onErrorMsg(TEXT['Out Of Stock.']);
+			return;
+		}
+		if (
+            (
+                (cost_price === undefined || cost_price === '' || cost_price === null || Number(cost_price) <= 0) ||
+                (sale_price === undefined || sale_price === '' || sale_price === null || Number(sale_price) <= 0) ||
+                (old_price === undefined || old_price === '' || old_price === null || Number(old_price) <= 0)
+            )
+        ) {
+            onErrorMsg(TEXT['This Product Dont Have Price.']);
+            return;
+        }
+
 		if(is_stock == 1){
 			var stockqty = $(this).data('stockqty');
-			if(is_stock_status == 1){
+			if(is_stock_status == 1 && is_stock_status != null){
 				if(qty > stockqty){
 					onErrorMsg(TEXT['The value must be less than or equal to']);
 					return;
@@ -63,6 +79,21 @@ $(function () {
 			onErrorMsg(TEXT['Please enter quantity.']);
 			return;
 		}
+		var stockqty = $(this).data('stockqty');
+		if((qty > stockqty)){
+			onErrorMsg(TEXT['Out Of Stock']);
+			return;
+		}
+		if (
+            (
+                (cost_price === undefined || cost_price === '' || cost_price === null || Number(cost_price) <= 0) ||
+                (sale_price === undefined || sale_price === '' || sale_price === null || Number(sale_price) <= 0) ||
+                (old_price === undefined || old_price === '' || old_price === null || Number(old_price) <= 0)
+            )
+        ) {
+            onErrorMsg(TEXT['This Product Dont Have Price.']);
+            return;
+        }
 		if(is_stock == 1){
 			var stockqty = $(this).data('stockqty');
 			if(is_stock_status == 1){
@@ -99,7 +130,40 @@ $(function () {
 		event.preventDefault();
 		
 		var id = $(this).data('id');
-		var qty = 0;
+		var qty = 1;
+		var cost_price = $(this).data('costprice');
+		var sale_price = $(this).data('saleprice');
+		var old_price = $(this).data('oldprice');
+		var stockqty = $(this).data('stockqty');
+		var is_stock = $(this).data('isstock');
+		var is_stock_status = $(this).data('isstockstatus');
+		
+		if((qty > stockqty)){
+			onErrorMsg(TEXT['This product out of stock.']);
+			return;
+		}
+		if (
+            (
+                (cost_price === undefined || cost_price === '' || cost_price === null || Number(cost_price) <= 0) ||
+                (sale_price === undefined || sale_price === '' || sale_price === null || Number(sale_price) <= 0) ||
+                (old_price === undefined || old_price === '' || old_price === null || Number(old_price) <= 0)
+            )
+        ) {
+            onErrorMsg(TEXT['This Product Dont Have Price.']);
+            return;
+        }
+		if(is_stock == 1){
+			var stockqty = $(this).data('stockqty');
+			if(is_stock_status == 1){
+				if(qty > stockqty){
+					onErrorMsg(TEXT['The value must be less than or equal to']);
+					return;
+				}
+			}else{
+				onErrorMsg(TEXT['This product out of stock.']);
+				return;
+			}
+		}
 		$.ajax({
 			type : 'GET',
 			url: base_url + '/frontend/add_to_cart/'+id+'/'+qty,

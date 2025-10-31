@@ -66,22 +66,24 @@
 						@if(count($pro_images)>0)
 						@foreach ($pro_images as $key => $row)
 						<div class="item">
-							<img src="{{ asset_path('media/'.$row->thumbnail) }}" alt="{{ $key }}" />
+							<img src="{{ asset_path('media/'.($row->f_thumbnail ? $row->f_thumbnail : 'no-image.png')) }}" alt="{{ $key }}" />
+							 {{-- ($row->f_thumbnail ? $row->f_thumbnail : 'no-image.png') --}}
+							 {{-- ($data->f_thumbnail ? $data->f_thumbnail : 'no-image.png') --}}
 						</div>
 						@endforeach
 						@else
 						<div class="item">
-							<img src="{{ asset_path('media/'.$data->f_thumbnail) }}" alt="{{ $data->title }}" />
+							<img src="{{ asset_path('media/'.($data->f_thumbnail ? $data->f_thumbnail : 'no-image.png')) }}" alt="{{ $data->title }}" />
 						</div>
 						@endif
 					</div>
 					<div class="thumbnail-card pd-slider-nav">
 						@if(count($pro_images)>0)
 						@foreach ($pro_images as $key => $row)
-						<img src="{{ asset_path('media/'.$row->thumbnail) }}" alt="{{ $key }}" />
+						<img src="{{ asset_path('media/'.($row->f_thumbnail ? $row->f_thumbnail : 'no-image.png')) }}" alt="{{ $key }}" />
 						@endforeach
 						@else
-						<img src="{{ asset_path('media/'.$data->f_thumbnail) }}" alt="{{ $data->title }}" />
+						<img src="{{ asset_path('media/'.($data->f_thumbnail ? $data->f_thumbnail : 'no-image.png')) }}" alt="{{ $data->title }}" />
 						@endif
 					</div>
 				</div>
@@ -105,7 +107,7 @@
 							@if(($data->is_discount == 1) && ($data->old_price !=''))
 								
 								@php 
-									$discount = number_format((($data->old_price - $data->sale_price)*100)/$data->old_price);
+									$discount = number_format((($data->old_price - $data->sale_price)*100)/$data->old_price, 2);
 								@endphp
 							
 								@if($gtext['currency_position'] == 'left')
@@ -125,16 +127,20 @@
 						@endif
 						<div class="pr_quantity">
 							<label for="quantity">{{ __('Quantity') }}</label>
-							<input name="quantity" id="quantity" type="number" min="1" max="{{ $data->is_stock == 1 ? $data->stock_qty : 999 }}" value="1">
+							@if($data->stock_qty !== null && $data->stock_qty > 0)
+							 <input name="quantity" id="quantity" type="number" min="1" max="{{ $data->is_stock == 1 ? $data->stock_qty : 0 }}" value="1">
+							@else
+								<strong class="text-danger">This Product Is Out Of Stock</strong>
+							@endif
 						</div>
 						<div class="pr_buy_cart">
-							<a class="btn theme-btn cart product_addtocart" data-id="{{ $data->id }}" data-stockqty="{{ $data->is_stock == 1 ? $data->stock_qty : 999 }}" href="javascript:void(0);">{{ __('Add To Cart') }}</a>
-							<a class="btn theme-btn cart product_buy_now" data-id="{{ $data->id }}" data-stockqty="{{ $data->is_stock == 1 ? $data->stock_qty : 999 }}" href="javascript:void(0);">{{ __('Buy Now') }}</a>
+							<a class="btn theme-btn cart product_addtocart" data-id="{{ $data->id }}" data-stockqty="{{ $data->stock_qty ? $data->stock_qty : 0 }}" href="javascript:void(0);">{{ __('Add To Cart') }}</a>
+							<a class="btn theme-btn cart product_buy_now" data-id="{{ $data->id }}" data-stockqty="{{ $data->stock_qty ? $data->stock_qty : 0 }}" href="javascript:void(0);">{{ __('Buy Now') }}</a>
 							<a class="btn theme-btn cart wishlist addtowishlist" data-id="{{ $data->id }}" href="javascript:void(0);"><i class="bi bi-heart-fill"></i></a>
 						</div>
 						
 						@if($data->is_stock == 1)
-							@if($data->stock_status_id == 1)
+							@if($data->stock_status_id == 1 && $data->stock_status_id != null)
 							<div class="pr_extra"><strong>{{ __('Availability') }}:</strong><span class="instock">{{ $data->stock_qty }} {{ __('In Stock') }}</span></div>
 							@else
 							<div class="pr_extra"><strong>{{ __('Availability') }}:</strong><span class="stockout">{{ __('Out Of Stock') }}</span></div>
@@ -144,6 +150,9 @@
 							@if($data->sku != '')
 							<div class="pr_extra"><strong>{{ __('SKU') }}:</strong>  {{ $data->sku }}</div>
 							@endif
+						@endif
+						@if($data->manufacture_date != '') 
+						<div class="pr_extra"><strong>{{ __('Manufacture Date') }}: </strong>{{ $data->manufacture_date }}</div>
 						@endif
 						@if($data->exdate != '') 
 						<div class="pr_extra"><strong>{{ __('Expire Date') }}: </strong>{{ $data->exdate }}</div>
@@ -336,7 +345,7 @@
 					@foreach ($related_products as $row)
 					@php 
 						if(($row->is_discount == 1) && ($row->old_price !='')){
-							$discount = number_format((($row->old_price - $row->sale_price)*100)/$row->old_price);
+							$discount = number_format((($row->old_price - $row->sale_price)*100)/$row->old_price, 2);
 						}
 					@endphp
 					<div class="col-lg-12">
@@ -345,7 +354,7 @@
 								@if(($row->is_discount == 1) && ($row->old_price !=''))
 								<span class="item-label">{{ $discount }}% {{ __('Off') }}</span>
 								@endif
-								<a href="{{ route('frontend.product', [$row->id, $row->slug]) }}"><img src="{{ asset_path('media/'.$row->f_thumbnail) }}" alt="{{ $row->title }}" /></a>
+								<a href="{{ route('frontend.product', [$row->id, $row->slug]) }}"><img src="{{ asset_path('media/'.($row->f_thumbnail ? $row->f_thumbnail : 'no-image.png')) }}" alt="{{ $row->title }}" /></a>
 							</div>
 							<div class="item-title">
 								<a href="{{ route('frontend.product', [$row->id, $row->slug]) }}">{{ str_limit($row->title) }}</a>
@@ -376,7 +385,7 @@
 								@endif
 							</div>
 							<div class="item-card-bottom">
-								<a class="btn add-to-cart addtocart" data-id="{{ $row->id }}" href="javascript:void(0);">{{ __('Add To Cart') }}</a>
+								<a class="btn add-to-cart addtocart" data-id="{{ $row->id }}" data-stockqty="{{ $row->stock_qty }}" data-costprice="{{ $row->cost_price }}" data-saleprice="{{ $row->sale_price }}"  data-oldprice="{{ $row->old_price }}"  data-isstock="{{$row->is_stock}}" data-isstockstatus="{{$row->stock_status_id}}"  href="javascript:void(0);">{{ __('Add To Cart') }}</a>
 								<ul class="item-cart-list">
 									<li><a class="addtowishlist" data-id="{{ $row->id }}" href="javascript:void(0);"><i class="bi bi-heart"></i></a></li>
 									<li><a href="{{ route('frontend.product', [$row->id, $row->slug]) }}"><i class="bi bi-eye"></i></a></li>
@@ -389,7 +398,7 @@
 					@foreach ($category_products as $row)
 					@php 
 						if(($row->is_discount == 1) && ($row->old_price !='')){
-							$discount = number_format((($row->old_price - $row->sale_price)*100)/$row->old_price);
+							$discount = number_format((($row->old_price - $row->sale_price)*100)/$row->old_price, 2);
 						}
 					@endphp
 					<div class="col-lg-12">
@@ -398,7 +407,7 @@
 								@if(($row->is_discount == 1) && ($row->old_price !=''))
 								<span class="item-label">{{ $discount }}% {{ __('Off') }}</span>
 								@endif
-								<a href="{{ route('frontend.product', [$row->id, $row->slug]) }}"><img src="{{ asset_path('media/'.$row->f_thumbnail) }}" alt="{{ $row->title }}" /></a>
+								<a href="{{ route('frontend.product', [$row->id, $row->slug]) }}"><img src="{{ asset_path('media/'.($row->f_thumbnail ? $row->f_thumbnail : 'no-image.png')) }}" alt="{{ $row->title }}" /></a>
 							</div>
 							<div class="item-title">
 								<a href="{{ route('frontend.product', [$row->id, $row->slug]) }}">{{ str_limit($row->title) }}</a>
@@ -429,7 +438,7 @@
 								@endif
 							</div>
 							<div class="item-card-bottom">
-								<a class="btn add-to-cart addtocart" data-id="{{ $row->id }}" href="javascript:void(0);">{{ __('Add To Cart') }}</a>
+								<a class="btn add-to-cart addtocart" data-id="{{ $row->id }}"  data-stockqty="{{ $row->stock_qty }}" data-costprice="{{ $row->cost_price }}" data-saleprice="{{ $row->sale_price }}"  data-oldprice="{{ $row->old_price }}" data-isstock="{{$row->is_stock}}" data-isstockstatus="{{$row->stock_status_id}}"  href="javascript:void(0);">{{ __('Add To Cart') }}</a>
 								<ul class="item-cart-list">
 									<li><a class="addtowishlist" data-id="{{ $row->id }}" href="javascript:void(0);"><i class="bi bi-heart"></i></a></li>
 									<li><a href="{{ route('frontend.product', [$row->id, $row->slug]) }}"><i class="bi bi-eye"></i></a></li>
@@ -452,11 +461,15 @@
  	var item_id = "{{ $data->id }}";
 	var is_stock = "{{ $data->is_stock }}";
 	var is_stock_status = "{{ $data->stock_status_id }}";
-	
+	var cost_price = "{{ $data->cost_price }}";
+	var sale_price = "{{ $data->sale_price }}";
+	var old_price = "{{ $data->old_price }}";
+
 var TEXT = [];
 	TEXT['Please enter quantity.'] = "{{ __('Please enter quantity.') }}";
 	TEXT['The value must be less than or equal to'] = "{{ __('The value must be less than or equal to') }} {{ $data->is_stock == 1 ? $data->stock_qty : '' }}";	
 	TEXT['This product out of stock.'] = "{{ __('This product out of stock.') }}";	
+	TEXT['This Product Dont Have Price.'] = "{{ __('This Product Dont Have Price.') }}";
 </script>
 <script src="{{asset_path('frontend/pages/product.js')}}"></script>
 @endpush	

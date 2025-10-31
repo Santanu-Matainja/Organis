@@ -63,7 +63,7 @@ function CategoryMenuList(){
 	
 	$datalist = Pro_category::where('lan', '=', $lan)->where('is_publish', '=', 1)->orderBy('id', 'ASC')->get();
 	$li_List = '';
-	$Path = asset('media');
+	$Path = asset_path('media');
 	$count = 1;
 	foreach($datalist as $row){
 		$id = $row->id;
@@ -268,7 +268,7 @@ function makeMegaMenu($menu_id, $menu_parent_id, $width_type, $width, $MenuType)
 			
 			if($row->is_image == 1){
 				if($row->image != ''){
-					$Path = asset('media');
+					$Path = asset_path('media');
 					$imageOrMegaLiList = '<img src="'.$Path.'/'.$row->image.'" />';
 				}else{
 					$imageOrMegaLiList = '';

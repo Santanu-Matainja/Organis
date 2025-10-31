@@ -54,7 +54,8 @@
 									<div class="col-lg-6">
 										<div class="form-group">
 											<label for="sku">{{ __('SKU') }}</label>
-											<input value="{{ $datalist['sku'] }}" name="sku" id="sku" type="text" class="form-control">
+											<input value="{{ $datalist['sku'] }}" name="sku" id="sku" type="text" class="form-control" {{ $datalist['sku'] ? 'readonly' : '' }}>
+											<em>Sku Should Be Unique</em>
 										</div>
 									</div>
 									<div class="col-md-6">

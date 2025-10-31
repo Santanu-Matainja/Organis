@@ -83,7 +83,7 @@ class CartController extends Controller
 							<div class="cart-item-card">
 								<a data-id="'.$row['id'].'" id="removetocart_'.$row['id'].'" onclick="onRemoveToCart('.$row['id'].')" href="javascript:void(0);" class="item-remove"><i class="bi bi-x"></i></a>
 								<div class="cart-item-img">
-									<img src="'.$Path.'/'.$row['thumbnail'].'" alt="'.$row['name'].'" />
+									<img src="'.$Path.'/'.($row['thumbnail'] ? $row['thumbnail'] : 'no-image.png').'" alt="'.$row['name'].'" />
 								</div>
 								<div class="cart-item-desc">
 									<h6><a href="'.route('frontend.product', [$row['id'], str_slug($row['name'])]).'">'.$row['name'].'</a></h6>

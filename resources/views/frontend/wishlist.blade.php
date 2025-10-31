@@ -94,7 +94,9 @@
 									<td class="pro-image-w">
 										<div class="pro-image">
 											<a href="{{ route('frontend.product', [$row['id'], str_slug($row['name'])]) }}">
-												<img src="{{ asset_path('media/'.$row['thumbnail']) }}" alt="{{ $row['name'] }}">
+												<img src="{{ asset_path('media/'.($row['thumbnail'] ? $row['thumbnail'] : 'no-image.png')) }}" alt="{{ $row['name'] }}">
+												{{-- ($row['thumbnail'] ? $row['thumbnail'] : 'no-image.png') --}}
+												
 											</a>
 										</div>
 									</td>
