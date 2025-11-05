@@ -7,22 +7,80 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Models\Product;
 use App\Models\User;
+use Illuminate\Support\Facades\Auth;
+
 
 class CartController extends Controller
 {
 	//Add to Cart
-	public function AddToCart($id, $qty){
+	// public function AddToCart($id, $qty){
 
-		$res = array();
+	// 	$res = array();
+	// 	$datalist = Product::where('id', $id)->first();
+	// 	$user = User::where('id', $datalist['user_id'])->first();
+
+	// 	$quantity = $qty == 0 ? 1 : $qty;
+	// 	$cart = session()->get('shopping_cart', []);
+		
+	// 	if(isset($cart[$id])){
+	// 		$cart[$id]['qty'] = $cart[$id]['qty'] + $quantity;
+	// 	}else{
+	// 		$cart[$id] = [
+	// 			"id" => $datalist['id'],
+	// 			"name" => $datalist['title'],
+	// 			"qty" => $quantity,
+	// 			"price" => $datalist['sale_price'],
+	// 			"weight" => 0,
+	// 			"thumbnail" => $datalist['f_thumbnail'],
+	// 			"unit" => $datalist['variation_size'],
+	// 			"seller_id" => $datalist['user_id'],
+	// 			"exdate" => $datalist['exdate'],
+	// 			"perisible" => $datalist['perisible'],
+	// 			"delivarytypeid" => $datalist['delivarytypeid'],
+	// 			"seller_name" => $user['name'],
+	// 			"store_name" => $user['shop_name'],
+	// 			"store_logo" => $user['photo'],
+	// 			"store_url" => $user['shop_url'],
+	// 			"seller_email" => $user['email'],
+	// 			"seller_phone" => $user['phone'],
+	// 			"seller_address" => $user['address']
+	// 		];
+	// 	}
+
+	// 	session()->put('shopping_cart', $cart);
+
+	// 	$res['msgType'] = 'success';
+	// 	$res['msg'] = __('New Data Added Successfully');
+		
+	// 	return response()->json($res);
+	// }
+	public function AddToCart($id, $qty)
+	{
+		$res = [];
+		$userId = Auth::id();
+
+		if (!$userId) {
+			$res['msgType'] = 'error';
+			$res['msg'] = __('Please login to add products to your cart.');
+			return response()->json($res);
+		}
+
+		// Fetch product and seller details
 		$datalist = Product::where('id', $id)->first();
 		$user = User::where('id', $datalist['user_id'])->first();
 
 		$quantity = $qty == 0 ? 1 : $qty;
-		$cart = session()->get('shopping_cart', []);
-		
-		if(isset($cart[$id])){
+
+		// ✅ Fetch existing cart data from DB (not session)
+		$cartRecord = DB::table('carts')->where('user_id', $userId)->first();
+		$cart = $cartRecord && $cartRecord->cart_data
+			? json_decode($cartRecord->cart_data, true)
+			: [];
+
+		// ✅ Add or update product in cart
+		if (isset($cart[$id])) {
 			$cart[$id]['qty'] = $cart[$id]['qty'] + $quantity;
-		}else{
+		} else {
 			$cart[$id] = [
 				"id" => $datalist['id'],
 				"name" => $datalist['title'],
@@ -45,11 +103,19 @@ class CartController extends Controller
 			];
 		}
 
-		session()->put('shopping_cart', $cart);
+		// ✅ Update or insert cart record
+		DB::table('carts')->updateOrInsert(
+			['user_id' => $userId],
+			[
+				'cart_data' => json_encode($cart),
+				'updated_at' => now(),
+				'created_at' => $cartRecord ? $cartRecord->created_at : now(),
+			]
+		);
 
 		$res['msgType'] = 'success';
 		$res['msg'] = __('New Data Added Successfully');
-		
+
 		return response()->json($res);
 	}
 	
@@ -60,15 +126,23 @@ class CartController extends Controller
 		$taxRate = $gtax['percentage'];
 		$Path = asset_path('media');
 
-		$ShoppingCartData = session()->get('shopping_cart');
+		$userId = Auth::id();
+		// $ShoppingCartData = session()->get('shopping_cart');
+		$cartRecord = DB::table('carts')->where('user_id', $userId)->first();
+		$ShoppingCartData = $cartRecord && $cartRecord->cart_data
+			? json_decode($cartRecord->cart_data, true)
+			: [];
+
 		$count = 0;
 		$Total_Price = 0;
 		$Sub_Total = 0;
 		$tax = 0;
 		$total = 0;
 		$items = '';
-		if(session()->get('shopping_cart')){
-			foreach ($ShoppingCartData as $row) {
+		// if(session()->get('shopping_cart')){
+		// 	foreach ($ShoppingCartData as $row) {
+		if (!empty($ShoppingCartData)) {
+        	foreach ($ShoppingCartData as $row) {
 				$count += $row['qty'];
 				$Total_Price += $row['price']*$row['qty'];
 				$Sub_Total += $row['price']*$row['qty'];
@@ -123,24 +197,61 @@ class CartController extends Controller
 	}
 	
 	//Remove to Cart
-	public function RemoveToCart($rowid){
-		$res = array();
+	// public function RemoveToCart($rowid){
+	// 	$res = array();
 
-		$cart = session()->get('shopping_cart');
-		if(isset($cart[$rowid])){
-			unset($cart[$rowid]);
-			session()->put('shopping_cart', $cart);
+	// 	$cart = session()->get('shopping_cart');
+	// 	if(isset($cart[$rowid])){
+	// 		unset($cart[$rowid]);
+	// 		session()->put('shopping_cart', $cart);
+	// 	}
+
+	// 	$res['msgType'] = 'success';
+	// 	$res['msg'] = __('Data Removed Successfully');
+		
+	// 	return response()->json($res);
+	// }
+	public function RemoveToCart($rowid)
+	{
+		$res = [];
+
+		$userId = Auth::id();
+
+		// Fetch current cart from DB
+		$cartRecord = DB::table('carts')->where('user_id', $userId)->first();
+
+		if ($cartRecord && $cartRecord->cart_data) {
+			$cart = json_decode($cartRecord->cart_data, true);
+
+			// Remove the product if exists
+			if (isset($cart[$rowid])) {
+				unset($cart[$rowid]);
+			}
+
+			// Update or clear the cart_data
+			if (empty($cart)) {
+				DB::table('carts')->where('user_id', $userId)->update(['cart_data' => null]);
+			} else {
+				DB::table('carts')->where('user_id', $userId)->update(['cart_data' => json_encode($cart)]);
+			}
 		}
 
 		$res['msgType'] = 'success';
 		$res['msg'] = __('Data Removed Successfully');
-		
+
 		return response()->json($res);
 	}
 	
     //get Cart
     public function getCart(){
-        return view('frontend.cart');
+
+		$userId = Auth::id();
+		$cartRecord = DB::table('carts')->where('user_id', $userId)->first();
+		$ShoppingCartData = $cartRecord && $cartRecord->cart_data
+			? json_decode($cartRecord->cart_data, true)
+			: [];
+
+        return view('frontend.cart', compact('ShoppingCartData'));
     }
 	
     //get Cart
@@ -149,14 +260,22 @@ class CartController extends Controller
 		$gtax = getTax();
 		$taxRate = $gtax['percentage'];
 		
-		$ShoppingCartData = session()->get('shopping_cart');
+		// $ShoppingCartData = session()->get('shopping_cart');
+		$userId = Auth::id();
+		// $ShoppingCartData = session()->get('shopping_cart');
+		$cartRecord = DB::table('carts')->where('user_id', $userId)->first();
+		$ShoppingCartData = $cartRecord && $cartRecord->cart_data
+			? json_decode($cartRecord->cart_data, true)
+			: [];
+
 		$count = 0;
 		$Total_Price = 0;
 		$Sub_Total = 0;
 		$tax = 0;
 		$total = 0;
 		
-		if(session()->get('shopping_cart')){
+		// if(session()->get('shopping_cart')){
+		if (!empty($ShoppingCartData)) {
 			foreach ($ShoppingCartData as $row) {
 				$count += $row['qty'];
 				$Total_Price += $row['price']*$row['qty'];
@@ -197,11 +316,23 @@ class CartController extends Controller
 	public function addToWishlist($id){
 
 		$res = array();
+		$userId = Auth::id();
+
+		if (!$userId) {
+			$res['msgType'] = 'error';
+			$res['msg'] = __('Please login to add products to your Wishlist.');
+			return response()->json($res);
+		}
+
 		$datalist = Product::where('id', $id)->first();
 		$user = User::where('id', $datalist['user_id'])->first();
 		
 		$quantity = 1;
-		$cart = session()->get('shopping_wishlist', []);
+		// $cart = session()->get('shopping_wishlist', []);
+		$cartRecord = DB::table('wishlists')->where('user_id', $userId)->first();
+		$cart = $cartRecord && $cartRecord->wishlist_data
+			? json_decode($cartRecord->wishlist_data, true)
+			: [];
 		
 		if(isset($cart[$id])){
 			$cart[$id]['qty'] = $quantity;
@@ -227,7 +358,16 @@ class CartController extends Controller
 			];
 		}
 
-		session()->put('shopping_wishlist', $cart);
+		// session()->put('shopping_wishlist', $cart);
+		// ✅ Update or insert cart record
+		DB::table('wishlists')->updateOrInsert(
+			['user_id' => $userId],
+			[
+				'wishlist_data' => json_encode($cart),
+				'updated_at' => now(),
+				'created_at' => $cartRecord ? $cartRecord->created_at : now(),
+			]
+		);
 
 		$res['msgType'] = 'success';
 		$res['msg'] = __('New Data Added Successfully');
@@ -237,17 +377,45 @@ class CartController extends Controller
 	
     //get Wishlist
     public function getWishlist(){
-		return view('frontend.wishlist');
+
+		$userId = Auth::id();
+		$cartRecord = DB::table('wishlists')->where('user_id', $userId)->first();
+		$ShoppingCartData = $cartRecord && $cartRecord->wishlist_data
+			? json_decode($cartRecord->wishlist_data, true)
+			: [];
+
+		return view('frontend.wishlist', compact('ShoppingCartData'));
 	}
 	
 	//Remove to Wishlist
 	public function RemoveToWishlist($rowid){
 		$res = array();
 		
-		$cart = session()->get('shopping_wishlist');
-		if(isset($cart[$rowid])){
-			unset($cart[$rowid]);
-			session()->put('shopping_wishlist', $cart);
+		// $cart = session()->get('shopping_wishlist');
+		// if(isset($cart[$rowid])){
+		// 	unset($cart[$rowid]);
+		// 	session()->put('shopping_wishlist', $cart);
+		// }
+
+		$userId = Auth::id();
+
+		// Fetch current cart from DB
+		$cartRecord = DB::table('wishlists')->where('user_id', $userId)->first();
+
+		if ($cartRecord && $cartRecord->wishlist_data) {
+			$cart = json_decode($cartRecord->wishlist_data, true);
+
+			// Remove the product if exists
+			if (isset($cart[$rowid])) {
+				unset($cart[$rowid]);
+			}
+
+			// Update or clear the cart_data
+			if (empty($cart)) {
+				DB::table('wishlists')->where('user_id', $userId)->update(['wishlist_data' => null]);
+			} else {
+				DB::table('wishlists')->where('user_id', $userId)->update(['wishlist_data' => json_encode($cart)]);
+			}
 		}
 
 		$res['msgType'] = 'success';
@@ -259,9 +427,24 @@ class CartController extends Controller
 	//Count to Wishlist
 	public function countWishlist(){
 
-		$ShoppingWishlistData = session()->get('shopping_wishlist');
+		// $ShoppingWishlistData = session()->get('shopping_wishlist');
+		// $count = 0;
+		// if(session()->get('shopping_wishlist')){
+		// 	foreach ($ShoppingWishlistData as $row) {
+		// 		$count++;
+		// 	}
+		// }
+
+		$userId = Auth::id();
+		$ShoppingWishlistData = [];
+
+		$cartRecord = DB::table('wishlists')->where('user_id', $userId)->first();
+		if ($cartRecord && $cartRecord->wishlist_data) {
+			$ShoppingWishlistData = json_decode($cartRecord->wishlist_data, true);
+		}
+
 		$count = 0;
-		if(session()->get('shopping_wishlist')){
+		if (!empty($ShoppingWishlistData)) {
 			foreach ($ShoppingWishlistData as $row) {
 				$count++;
 			}

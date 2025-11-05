@@ -15,5 +15,6 @@ class Brand extends Model
         'is_featured',
         'is_publish',
         'lan',
+        'user_id',
     ];
 }

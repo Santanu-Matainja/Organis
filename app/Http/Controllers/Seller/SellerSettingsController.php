@@ -31,7 +31,9 @@ class SellerSettingsController extends Controller
 			'zip_code' => '',
 			'country_id' => '',
 			'photo' => '',
-			'background_image' => ''
+			'background_image' => '',
+			'vat_number' => '',
+			'trade_register_number' => '',
 		);
 		
 		foreach ($sellerData as $row){
@@ -46,6 +48,8 @@ class SellerSettingsController extends Controller
 			$seller_data['country_id'] = $row->country_id;
 			$seller_data['photo'] = $row->photo;
 			$seller_data['background_image'] = $row->background_image;
+			$seller_data['vat_number'] = $row->vat_number;
+			$seller_data['trade_register_number'] = $row->trade_register_number;
 		}
 		
 		$bankInformation = DB::table('bank_informations')->where('seller_id', $id)->get();
@@ -90,6 +94,8 @@ class SellerSettingsController extends Controller
 		$photo = $request->input('photo');
 		$shipping_fee = $request->input('shipping_fee');
 		$background_image = $request->input('background_image');
+		$vat_number = $request->input('vat_number');
+		$trade_register_number = $request->input('trade_register_number');
 		
 		$validator_array = array(
 			'shop_name' => $request->input('shop_name'),
@@ -100,7 +106,9 @@ class SellerSettingsController extends Controller
 			'state' => $request->input('state'),
 			'zip_code' => $request->input('zip_code'),
 			'country_id' => $request->input('country_id'),
-			'shipping_fee' => $request->input('shipping_fee')
+			'shipping_fee' => $request->input('shipping_fee'),
+			'vat_number' => $request->input('vat_number'),
+			'trade_register_number' => $request->input('trade_register_number'),
 		);
 		$rId = $id == '' ? '' : ','.$id;
 		$validator = Validator::make($validator_array, [
@@ -113,6 +121,8 @@ class SellerSettingsController extends Controller
 			'zip_code' => 'required',
 			'country_id' => 'required',
 			'shipping_fee' => 'required',
+			'vat_number' => 'required',
+			'trade_register_number' => 'required',
 		]);
 
 		$errors = $validator->errors();
@@ -180,6 +190,20 @@ class SellerSettingsController extends Controller
 			return response()->json($res);
 		} 
 
+		if($errors->has('vat_number')){
+			$res['msgType'] = 'error';
+			$res['msg'] = $errors->first('vat_number');
+			$res['id'] = '';
+			return response()->json($res);
+		} 
+
+		if($errors->has('trade_register_number')){
+			$res['msgType'] = 'error';
+			$res['msg'] = $errors->first('trade_register_number');
+			$res['id'] = '';
+			return response()->json($res);
+		} 
+
 		$shippingfee = [
 			'seller_id' => $id,
 			'shipping_fee' => $shipping_fee,
@@ -203,6 +227,8 @@ class SellerSettingsController extends Controller
 			'country_id' => $country_id,
 			'photo' => $photo,
 			'background_image' => $background_image,
+			'vat_number' => $vat_number,
+			'trade_register_number' => $trade_register_number,
 		);
 
 		$response = User::where('id', $id)->update($data);

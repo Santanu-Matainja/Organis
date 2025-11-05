@@ -43,9 +43,10 @@ class SellerController extends Controller
 				'name' => 'required',
 				'email' => 'required|email|unique:users',
 				'password' => 'required|confirmed|min:6',
-				'shop_name' => 'required',
-				'shop_url' => 'required',
-				'shop_phone' => 'required',
+				// 'shop_name' => 'required',
+				// 'shop_url' => 'required',
+				// 'company_address' => 'required',
+				// 'shop_phone' => 'required',
 			]);
 			
 			$captcha = $request->input('g-recaptcha-response');
@@ -62,9 +63,10 @@ class SellerController extends Controller
 				'name' => 'required',
 				'email' => 'required|email|unique:users',
 				'password' => 'required|confirmed|min:6',
-				'shop_name' => 'required',
-				'shop_url' => 'required',
-				'shop_phone' => 'required',
+				// 'shop_name' => 'required',
+				// 'shop_url' => 'required',
+				// 'company_address' => 'required',
+				// 'shop_phone' => 'required',
 			]);
 		}
 		
@@ -83,6 +85,9 @@ class SellerController extends Controller
 			'shop_name' => $request->input('shop_name'),
 			'shop_url' => $request->input('shop_url'),
 			'phone' => $request->input('shop_phone'),
+			'address' => $request->input('company_address'),
+			'vat_number' => $request->input('vat_number'),
+			'trade_register_number' => $request->input('trade_register_number'),
 			'status_id' => $status_id,
 			'role_id' => 3
 		);

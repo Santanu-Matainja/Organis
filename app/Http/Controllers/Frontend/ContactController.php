@@ -103,8 +103,7 @@ class ContactController extends Controller
 		
 		if($gtext['ismail'] == 1){
 			try {
-
-				require 'vendor/autoload.php';
+				
 				$mail = new PHPMailer(true);
 				$mail->CharSet = "UTF-8";
 

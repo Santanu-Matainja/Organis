@@ -31,14 +31,20 @@
 								<div class="row">
 									<div class="col-md-6">
 										<div class="form-group">
-											<label for="shop_name">{{ __('Shop Name') }}<span class="red">*</span></label>
+											<label for="shop_name">{{ __('Company Name') }}<span class="red">*</span></label>
 											<input type="text" name="shop_name" id="shop_name" value="{{ $seller_data['shop_name'] }}" class="form-control parsley-validated" data-required="true">
+										</div>
+									</div>
+									<div class="col-md-6 d-none">
+										<div class="form-group">
+											<label for="shop_url">{{ __('Shop URL') }}<span class="red">*</span></label>
+											<input type="text" name="shop_url" id="shop_url" value="{{ $seller_data['shop_url'] }}" class="form-control parsley-validated" data-required="true">
 										</div>
 									</div>
 									<div class="col-md-6">
 										<div class="form-group">
-											<label for="shop_url">{{ __('Shop URL') }}<span class="red">*</span></label>
-											<input type="text" name="shop_url" id="shop_url" value="{{ $seller_data['shop_url'] }}" class="form-control parsley-validated" data-required="true">
+											<label for="address">{{ __('Company Address') }}<span class="red">*</span></label>
+											<input type="text" name="address" id="address" value="{{ $seller_data['address'] }}" class="form-control parsley-validated" data-required="true">
 										</div>
 									</div>
 								</div>
@@ -46,18 +52,24 @@
 								<div class="row">
 									<div class="col-md-6">
 										<div class="form-group">
-											<label for="phone">{{ __('Shop Phone') }}<span class="red">*</span></label>
+											<label for="phone">{{ __('Phone') }}<span class="red">*</span></label>
 											<input type="text" name="phone" id="phone" value="{{ $seller_data['phone'] }}" class="form-control parsley-validated" data-required="true">
 										</div>
 									</div>
 									<div class="col-md-6">
 										<div class="form-group">
-											<label for="address">{{ __('Address') }}<span class="red">*</span></label>
-											<input type="text" name="address" id="address" value="{{ $seller_data['address'] }}" class="form-control parsley-validated" data-required="true">
+											<label for="vat_number">{{ __('Vat Number') }}<span class="red">*</span></label>
+											<input type="text" name="vat_number" id="vat_number" value="{{ $seller_data['vat_number'] }}" class="form-control parsley-validated" data-required="true">
 										</div>
 									</div>
-								</div>
-								<div class="row">
+									<div class="col-md-6">
+										<div class="form-group">
+											<label for="trade_register_number">{{ __('Vat trade_register_number') }}<span class="red">*</span></label>
+											<input type="text" name="trade_register_number" id="trade_register_number" value="{{ $seller_data['trade_register_number'] }}" class="form-control parsley-validated" data-required="true">
+										</div>
+									</div>
+									
+								
 									<div class="col-md-6">
 										<div class="form-group">
 											<label for="city">{{ __('City') }}<span class="red">*</span></label>
@@ -70,9 +82,7 @@
 											<input type="text" name="state" id="state" value="{{ $seller_data['state'] }}" class="form-control parsley-validated" data-required="true">
 										</div>
 									</div>
-								</div>
-								
-								<div class="row">
+							
 									<div class="col-md-6">
 										<div class="form-group">
 											<label for="zip_code">{{ __('Zip Code') }}<span class="red">*</span></label>
@@ -91,9 +101,7 @@
 											</select>
 										</div>
 									</div>
-								</div>
-
-								<div class="row">
+								
 									<div class="col-md-6">
 										<div class="form-group">
 											<label for="shipping_fee">{{ __('Shipping Fee') }}<span class="red">*</span></label>

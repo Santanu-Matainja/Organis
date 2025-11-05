@@ -74,6 +74,7 @@
 		@elseif (Auth::user()->role_id == 3)
 		<li><a href="{{ route('seller.dashboard') }}"><i class="fa fa-tachometer"></i>{{ __('Dashboard') }}</a></li>
 		<li><a href="{{ route('seller.products') }}" id="select_product"><i class="fa fa-product-hunt"></i>{{ __('Products') }}</a></li>
+		<li><a href="{{ route('seller.brands') }}" id="select_brand"><i class="fa fa-bold"></i>{{ __('Brands') }}</a></li>
 		<li><a href="{{ route('seller.orders') }}" id="select_order"><i class="fa fa-rocket"></i>{{ __('Orders') }}</a></li>
 		<li><a href="{{ route('seller.withdrawals') }}"><i class="fa fa-rocket"></i>{{ __('Withdrawals') }}</a></li>
 		<li><a href="{{ route('seller.review') }}"><i class="fa fa-recycle"></i>{{ __('Review & Ratings') }}</a></li>

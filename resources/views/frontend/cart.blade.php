@@ -62,7 +62,8 @@ $gtax = getTax();
 	<!-- Inner Section -->
 	<section class="inner-section inner-section-bg">
 		<div class="container">
-			@if(session('shopping_cart'))
+			{{-- @if(session('shopping_cart')) --}}
+			@if($ShoppingCartData)
 			<div class="row">
 				<div class="col-xl-12">
 					<div class="table-responsive shopping-cart">
@@ -80,7 +81,8 @@ $gtax = getTax();
 								</tr>
 							</thead>
 							<tbody>
-								@foreach (session('shopping_cart') as $row)
+								{{-- @foreach (session('shopping_cart') as $row) --}}
+								@foreach ($ShoppingCartData as $row)
 								@php
 								
 									$pro_price = $row['price'];

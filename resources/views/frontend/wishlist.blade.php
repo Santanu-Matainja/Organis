@@ -61,7 +61,8 @@
 	<section class="inner-section inner-section-bg">
 		<div class="container">
 			<div class="row">
-				@if(session('shopping_wishlist'))
+				{{-- @if(session('shopping_wishlist')) --}}
+				@if($ShoppingCartData)
 				<div class="col-xl-12">
 					<div class="table-responsive shopping-cart">
 						<table class="table">
@@ -77,7 +78,8 @@
 							</thead>
 							<tbody>
 								
-								@foreach (session('shopping_wishlist') as $row)
+								{{-- @foreach (session('shopping_wishlist') as $row) --}}
+								@foreach ($ShoppingCartData as $row)
 								@php
 									$pro_price = $row['price'];
 

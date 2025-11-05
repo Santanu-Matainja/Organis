@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Backend;
+namespace App\Http\Controllers\Seller;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
@@ -8,12 +8,18 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use App\Models\Media_option;
 use App\Models\Brand;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Str;
+use Intervention\Image\ImageManager;
+use Intervention\Image\Drivers\Gd\Driver;
 
-class BrandsController extends Controller
+class SellerBrandController extends Controller
 {
     //Brands page load
     public function getBrandsPageLoad() {
 		
+        $id = Auth::user()->id;
+
 		$media_datalist = Media_option::orderBy('id','desc')->paginate(28);
 		$languageslist = DB::table('languages')->where('status', 1)->orderBy('language_name', 'asc')->get();
 		$statuslist = DB::table('tp_status')->orderBy('id', 'asc')->get();
@@ -21,26 +27,29 @@ class BrandsController extends Controller
 		$datalist = DB::table('brands')
 			->join('tp_status', 'brands.is_publish', '=', 'tp_status.id')
 			->join('languages', 'brands.lan', '=', 'languages.language_code')
-			->select('brands.id', 'brands.name', 'brands.thumbnail', 'brands.is_featured', 'brands.is_publish', 'tp_status.status', 'languages.language_name')
+			->select('brands.id', 'brands.name', 'brands.thumbnail', 'brands.is_featured', 'brands.is_publish', 'tp_status.status', 'languages.language_name', 'brands.user_id')
 			->orderBy('brands.id','desc')
+            ->where('user_id', $id)
 			->paginate(10);
 
-        return view('backend.brands', compact('media_datalist', 'languageslist', 'statuslist', 'datalist'));
+        return view('seller.brands', compact('media_datalist', 'languageslist', 'statuslist', 'datalist'));
     }
-	
-	//Get data for Brands Pagination
+
+    //Get data for Brands Pagination
 	public function getBrandsTableData(Request $request){
 
 		$search = $request->search;
 		$language_code = $request->language_code;
-		
+		$id = Auth::user()->id;
+
 		if($request->ajax()){
 
 			if($search != ''){
 				$datalist = DB::table('brands')
 					->join('tp_status', 'brands.is_publish', '=', 'tp_status.id')
 					->join('languages', 'brands.lan', '=', 'languages.language_code')
-					->select('brands.id', 'brands.name', 'brands.thumbnail', 'brands.is_featured', 'brands.is_publish', 'tp_status.status', 'languages.language_name')
+					->select('brands.id', 'brands.name', 'brands.thumbnail', 'brands.is_featured', 'brands.is_publish', 'tp_status.status', 'languages.language_name', 'brands.user_id')
+                    ->where('user_id', $id)
 					->where(function ($query) use ($search){
 						$query->where('name', 'like', '%'.$search.'%')
 							->orWhere('thumbnail', 'like', '%'.$search.'%');
@@ -55,7 +64,8 @@ class BrandsController extends Controller
 				$datalist = DB::table('brands')
 					->join('tp_status', 'brands.is_publish', '=', 'tp_status.id')
 					->join('languages', 'brands.lan', '=', 'languages.language_code')
-					->select('brands.id', 'brands.name', 'brands.thumbnail', 'brands.is_featured', 'brands.is_publish', 'tp_status.status', 'languages.language_name')
+					->select('brands.id', 'brands.name', 'brands.thumbnail', 'brands.is_featured', 'brands.is_publish', 'tp_status.status', 'languages.language_name', 'brands.user_id')
+                    ->where('user_id', $id)
 					->where(function ($query) use ($language_code){
 						$query->whereRaw("brands.lan = '".$language_code."' OR '".$language_code."' = '0'");
 					})
@@ -63,7 +73,7 @@ class BrandsController extends Controller
 					->paginate(10);
 			}
 
-			return view('backend.partials.brands_table', compact('datalist'))->render();
+			return view('seller.partials.brands_table', compact('datalist'))->render();
 		}
 	}
 	
@@ -71,13 +81,50 @@ class BrandsController extends Controller
     public function saveBrandsData(Request $request){
 		$res = array();
 
+        $user_id = Auth::user()->id;
 		$id = $request->input('RecordId');
 		$name = esc($request->input('name'));
 		$lan = $request->input('lan');
 		$thumbnail = $request->input('thumbnail');
 		$is_featured = $request->input('is_featured');
-		$is_publish = $request->input('is_publish');
+		// $is_publish = $request->input('is_publish');
+		$is_publish = 2;
 		
+        //image Save
+        $destinationPath = public_path('media');
+		$dateTime = date('dmYHis');
+
+		$thumbnail = thumbnail($request['media_type']); 
+		$width = $thumbnail['width'];
+		$height = $thumbnail['height'];
+
+		$file = $request->file('thumbnail');
+		$FileName = $dateTime . '-' . $file->getClientOriginalName();
+		$ThumFileName = $dateTime . '-' . $width . 'x' . $height . '-' . $file->getClientOriginalName();
+
+		$FileExt = $file->getClientOriginalExtension();
+		$Filetype = Str::lower($FileExt);
+		$FileRealPath = $file->getRealPath();
+		$FileSize = $file->getSize();
+		$OriginalFileName = basename($file->getClientOriginalName(), "." . $FileExt);
+
+		if (file_exists($destinationPath . '/' . $FileName)) {
+			unlink($destinationPath . '/' . $FileName);
+		}
+
+        if (in_array($Filetype, ['jpg', 'jpeg', 'png', 'gif', 'ico', 'svg'])) {
+            if (in_array($Filetype, ['gif', 'ico', 'svg'])) {
+                $ThumFileName = $FileName;
+            } else {
+                $manager = new ImageManager(new Driver());
+                $image = $manager->read($FileRealPath);
+                $image->scale($width, $height);
+                $image->save($destinationPath . '/' . $ThumFileName);
+            }       
+        }
+
+        
+        
 		$validator_array = array(
 			'name' => $request->input('name'),
 			'lan' => $request->input('lan'),
@@ -113,10 +160,10 @@ class BrandsController extends Controller
 		$data = array(
 			'name' => $name,
 			'lan' => $lan,
-			'thumbnail' => $thumbnail,
+			'thumbnail' => $ThumFileName,
 			'is_featured' => $is_featured,
 			'is_publish' => $is_publish,
-			'user_id' => $id,
+			'user_id' => $user_id,
 		);
 
 		if($id ==''){
@@ -223,4 +270,19 @@ class BrandsController extends Controller
 		
 		return response()->json($res);
 	}	
+
+    // Image Remove
+
+    public function deleteMediaFile(Request $request)
+    {
+        $fileName = $request->input('file_name');
+        $filePath = public_path('media/' . $fileName);
+
+        if (file_exists($filePath)) {
+            unlink($filePath);
+        }
+
+        return response()->json(['status' => 'success']);
+    }
+
 }

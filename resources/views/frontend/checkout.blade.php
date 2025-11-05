@@ -119,7 +119,7 @@ $tax_rate = $gtax['percentage'];
 						<div class="row">
 							<div class="col-md-6">
 								<div class="mb-3">
-									<input id="zip_code" name="zip_code" type="text" placeholder="{{ __('Zip Code') }}" class="form-control parsley-validated" data-required="true" value="@if(isset(Auth::user()->zip_code)) {{ Auth::user()->zip_code }} @endif">
+									<input id="zip_code" name="zip_code" type="number" placeholder="{{ __('Zip Code') }}" class="form-control parsley-validated" data-required="true" value="@if(isset(Auth::user()->zip_code)) {{ Auth::user()->zip_code }} @endif">
 									<span class="text-danger error-text zip_code_error"></span>
 								</div>
 							</div>
@@ -432,7 +432,8 @@ $tax_rate = $gtax['percentage'];
 						<div class="carttotals-card">
 							<div class="carttotals-head">{{ __('Order Summary') }}</div>
 							<div class="carttotals-body">
-								@if(session('shopping_cart'))
+								{{-- @if(session('shopping_cart')) --}}
+								@if($ShoppingCartData)
 									<table class="table">
 										<tbody>
 											@php 
@@ -442,7 +443,8 @@ $tax_rate = $gtax['percentage'];
 											@endphp
 
 											{{-- ✅ Group cart data by seller --}}
-											@foreach(session('shopping_cart') as $row)
+											{{-- @foreach(session('shopping_cart') as $row) --}}
+											@foreach ($ShoppingCartData as $row)
 												@php
 													$Total_Price += $row['price'] * $row['qty'];
 													$data = [

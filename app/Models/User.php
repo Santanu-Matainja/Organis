@@ -34,6 +34,8 @@ class User extends Authenticatable
         'status_id',
         'role_id',
         'background_image',
+        'vat_number',
+        'trade_register_number',
     ];
 
     /**

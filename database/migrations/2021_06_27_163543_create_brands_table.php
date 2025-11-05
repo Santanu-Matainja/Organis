@@ -20,6 +20,7 @@ class CreateBrandsTable extends Migration
 			$table->integer('is_featured')->nullable();
 			$table->integer('is_publish')->nullable();
 			$table->string('lan', 100)->nullable();
+			$table->string('user_id')->nullable();
             $table->timestamps();
         });
     }

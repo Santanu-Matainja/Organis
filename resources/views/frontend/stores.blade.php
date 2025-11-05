@@ -92,7 +92,7 @@
 			<div class="container-fluid px-0">
 				<!-- Banner -->
 				<div class="position-relative" style="height:180px;">
-					<img src="{{ asset_path('media/'. ($seller_data->background_image ? $seller_data->background_image : 'https://t4.ftcdn.net/jpg/09/27/94/25/360_F_927942593_12DExYYYYu346HNyzeqsaJwKGUzvTAgD.jpg')) }}" class="w-100 h-100 object-fit-cover" alt="Banner">
+					<img src="{{ asset_path('media/'. ($seller_data->background_image ? $seller_data->background_image : '30102025121146-940x180-background_img.jpg')) }}" class="w-100 h-100 object-fit-cover" alt="Banner">
 				</div> 
 
 				<!-- Profile Section -->

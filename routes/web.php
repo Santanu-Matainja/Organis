@@ -613,6 +613,16 @@ Route::prefix('seller')->group(function(){
 	Route::get('/product/{id}', [App\Http\Controllers\Seller\ProductsController::class, 'getProductPageData'])->name('seller.product')->middleware(['auth','is_seller']);
 	Route::post('/updateProductsData', [App\Http\Controllers\Seller\ProductsController::class, 'updateProductsData'])->name('seller.updateProductsData')->middleware(['auth','is_seller']);
 
+	// Seller Brands
+	Route::get('/brands', [App\Http\Controllers\Seller\SellerBrandController::class, 'getBrandsPageLoad'])->name('seller.brands')->middleware(['auth','is_seller']);
+	Route::get('/getSellerBrandsTableData', [App\Http\Controllers\Seller\SellerBrandController::class, 'getBrandsTableData'])->name('seller.getBrandsTableData')->middleware(['auth','is_seller']);
+	Route::post('/saveSellerBrandsData', [App\Http\Controllers\Seller\SellerBrandController::class, 'saveBrandsData'])->name('seller.saveBrandsData')->middleware(['auth','is_seller']);
+	Route::post('/getSellerBrandsById', [App\Http\Controllers\Seller\SellerBrandController::class, 'getBrandsById'])->name('seller.getBrandsById')->middleware(['auth','is_seller']);
+	Route::post('/deleteSellerBrands', [App\Http\Controllers\Seller\SellerBrandController::class, 'deleteBrands'])->name('seller.deleteBrands')->middleware(['auth','is_seller']);
+	Route::post('/bulkActionSellerBrands', [App\Http\Controllers\Seller\SellerBrandController::class, 'bulkActionBrands'])->name('seller.bulkActionBrands')->middleware(['auth','is_seller']);
+	Route::post('/delete-media-file', [App\Http\Controllers\Seller\SellerBrandController::class, 'deleteMediaFile'])->name('seller.deleteMediaFile')->middleware(['auth','is_seller']);
+
+
 	//Price
 	Route::get('/price/{id}', [App\Http\Controllers\Seller\ProductsController::class, 'getPricePageData'])->name('seller.price')->middleware(['auth','is_seller']);
 	Route::post('/savePriceData', [App\Http\Controllers\Seller\ProductsController::class, 'savePriceData'])->name('seller.savePriceData')->middleware(['auth','is_seller']);

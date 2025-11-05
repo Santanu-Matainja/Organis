@@ -24,7 +24,7 @@ $(function () {
 		}
 		var stockqty = $(this).data('stockqty');
 		if((qty > stockqty)){
-			onErrorMsg(TEXT['Out Of Stock.']);
+			onErrorMsg(TEXT['This product out of stock.']);
 			return;
 		}
 		if (
@@ -81,7 +81,7 @@ $(function () {
 		}
 		var stockqty = $(this).data('stockqty');
 		if((qty > stockqty)){
-			onErrorMsg(TEXT['Out Of Stock']);
+			onErrorMsg(TEXT['This product out of stock.']);
 			return;
 		}
 		if (

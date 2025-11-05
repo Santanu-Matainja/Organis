@@ -39,11 +39,18 @@ class CheckoutFrontController extends Controller
 	
     public function LoadCheckout()
     {
-		$country_list = Country::where('is_publish', '=', 1)->orderBy('country_name', 'ASC')->get();
+		$country_list = Country::orderBy('country_name', 'ASC')->get();
 		// $shipping_list = Shipping::where('is_publish', '=', 1)->get(); 
 		$shipping_list = DeliveryType::where('status_id', '=', 1)->get(); 
+
+		$userId = Auth::id();
+		// $ShoppingCartData = session()->get('shopping_cart');
+		$cartRecord = DB::table('carts')->where('user_id', $userId)->first();
+		$ShoppingCartData = $cartRecord && $cartRecord->cart_data
+			? json_decode($cartRecord->cart_data, true)
+			: [];
 				
-        return view('frontend.checkout', compact('country_list', 'shipping_list'));
+        return view('frontend.checkout', compact('country_list', 'shipping_list', 'ShoppingCartData'));
     }
 	
     public function LoadThank()
@@ -62,12 +69,19 @@ class CheckoutFrontController extends Controller
 		
 		$base_url = url('/');
 		
-		$CartDataList = session()->get('shopping_cart');
+		// $CartDataList = session()->get('shopping_cart');
+		$userId = Auth::id();
+		$cartRecord = DB::table('carts')->where('user_id', $userId)->first();
+		$CartDataList = $cartRecord && $cartRecord->cart_data
+			? json_decode($cartRecord->cart_data, true)
+			: [];
+		
 		
 		$total_qty = 0;
 		$TotalPrice = 0;
 
-		if(session()->get('shopping_cart')){
+		// if(session()->get('shopping_cart')){
+		if($CartDataList){
 			foreach ($CartDataList as $row) {
 				$total_qty += $row['qty'];
 				$TotalPrice += $row['price']*$row['qty'];
@@ -509,6 +523,15 @@ class CheckoutFrontController extends Controller
 				}
 			}
 			
+			
+			$userId = Auth::id();
+			
+			$cartRecord = DB::table('carts')->where('user_id', $userId)->first();
+
+			if ($cartRecord && $cartRecord->cart_data) {
+				DB::table('carts')->where('user_id', $userId)->update(['cart_data' => null]);
+			}
+
 			$res['msgType'] = 'success';
 			$res['msg'] = __('Your order is successfully.');
 			$res['intent'] = $intent;

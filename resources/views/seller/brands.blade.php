@@ -64,13 +64,13 @@
 							</div>
 						</div>
 						<div id="tp_datalist">
-							@include('backend.partials.brands_table')
+							@include('seller.partials.brands_table')
 						</div>
 					</div>
 					<!--/Data grid/-->
 					<!--Data Entry Form-->
 					<div id="form-panel" class="card-body dnone">
-						<form novalidate="" data-validate="parsley" id="DataEntry_formId">
+						<form novalidate="" data-validate="parsley" id="DataEntry_formId" enctype="multipart/form-data">
 							<div class="row">
 								<div class="col-md-12">
 									<div class="form-group">
@@ -101,7 +101,7 @@
 										</select>
 									</div>
 								</div>
-								<div class="col-md-4">
+								<div class="col-md-4 d-none">
 									<div class="form-group">
 										<label for="is_publish">{{ __('Status') }}<span class="red">*</span></label>
 										<select name="is_publish" id="is_publish" class="chosen-select form-control">
@@ -119,8 +119,10 @@
 									<div class="form-group">
 										<label for="brand_thumbnail">{{ __('Image') }}</label>
 										<div class="tp-upload-field">
-											<input type="text" name="thumbnail" id="brand_thumbnail" class="form-control" readonly>
-											<a onClick="onGlobalMediaModalView()" href="javascript:void(0);" class="tp-upload-btn"><i class="fa fa-window-restore"></i>{{ __('Browse') }}</a>
+											<input type="text" id="brand_thumbnail" class="form-control" readonly>
+											<!-- Hidden file input -->
+    										<input type="file" name="thumbnail" id="thumbnail_file" accept="image/*" class="dnone">
+											<a onClick="openinput()" href="javascript:void(0);" class="tp-upload-btn"><i class="fa fa-window-restore"></i>{{ __('Browse') }}</a>
 										</div>
 										<em>Recommended image size width: 300px and height: 200px.</em>
 										<div id="remove_thumbnail" class="select-image">
@@ -168,6 +170,6 @@ var TEXT = [];
 	TEXT['Please select action'] = "{{ __('Please select action') }}";
 	TEXT['Please select record'] = "{{ __('Please select record') }}";
 </script>
-<script src="{{asset_path('backend/pages/brands.js')}}"></script>
+<script src="{{asset_path('backend/pages/sellerbrands.js')}}"></script>
 <script src="{{asset_path('backend/pages/global-media.js')}}"></script>
 @endpush

@@ -108,27 +108,72 @@
 							<div class="form-group">
 								<input name="password_confirmation" type="password" class="form-control" placeholder="{{ __('Confirm password') }}" required >
 							</div>
-							
+
 							<div class="form-group">
-								<input name="shop_name" type="text" class="form-control @error('shop_name') is-invalid @enderror" placeholder="{{ __('Shop Name') }}" value="{{ old('shop_name') }}" required />
+								<input name="shop_phone" type="text" class="form-control @error('shop_phone') is-invalid @enderror" placeholder="{{ __('Phone') }}" value="{{ old('shop_phone') }}" required />
+                                @if ($errors->has('shop_phone'))
+                                <span class="text-danger">{{ $errors->first('shop_phone') }}</span>
+                                @endif
+							</div>
+							
+							{{-- <div class="form-group">
+								<input name="shop_name" id="shop_name" type="text" class="form-control @error('shop_name') is-invalid @enderror" placeholder="{{ __('Comapany Name') }}" value="{{ old('shop_name') }}" required />
                                 @if ($errors->has('shop_name'))
                                 <span class="text-danger">{{ $errors->first('shop_name') }}</span>
                                 @endif
 							</div>
-							
 							<div class="form-group">
+								<input name="company_address" id="company_address" type="text" class="form-control @error('company_address') is-invalid @enderror" placeholder="{{ __('Company Address') }}" value="{{ old('company_address') }}" required />
+								@if ($errors->has('company_address'))
+                                <span class="text-danger">{{ $errors->first('company_address') }}</span>
+                                @endif
+							</div> --}}
+							<div class="form-group">
+								<select name="account_type" id="account_type" class="form-control" required>
+									<option value="all" selected>Select Account Type</option>
+									<option value="Individual" {{ old('account_type') == 'Individual' ? 'selected' : '' }}>Individual</option>
+									<option value="Company" {{ old('account_type') == 'Company' ? 'selected' : '' }}>Company</option>
+								</select>
+							</div>
+
+							<div id="company_fields" style="display: none;">
+								<div class="form-group">
+									<input name="shop_name" id="shop_name" type="text" class="form-control @error('shop_name') is-invalid @enderror" placeholder="{{ __('Company Name') }}" value="{{ old('shop_name') }}" />
+									@if ($errors->has('shop_name'))
+										<span class="text-danger">{{ $errors->first('shop_name') }}</span>
+									@endif
+								</div>
+
+								<div class="form-group">
+									<input name="company_address" id="company_address" type="text" class="form-control @error('company_address') is-invalid @enderror" placeholder="{{ __('Company Address') }}" value="{{ old('company_address') }}" />
+									@if ($errors->has('company_address'))
+										<span class="text-danger">{{ $errors->first('company_address') }}</span>
+									@endif
+								</div>
+
+								<div class="form-group">
+									<input name="vat_number" id="vat_number" type="text" class="form-control @error('vat_number') is-invalid @enderror" placeholder="{{ __('VAT Number') }}" value="{{ old('vat_number') }}" />
+									@if ($errors->has('vat_number'))
+										<span class="text-danger">{{ $errors->first('vat_number') }}</span>
+									@endif
+								</div>
+
+								<div class="form-group">
+									<input name="trade_register_number" id="trade_register_number" type="text" class="form-control @error('trade_register_number') is-invalid @enderror" placeholder="{{ __('Trade Register Number') }}" value="{{ old('trade_register_number') }}" />
+									@if ($errors->has('trade_register_number'))
+										<span class="text-danger">{{ $errors->first('trade_register_number') }}</span>
+									@endif
+								</div>
+							</div>
+
+							<div class="form-group d-none">
 								<input name="shop_url" id="shop_url" type="text" class="form-control @error('shop_url') is-invalid @enderror" placeholder="{{ __('Shop URL') }}" value="{{ old('shop_url') }}" required />
 								@if ($errors->has('shop_url'))
                                 <span class="text-danger">{{ $errors->first('shop_url') }}</span>
                                 @endif
 							</div>
 							
-							<div class="form-group">
-								<input name="shop_phone" type="text" class="form-control @error('shop_phone') is-invalid @enderror" placeholder="{{ __('Shop Phone') }}" value="{{ old('shop_phone') }}" required />
-                                @if ($errors->has('shop_phone'))
-                                <span class="text-danger">{{ $errors->first('shop_phone') }}</span>
-                                @endif
-							</div>
+							
 							
 							@if($gtext['is_recaptcha'] == 1)
 							<div class="form-group">
@@ -161,8 +206,8 @@
 <script src='https://www.google.com/recaptcha/api.js' async defer></script>
 @endif
 <script>
-$("#shop_url").on("blur", function () {
-	var shop_url = $("#shop_url").val();
+$("#shop_name").on("blur", function () {
+	var shop_url = $("#shop_name").val();
 	var str_name = shop_url.trim();
 	var strLength = str_name.length;
 	if(strLength>0){
@@ -176,6 +221,24 @@ $("#shop_url").on("blur", function () {
 			}
 		});
 	}
+});
+
+$(document).ready(function () {
+	function toggleCompanyFields() {
+		if ($('#account_type').val() === 'Company') {
+			$('#company_fields').slideDown();
+		} else {
+			$('#company_fields').slideUp();
+		}
+	}
+
+	// Run on page load
+	toggleCompanyFields();
+
+	// Run on change
+	$('#account_type').on('change', function () {
+		toggleCompanyFields();
+	});
 });
 </script>
 @endpush

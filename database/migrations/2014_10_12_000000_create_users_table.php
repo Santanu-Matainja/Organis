@@ -21,6 +21,9 @@ class CreateUsersTable extends Migration
             $table->string('password');
 			$table->string('shop_name', 200)->nullable();
 			$table->string('shop_url', 200)->nullable();
+			$table->string('address', 200)->nullable();
+			$table->string('vat_number', 200)->nullable();
+			$table->string('trade_register_number', 200)->nullable();
 			$table->string('phone', 200)->nullable();
 			$table->text('address')->nullable();
 			$table->string('city', 200)->nullable();

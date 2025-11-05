@@ -106,14 +106,14 @@
 										<div class="col-md-12">
 											<div class="mb-3">
 												<label for="phone">{{ __('Phone') }}</label>
-												<input id="phone" name="phone" type="text" class="form-control" placeholder="{{ __('Phone') }}" value="@if(isset(Auth::user()->phone)) {{ Auth::user()->phone }} @endif" />
+												<input id="phone" name="phone" type="number" class="form-control" placeholder="{{ __('Phone') }}" value="{{ old('phone', Auth::user()->phone ?? '') }}" />
 											</div>
 										</div>
 									</div>
 									<div class="row">
 										<div class="col-md-12">
 											<div class="mb-3">
-												<label for="address">{{ __('Address') }}</label>
+												<label for="address">{{ __('Company Address') }}</label>
 												<textarea id="address" name="address" class="form-control" placeholder="{{ __('Address') }}" rows="4">@if(isset(Auth::user()->address)) {{ Auth::user()->address }} @endif</textarea>
 											</div>
 										</div>
@@ -150,8 +150,8 @@
 										<div class="col-md-12">
 											<div class="mb-3">
 												<label for="zip_code">{{ __('Zip Code') }}</label>
-												<input type="text" id="zip_code" name="zip_code" class="form-control" placeholder="{{ __('Zip Code') }}"
-													value="@if(isset(Auth::user()->zip_code)) {{ Auth::user()->zip_code }} @endif">
+												<input type="number" id="zip_code" name="zip_code" class="form-control" placeholder="{{ __('Zip Code') }}"
+													value="{{ old('phone', Auth::user()->zip_code ?? '') }}">
 											</div>
 										</div>
 									</div>
