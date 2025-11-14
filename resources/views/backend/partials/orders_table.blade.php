@@ -6,11 +6,12 @@
 				<th class="text-left" style="width:8%">{{ __('Order#') }}</th>
 				<th class="text-left" style="width:8%">{{ __('Order Date') }}</th>
 				<th class="text-left" style="width:10%">{{ __('Customer') }} </th>
-				<th class="text-left" style="width:10%">{{ __('Store') }}</th>
-				<th class="text-center" style="width:8%">{{ __('Subtotal') }}</th>
-				<th class="text-center" style="width:5%">{{ __('Tax') }}</th>
-				<th class="text-center" style="width:8%">{{ __('Shipping Fee') }}</th>
-				<th class="text-center" style="width:8%">{{ __('Total Amount') }}</th>
+				<th class="text-left" style="width:5%">{{ __('Store') }}</th>
+				<th class="text-center" style="width:3%">{{ __('Subtotal') }}</th>
+				<th class="text-center" style="width:3%">{{ __('Tax') }}</th>
+				<th class="text-center" style="width:5%">{{ __('Shipping Fee') }}</th>
+				<th class="text-center" style="width:5%">{{ __('Commission') }}</th>
+				<th class="text-center" style="width:5%">{{ __('Total Amount') }}</th>
 				<th class="text-center" style="width:9%">{{ __('Payment Method') }}</th>
 				<th class="text-center" style="width:9%">{{ __('Payment Status') }}</th>
 				<th class="text-center" style="width:9%">{{ __('Order Status') }}</th>
@@ -25,8 +26,18 @@
 			$sub_total = $row->total_amount;
 			$tax = $row->tax;
 			$shipping_fee = $row->shipping_fee;
+
+			if ($shipping_fee === '') {
+				$shipping_fee = 0.00;
+			} elseif (strpos($shipping_fee, ',') !== false) {
+				$shipping_fee = array_map('trim', explode(',', $shipping_fee));
+				$shipping_fee = array_map('floatval', $shipping_fee);
+				$shipping_fee = array_sum($shipping_fee);
+			} else {
+				$shipping_fee = (float)$shipping_fee;
+			}
 			
-			$total_amount = $row->total_amount + $row->tax + $row->shipping_fee;
+			$total_amount = $row->total_amount + $row->tax + $shipping_fee + $commissions;
 			
 			@endphp
 			<tr>
@@ -58,6 +69,12 @@
 				<td class="text-center">{{ $gtext['currency_icon'] }}{{ NumberFormat($shipping_fee) }}</td>
 				@else
 				<td class="text-center">{{ NumberFormat($shipping_fee) }}{{ $gtext['currency_icon'] }}</td>
+				@endif
+				
+				@if($gtext['currency_position'] == 'left')
+				<td class="text-center">{{ $gtext['currency_icon'] }}{{ NumberFormat($commissions) }}</td>
+				@else
+				<td class="text-center">{{ NumberFormat($commissions) }}{{ $gtext['currency_icon'] }}</td>
 				@endif
 				
 				@if($gtext['currency_position'] == 'left')

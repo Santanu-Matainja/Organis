@@ -60,8 +60,11 @@ class MyDashboardController extends Controller
 				'a.id')
 			->orderBy('a.created_at','desc')
 			->paginate(20);
-			
-        return view('frontend.my-orders', compact('datalist'));
+
+		$commisiontable = DB::table('commissions')->limit(1)->first();
+		$commissions = $commisiontable->commission;
+	
+        return view('frontend.my-orders', compact('datalist', 'commissions'));
     }
 	
     public function MyOrderDetails($id, $order_no)
@@ -123,8 +126,11 @@ class MyDashboardController extends Controller
 			->select('order_items.*', 'products.title', 'products.f_thumbnail', 'products.id')
 			->where('order_items.order_master_id', $id)
 			->get();
-			
-        return view('frontend.order-details', compact('mdata', 'datalist'));
+		
+		$commisiontable = DB::table('commissions')->limit(1)->first();
+		$commissions = $commisiontable->commission;
+
+        return view('frontend.order-details', compact('mdata', 'datalist', 'commissions'));
     }
 	
     public function LoadMyProfile()

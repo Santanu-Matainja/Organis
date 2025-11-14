@@ -65,6 +65,9 @@ Route::post('/user/customer-register', [App\Http\Controllers\Backend\CustomerAut
 Route::get('/user/reset', [App\Http\Controllers\Backend\CustomerAuthController::class, 'LoadReset'])->name('frontend.reset');
 Route::post('/user/resetPassword', [App\Http\Controllers\Backend\CustomerAuthController::class, 'resetPassword'])->name('frontend.resetPassword');
 Route::post('/user/resetPasswordUpdate', [App\Http\Controllers\Backend\CustomerAuthController::class, 'resetPasswordUpdate'])->name('frontend.resetPasswordUpdate');
+// Email Verify
+Route::get('/user/email', [App\Http\Controllers\Backend\CustomerAuthController::class, 'emailverification'])->name('frontend.emailverification');
+Route::post('/user/emailverify', [App\Http\Controllers\Backend\CustomerAuthController::class, 'verifyemailOtp'])->name('frontend.verifyemail');
 
 //Seller Authentication
 Route::get('/seller/register', [App\Http\Controllers\Backend\SellerController::class, 'LoadSellerRegister'])->name('frontend.seller-register');
@@ -270,6 +273,10 @@ Route::prefix('backend')->group(function(){
 	Route::get('/inventory/{id}', [App\Http\Controllers\Backend\ProductsController::class, 'getInventoryPageData'])->name('backend.inventory')->middleware(['auth','is_admin']);
 	Route::post('/saveInventoryData', [App\Http\Controllers\Backend\ProductsController::class, 'saveInventoryData'])->name('backend.saveInventoryData')->middleware(['auth','is_admin']);
 	
+	// Shipping Details 
+	Route::get('/shipping/{id}', [App\Http\Controllers\Backend\ProductsController::class, 'getShippingPageData'])->name('backend.productshipping')->middleware(['auth','is_admin']);
+	Route::post('/saveProductsShippingData', [App\Http\Controllers\Backend\ProductsController::class, 'saveShippingData'])->name('backend.saveShippingData')->middleware(['auth','is_admin']);
+
 	//Product Images
 	Route::get('/product-images/{id}', [App\Http\Controllers\Backend\ProductsController::class, 'getProductImagesPageData'])->name('backend.product-images')->middleware(['auth','is_admin']);
 	Route::get('/getProductImagesTableData', [App\Http\Controllers\Backend\ProductsController::class, 'getProductImagesTableData'])->name('backend.getProductImagesTableData')->middleware(['auth','is_admin']);
@@ -375,6 +382,10 @@ Route::prefix('backend')->group(function(){
 	//Tax
 	Route::get('/tax', [App\Http\Controllers\Backend\TaxesController::class, 'getTaxPageLoad'])->name('backend.tax')->middleware(['auth','is_admin']);
 	Route::post('/saveTaxData', [App\Http\Controllers\Backend\TaxesController::class, 'saveTaxData'])->name('backend.saveTaxData')->middleware(['auth','is_admin']);
+
+	//Commission
+	Route::get('/commission', [App\Http\Controllers\Backend\CommissionController::class, 'getCommissionPageLoad'])->name('backend.commission')->middleware(['auth','is_admin']);
+	Route::post('/saveCommissionData', [App\Http\Controllers\Backend\CommissionController::class, 'saveCommissionData'])->name('backend.saveCommissionData')->middleware(['auth','is_admin']);
 
 	//Currency
 	Route::get('/currency', [App\Http\Controllers\Backend\CurrencyController::class, 'getCurrencyPageLoad'])->name('backend.currency')->middleware(['auth','is_admin']);
@@ -632,6 +643,11 @@ Route::prefix('seller')->group(function(){
 	Route::get('/check-sku', [App\Http\Controllers\Seller\ProductsController::class, 'checkSku'])->name('seller.checksku')->middleware(['auth','is_seller']);
 	Route::post('/saveInventoryData', [App\Http\Controllers\Seller\ProductsController::class, 'saveInventoryData'])->name('seller.saveInventoryData')->middleware(['auth','is_seller']);
 	
+	// Shipping Details 
+	Route::get('/shipping/{id}', [App\Http\Controllers\Seller\ProductsController::class, 'getShippingPageData'])->name('seller.shipping')->middleware(['auth','is_seller']);
+	Route::post('/saveShippingData', [App\Http\Controllers\Seller\ProductsController::class, 'saveShippingData'])->name('seller.saveShippingData')->middleware(['auth','is_seller']);
+
+
 	//Product Images
 	Route::get('/product-images/{id}', [App\Http\Controllers\Seller\ProductsController::class, 'getProductImagesPageData'])->name('seller.product-images')->middleware(['auth','is_seller']);
 	Route::get('/getProductImagesTableData', [App\Http\Controllers\Seller\ProductsController::class, 'getProductImagesTableData'])->name('seller.getProductImagesTableData')->middleware(['auth','is_seller']);

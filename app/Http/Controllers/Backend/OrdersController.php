@@ -31,8 +31,11 @@ class OrdersController extends Controller
 			->groupBy('a.customer_id', 'a.payment_status_id', 'a.order_status_id', 'a.created_at', 'f.ostatus_name', 'e.pstatus_name', 'd.method_name', 'a.shipping_fee', 'b.name', 'c.shop_name', 'a.order_no', 'a.id')
 			->orderBy('a.created_at','desc')
 			->paginate(25);
-		
-        return view('backend.orders', compact('order_status_list', 'datalist'));		
+			
+		$commisiontable = DB::table('commissions')->limit(1)->first();
+		$commissions = $commisiontable->commission;
+
+        return view('backend.orders', compact('order_status_list', 'datalist', 'commissions'));		
 	}
 	
 	//Get data for Orders Pagination
@@ -115,7 +118,10 @@ class OrdersController extends Controller
 				}
 			}
 
-			return view('backend.partials.orders_table', compact('datalist'))->render();
+			$commisiontable = DB::table('commissions')->limit(1)->first();
+			$commissions = $commisiontable->commission;
+
+			return view('backend.partials.orders_table', compact('datalist', 'commissions'))->render();
 		}
 	}
 	
@@ -216,7 +222,10 @@ class OrdersController extends Controller
 			->where('order_items.order_master_id', $id)
 			->get();
 
-        return view('backend.order', compact('payment_status_list', 'order_status_list', 'mdata', 'datalist'));		
+		$commisiontable = DB::table('commissions')->limit(1)->first();
+		$commissions = $commisiontable->commission;
+
+        return view('backend.order', compact('payment_status_list', 'order_status_list', 'mdata', 'datalist', 'commissions'));		
 	}	
 	
 	//update Order Status
@@ -373,20 +382,35 @@ class OrdersController extends Controller
 							<td style="width:15%;text-align:right;border:1px solid #ddd;">'.$total_price.'</td>
 						</tr>';
 		}
+
+		if ($mdata->shipping_fee === '') {
+			$mdata->shipping_fee = 0.00;
+		} elseif (strpos($mdata->shipping_fee, ',') !== false) {
+			$mdata->shipping_fee = array_map('trim', explode(',', $mdata->shipping_fee));
+			$mdata->shipping_fee = array_map('floatval', $mdata->shipping_fee);
+			$mdata->shipping_fee = array_sum($mdata->shipping_fee);
+		} else {
+			$mdata->shipping_fee = (float)$mdata->shipping_fee;
+		}
+
+		$commisiontable = DB::table('commissions')->limit(1)->first();
+		$commissions = $commisiontable->commission;
 		
-		$total_amount_shipping_fee = $mdata->total_amount+$mdata->shipping_fee+$mdata->tax;
+		$total_amount_shipping_fee = $mdata->total_amount+$mdata->shipping_fee+$mdata->tax+$commissions;
 		
 		if($gtext['currency_position'] == 'left'){
 			$shipping_fee = $gtext['currency_icon'].NumberFormat($mdata->shipping_fee);
 			$tax = $gtext['currency_icon'].NumberFormat($mdata->tax);
 			$discount = $gtext['currency_icon'].NumberFormat($mdata->discount);
 			$subtotal = $gtext['currency_icon'].NumberFormat($mdata->total_amount);
+			$commissions = $gtext['currency_icon'].NumberFormat($commissions);
 			$total_amount = $gtext['currency_icon'].NumberFormat($total_amount_shipping_fee);
 		}else{
 			$shipping_fee = NumberFormat($mdata->shipping_fee).$gtext['currency_icon'];
 			$tax = NumberFormat($mdata->tax).$gtext['currency_icon'];
 			$discount = NumberFormat($mdata->discount).$gtext['currency_icon'];
 			$subtotal = NumberFormat($mdata->total_amount).$gtext['currency_icon'];
+			$commissions = NumberFormat($commissions).$gtext['currency_icon'];
 			$total_amount = NumberFormat($total_amount_shipping_fee).$gtext['currency_icon'];
 		}
 		
@@ -503,6 +527,10 @@ class OrdersController extends Controller
 														<tr>
 															<td style="width:85%;text-align:right;">'.__('Tax').':</td>
 															<td style="width:15%;text-align:right;">'.$tax.'</td>
+														</tr>
+														<tr>
+															<td style="width:85%;text-align:right;">'.__('Tax').':</td>
+															<td style="width:15%;text-align:right;">'.$commissions.'</td>
 														</tr>
 														<tr>
 															<td style="width:85%;text-align:right;">'.__('Subtotal').':</td>

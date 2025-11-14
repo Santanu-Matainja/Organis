@@ -306,6 +306,7 @@ function onLoadEditData() {
 
 			var seller_data = response.seller_data;
 			var bank_info_data = response.bank_information;
+			var sellerdelivaryfee = response.sellerdelivaryfee;
 
 			var passtype = $('#password').attr('type');
 			if(passtype == 'text'){
@@ -313,6 +314,7 @@ function onLoadEditData() {
 				$(".toggle-password").addClass("fa-eye");
 				$('#password').attr('type', 'password');
 			}
+			//.prop("readonly", !!seller_data.name) ||when value present then readonly add
 			$("#seller_id").val(seller_data.id);
 			$("#RecordId").val(seller_data.id);
 			$("#name").val(seller_data.name);
@@ -330,6 +332,9 @@ function onLoadEditData() {
 			$("#zip_code").val(seller_data.zip_code);
 			$("#country_id").val(seller_data.country_id).trigger("chosen:updated");
 			$("#status_id").val(seller_data.status_id).trigger("chosen:updated");
+			$("#trade_register_number").val(seller_data.trade_register_number);
+			$("#vat_number").val(seller_data.vat_number);
+			$("#shipping_fee").val(sellerdelivaryfee);
  			
 			if(seller_data.photo != null){
 				$("#photo_thumbnail").val(seller_data.photo);

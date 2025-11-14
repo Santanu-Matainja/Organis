@@ -160,7 +160,7 @@
 									</div>
 									<div class="col-lg-4">
 										<div class="form-group">
-											<label for="manufacture_date">{{ __('Expire Date') }}</label>
+											<label for="manufacture_date">{{ __('Manufacture Date') }}</label>
 											<input value="{{ $datalist['manufacture_date'] }}" name="manufacture_date" id="manufacture_date" type="date" class="form-control parsley-validated" min="{{ date('Y-m-d') }}">
 										</div>
 									</div>
@@ -170,23 +170,10 @@
 											<input value="{{ $datalist['exdate'] }}" name="exdate" id="exdate" type="date" class="form-control parsley-validated" min="{{ date('Y-m-d') }}">
 										</div>
 									</div>
-									<div class="col-lg-4"></div>
-									<div class="col-lg-4">
-										<div class="form-check mt-4">
-											<input value="1"  name="perisible" id="perisible" type="checkbox" class="form-check-input parsley-validated" {{ old('perisible', $datalist['perisible']) ? 'checked' : '' }}  style="height: 50px;width: 18px;">
-											<label for="perisible"  style="margin: 18px 7px;">{{ __('Perisible') }}</label>
-										</div>
-									</div>
 									<div class="col-lg-4">
 										<div class="form-group">
-											<label for="delivarytypeid">{{ __('Delivary Type') }}<span class="red">*</span></label>
-											<select name="delivarytypeid" id="delivarytypeid" class="chosen-select form-control">
-											@foreach($delivarytypes as $row)
-												<option {{ $row->id == $datalist['delivarytypeid'] ? "selected=selected" : '' }} value="{{ $row->id }}">
-													{{ $row->lable }}
-												</option>
-											@endforeach
-											</select>
+											<label for="maxorderqty">{{ __('Maximum Order Quantity') }}<span class="red">*</span></label>
+											<input value="{{ $datalist['maxorderqty'] }}" name="maxorderqty" id="maxorderqty" type="text" class="form-control parsley-validated">
 										</div>
 									</div>
 								</div>

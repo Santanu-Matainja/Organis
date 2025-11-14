@@ -64,7 +64,7 @@
 									</div>
 									<div class="col-md-6">
 										<div class="form-group">
-											<label for="trade_register_number">{{ __('Vat trade_register_number') }}<span class="red">*</span></label>
+											<label for="trade_register_number">{{ __('Trade Register Number') }}<span class="red">*</span></label>
 											<input type="text" name="trade_register_number" id="trade_register_number" value="{{ $seller_data['trade_register_number'] }}" class="form-control parsley-validated" data-required="true">
 										</div>
 									</div>
@@ -167,7 +167,7 @@
 									</div>
 									<div class="col-md-6">
 										<div class="form-group">
-											<label for="bank_code">{{ __('Bank Code/IFSC') }}</label>
+											<label for="bank_code">{{ __('Bank Code/BIC') }}</label>
 											<input type="text" name="bank_code" id="bank_code" value="{{ $bank_information['bank_code'] }}" class="form-control">
 										</div>
 									</div>
@@ -176,7 +176,7 @@
 								<div class="row">
 									<div class="col-md-6">
 										<div class="form-group">
-											<label for="account_number">{{ __('Account Number') }}</label>
+											<label for="account_number">{{ __('Account Number/IBAN') }}</label>
 											<input type="text" name="account_number" id="account_number" value="{{ $bank_information['account_number'] }}" class="form-control">
 										</div>
 									</div>

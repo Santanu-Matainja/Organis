@@ -12,7 +12,7 @@
 			<div class="loginsignup-area">
 				<div class="loginsignup text-center">
 					<div class="logo">
-						<a href="{{ url('/login') }}">
+						<a href="{{ url('/user/login') }}">
 							<img src="{{ $gtext['back_logo'] ? asset_path('media/'.$gtext['back_logo']) : asset_path('backend/images/backend-logo.png') }}" alt="logo">
 						</a>
 					</div>

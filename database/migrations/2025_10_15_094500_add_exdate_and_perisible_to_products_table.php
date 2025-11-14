@@ -16,6 +16,7 @@ return new class extends Migration
             $table->date('exdate')->nullable()->after('manufacture_date');
             $table->boolean('perisible')->default(0)->after('exdate');
             $table->string('delivarytypeid')->nullable()->after('perisible'); 
+            $table->string('maxorderqty')->nullable()->after('delivarytypeid'); 
         });
     }
 

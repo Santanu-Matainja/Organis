@@ -86,7 +86,18 @@
 											@if (count($datalist)>0)
 											@foreach($datalist as $row)
 											@php 
-												$total_amount = $row->total_amount+$row->shipping_fee+$row->tax;
+												$shipping_fee = $row->shipping_fee;		
+												if ($shipping_fee === '') {
+													$shipping_fee = 0.00;
+												} elseif (strpos($shipping_fee, ',') !== false) {
+													$shipping_fee = array_map('trim', explode(',', $shipping_fee));
+													$shipping_fee = array_map('floatval', $shipping_fee);
+													$shipping_fee = array_sum($shipping_fee);
+												} else {
+													$shipping_fee = (float)$shipping_fee;
+												}
+			
+												$total_amount = $row->total_amount+$shipping_fee+$row->tax+$commissions;
 											@endphp
 											<tr>
 												<td class="text-left"><a href="{{ route('frontend.order-details', [$row->id, $row->order_no]) }}">{{ $row->order_no }}</a></td>

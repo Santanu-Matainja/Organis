@@ -27,6 +27,11 @@ $(function () {
 			onErrorMsg(TEXT['This product out of stock.']);
 			return;
 		}
+		var maxorderqty = $(this).data('maxorderqty');
+		if((qty > maxorderqty)){
+			onErrorMsg(TEXT['Maximum order limit cross.']);
+			return;
+		}
 		if (
             (
                 (cost_price === undefined || cost_price === '' || cost_price === null || Number(cost_price) <= 0) ||
@@ -82,6 +87,11 @@ $(function () {
 		var stockqty = $(this).data('stockqty');
 		if((qty > stockqty)){
 			onErrorMsg(TEXT['This product out of stock.']);
+			return;
+		}
+		var maxorderqty = $(this).data('maxorderqty');
+		if((qty > maxorderqty)){
+			onErrorMsg(TEXT['Maximum order limit cross.']);
 			return;
 		}
 		if (

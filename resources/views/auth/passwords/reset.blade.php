@@ -56,7 +56,7 @@
 						@endif
 						<input type="submit" class="btn login-btn" value="{{ __('Reset Password') }}">
 					</form>
-					<h3><a href="{{ url('/login') }}">{{ __('Back to login') }}</a></h3>
+					<h3><a href="{{ url('/user/login') }}">{{ __('Back to login') }}</a></h3>
 				</div>
 			</div>
 		</div>

@@ -14,6 +14,8 @@ use App\Models\Attribute;
 use App\Models\Media_option;
 use App\Models\Pro_image;
 use App\Models\Related_product;
+use App\Models\ProductShipping;
+use App\Models\DeliveryType;
 
 class ProductsController extends Controller
 {
@@ -370,6 +372,10 @@ class ProductsController extends Controller
 		$user_id = $request->input('storeid');
 		$variation_size = $request->input('variation_size');
 		$sale_price = $request->input('sale_price');
+
+		$exdate = $request->input('exdate');
+		$manufacture_date = $request->input('manufacture_date');
+		$maxorderqty = $request->input('maxorderqty');
 		
 		$validator_array = array(
 			'product_name' => $request->input('title'),
@@ -380,7 +386,8 @@ class ProductsController extends Controller
 			'status' => $request->input('is_publish'),
 			'store' => $request->input('storeid'),
 			'variation_size' => $request->input('variation_size'),
-			'sale_price' => $request->input('sale_price')
+			'sale_price' => $request->input('sale_price'),
+			'maxorderqty' => $request->input('maxorderqty'),
 		);
 		
 		$rId = $id == '' ? '' : ','.$id;
@@ -393,7 +400,8 @@ class ProductsController extends Controller
 			'status' => 'required',
 			'store' => 'required',
 			'variation_size' => 'required',
-			'sale_price' => 'required'
+			'sale_price' => 'required',
+			'maxorderqty' => 'required',
 		]);
 
 		$errors = $validator->errors();
@@ -451,6 +459,12 @@ class ProductsController extends Controller
 			$res['msg'] = $errors->first('sale_price');
 			return response()->json($res);
 		}
+
+		if($errors->has('maxorderqty')){
+			$res['msgType'] = 'error';
+			$res['msg'] = $errors->first('maxorderqty');
+			return response()->json($res);
+		}
 		
 		$data = array(
 			'title' => $title,
@@ -468,7 +482,10 @@ class ProductsController extends Controller
 			'user_id' => $user_id,
 			'variation_size' => $variation_size,
 			'sale_price' => $sale_price,
-			'lan' => $lan
+			'lan' => $lan,
+			'exdate' => $exdate,
+			'manufacture_date' => $manufacture_date,
+			'maxorderqty' => $maxorderqty,
 		);
 		
 		$response = Product::where('id', $id)->update($data);
@@ -591,6 +608,74 @@ class ProductsController extends Controller
 		
 		return response()->json($res);
     }
+	
+	// Shipping 
+	public function getShippingPageData($id){
+		
+		$datalist = Product::where('id', $id)->first();
+		$delivarytypes = DeliveryType::orderBy('lable','asc')->get();
+
+		$selectedDeliveryTypes = explode(',', $datalist['delivarytypeid'] ?? '');
+
+		$shippingMethod = ProductShipping::where('product_id', $id)->first();
+
+        return view('backend.productshipping', compact('datalist', 'selectedDeliveryTypes', 'delivarytypes', 'shippingMethod'));
+    }
+
+	public function saveShippingData(Request $request)
+	{
+		$res = [];
+
+		$productId = $request->input('RecordId');
+		$deliveryTypes = $request->input('delivarytypeid'); // array
+		$slabs = $request->input('slabs'); 
+		$perisible = $request->has('perisible') ? 1 : 0;
+		$pincode = $request->input('pincode');
+
+		$deliveryTypeString = is_array($deliveryTypes) ? implode(',', $deliveryTypes) : null;
+
+		$productUpdate = Product::where('id', $productId)
+			->update(['delivarytypeid' => $deliveryTypeString, 'perisible' => $perisible]);
+
+		$validSlabs = [];
+		if (!empty($slabs)) {
+			foreach ($slabs as $slab) {
+				if (
+					isset($slab['min_qty'], $slab['max_qty'], $slab['price']) &&
+					$slab['min_qty'] != '' &&
+					$slab['max_qty'] != '' &&
+					$slab['price'] != ''
+				) {
+					$validSlabs[] = [
+						'min_qty' => (int)$slab['min_qty'],
+						'max_qty' => (int)$slab['max_qty'],
+						'price' => (float)$slab['price'],
+					];
+				}
+			}
+		}
+
+		if (!empty($validSlabs)) {
+			ProductShipping::updateOrCreate(
+				['product_id' => $productId],
+				[
+					'slab' => json_encode($validSlabs),
+					'pincode' => $pincode,
+				]
+			);
+		}
+
+		if ($productUpdate || !empty($validSlabs)) {
+			$res['msgType'] = 'success';
+			$res['msg'] = __('Shipping data saved successfully.');
+		} else {
+			$res['msgType'] = 'error';
+			$res['msg'] = __('No data to save.');
+		}
+
+		return response()->json($res);
+	}
+
 	
     //get Product Images
     public function getProductImagesPageData($id){

@@ -49,8 +49,10 @@ class CheckoutFrontController extends Controller
 		$ShoppingCartData = $cartRecord && $cartRecord->cart_data
 			? json_decode($cartRecord->cart_data, true)
 			: [];
-				
-        return view('frontend.checkout', compact('country_list', 'shipping_list', 'ShoppingCartData'));
+
+		$commision = DB::table('commissions')->limit(1)->first();
+
+        return view('frontend.checkout', compact('country_list', 'shipping_list', 'ShoppingCartData', 'commision'));
     }
 	
     public function LoadThank()
@@ -110,7 +112,7 @@ class CheckoutFrontController extends Controller
 		$payment_method_id = $request->input('payment_method');
 		// $shipping_method_id = $request->input('shipping_method');
 		
-		$shipping_methods_by_product = $request->input('shipping_method', []); // key => product_id
+		$shipping_methods_by_product = $request->input('shipping_method', []); 
 
 		if($new_account == 1){
 			
@@ -205,48 +207,75 @@ class CheckoutFrontController extends Controller
 
 		foreach ($UniqueDataList as $seller_id) {
 			$seller_fee = 0;
-			$titles = []; 
+			$titles = [];
+			$shippingfee = [];
 			$seller_total_qty = 0;
 			$seller_total_price = 0;
 			$seller_tax = 0;
-			$seller_discount = 0; 
+			$seller_discount = 0;
 			$seller_subtotal = 0;
+
+			// get selected shipping id from frontend
+			$selected_shipid = $request->shipping_method[$seller_id] ?? null;
+			$selected_shipping = DeliveryType::find($selected_shipid);
+			$titles[] = $selected_shipping->lable ?? '';
 
 			foreach ($CartDataList as $cartRow) {
 				if ($cartRow['seller_id'] == $seller_id) {
 					$pId = $cartRow['id'];
-					$shipid = $shipping_methods_by_product[$pId] ?? null;
-
-					if ($shipid) {
-						$ship = DeliveryType::find($shipid);
-
-						if ($ship) {
-							$fee = comma_remove($ship->shipping_fee);
-							$seller_fee += $fee;
-
-							// store title for reference (e.g. "Standard - ₹50")
-							$titles[] = $ship->lable ;
-						}
-					}
-
 					$qty = comma_remove($cartRow['qty']);
 					$price = comma_remove($cartRow['price']);
 					$total_price = $qty * $price;
-
 					$tax = ($total_price * $tax_rate) / 100;
 
 					$seller_total_qty += $qty;
 					$seller_total_price += $total_price;
 					$seller_tax += $tax;
 
+					// calculate slab shipping for this product
+					$productShippingFee = 0;
+					$productShipping = DB::table('product_shippings')->where('product_id', $pId)->first();
+
+					if ($productShipping && !empty($productShipping->slab)) {
+						$slabs = json_decode($productShipping->slab, true);
+						if (is_string($slabs)) $slabs = json_decode($slabs, true);
+
+						if (is_array($slabs) && count($slabs) > 0) {
+							foreach ($slabs as $slab) {
+								$min = (int)$slab['min_qty'];
+								$max = (int)$slab['max_qty'];
+								$price = (float)$slab['price'];
+								if ($qty >= $min && $qty <= $max) {
+									$productShippingFee = $price;
+									break;
+								}
+							}
+						}
+					}
+
+					if ($selected_shipid == 2) {
+						$seller_fee += $productShippingFee;
+					} elseif ($selected_shipid == 3) {
+						$seller_fee += 0;
+					} elseif ($selected_shipid == 4) {
+						$base_fee = $selected_shipping->shipping_fee ?? 0;
+						$seller_fee += $base_fee + $productShippingFee;
+					} else {
+						$seller_fee += $selected_shipping->shipping_fee ?? 0;
+					}
+
+					$shippingfee[] = $productShippingFee;
 				}
 			}
 
 			$perSellerShippingFee[$seller_id] = $seller_fee;
 			$perSellerShippingTitle[$seller_id] = implode(', ', $titles);
+			$ShippingTitle[$seller_id] = implode(', ', $shippingfee);
 
 			$seller_subtotal = $seller_total_price + $seller_tax;
-			$seller_total_amount = $seller_subtotal + ($perSellerShippingFee[$seller_id] ?? 0) - $seller_discount;
+			
+			$commision = DB::table('commissions')->limit(1)->first();
+			$seller_total_amount = $seller_subtotal + ($perSellerShippingFee[$seller_id] ?? 0) - $seller_discount + $commision->commission;
 
 			$perSellerTotals[$seller_id] = [
 				'total_qty' => $seller_total_qty,
@@ -257,7 +286,7 @@ class CheckoutFrontController extends Controller
 				'total_amount' => $seller_total_amount,
 			];
 		}
-		
+
 		$MasterData = array();
 		$OrderNoArr = array();
 		
@@ -272,7 +301,7 @@ class CheckoutFrontController extends Controller
 			$seller_id = $row;
 			
 			$shipping_title = $perSellerShippingTitle[$seller_id] ?? null;
-			$shipping_fee = $perSellerShippingFee[$seller_id] ?? 0;
+			$shipping_fee = $ShippingTitle[$seller_id] ?? 0;
 
 			$totals = $perSellerTotals[$seller_id];
 
@@ -352,11 +381,11 @@ class CheckoutFrontController extends Controller
 
 			$sellerCount = count($UniqueDataList);
 		
-			if($shipping_fee ==''){
-				$shippingFee = 0; 
-			}else{
-				$shippingFee = $sellerCount * $shipping_fee;
-			}
+			// if($shipping_fee ==''){
+			// 	$shippingFee = 0; 
+			// }else{
+			// 	$shippingFee = $sellerCount * $shipping_fee; // this shipping fee will be in array
+			// }
 			
 				// sum per-seller shipping fees
 			$shippingFeeTotal = array_sum($perSellerShippingFee);
@@ -656,7 +685,9 @@ class CheckoutFrontController extends Controller
 		$totalAmount = 0;
 		$totalTax = 0;
 		$totalDiscount = 0;
-		
+		$shippingTitles = [];
+		$shippingFees = [];
+
 		$item_list = '';
 		foreach($datalist as $row){
 			if($index == 0){
@@ -675,10 +706,13 @@ class CheckoutFrontController extends Controller
 				$mdata['method_name'] = $row->method_name;
 				$mdata['pstatus_name'] = $row->pstatus_name;
 				$mdata['ostatus_name'] = $row->ostatus_name;
-				$mdata['shipping_title'] = $row->shipping_title;
-				$mdata['shipping_fee'] = $row->shipping_fee;
+				// $mdata['shipping_title'] = $row->shipping_title;
+				// $mdata['shipping_fee'] = $row->shipping_fee;
 			}
-			
+			// collect shipping titles and fees
+			$shippingTitles[] = $row->shipping_title;
+			$shippingFees[]   = (float)$row->shipping_fee;
+
 			$totalAmount +=$row->total_price;
 			$totalTax +=$row->tax;
 			$totalDiscount +=$row->discount;
@@ -722,26 +756,49 @@ class CheckoutFrontController extends Controller
 			$index++;
 		}
 
-		$shipping_fee = $mdata['shipping_fee'] * $SellerCount;
+		$mdata['shipping_title'] = implode(', ', $shippingTitles);
+		$mdata['shipping_fee']   = implode(', ', $shippingFees);
+
 		
-		$total_amount_shipping_fee = $totalAmount + $shipping_fee + $totalTax;
+		$shippingDetails = [];
+		foreach ($shippingTitles as $i => $title) {
+			$fee = isset($shippingFees[$i]) ? $shippingFees[$i] : 0;
+			$shippingDetails[] = "{$title} (" . $gtext['currency_icon'] . NumberFormat($fee) . ")";
+		}
+		$shippingDisplay = implode(', ', $shippingDetails);
+		$totalShippingFee = array_sum($shippingFees);
+
+		$commisiontable = DB::table('commissions')->limit(1)->first();
+		$commissionset = $commisiontable->commission;
+
+		$total_amount_shipping_fee = $totalAmount + $totalShippingFee + $totalTax + $commissionset;
+
+		// $shipping_fee = $mdata['shipping_fee'] * $SellerCount;
+		// $total_amount_shipping_fee = $totalAmount + $shipping_fee + $totalTax;
 		
 		if($gtext['currency_position'] == 'left'){
-			$shippingFee = $gtext['currency_icon'].NumberFormat($mdata['shipping_fee']);
-			$shipping_fee = $gtext['currency_icon'].NumberFormat($shipping_fee);
+			// $shippingFee = $gtext['currency_icon'].NumberFormat($mdata['shipping_fee']);
+			// $shipping_fee = $gtext['currency_icon'].NumberFormat($shipping_fee);
+			$shippingFee = $shippingDisplay;
+			$shipping_fee = $gtext['currency_icon'].NumberFormat($totalShippingFee);
 			$tax = $gtext['currency_icon'].NumberFormat($totalTax);
 			$discount = $gtext['currency_icon'].NumberFormat($totalDiscount);
 			$subtotal = $gtext['currency_icon'].NumberFormat($totalAmount);
 			$total_amount = $gtext['currency_icon'].NumberFormat($total_amount_shipping_fee);
+			$commission = $gtext['currency_icon'].NumberFormat($commissionset);
 			
 		}else{
-			$shippingFee = NumberFormat($mdata['shipping_fee']).$gtext['currency_icon'];
-			$shipping_fee = NumberFormat($shipping_fee).$gtext['currency_icon'];
+			// $shippingFee = NumberFormat($mdata['shipping_fee']).$gtext['currency_icon'];
+			// $shipping_fee = NumberFormat($shipping_fee).$gtext['currency_icon'];
+			$shippingFee = $shippingDisplay;
+			$shipping_fee = NumberFormat($totalShippingFee) . $gtext['currency_icon'];
 			$tax = NumberFormat($totalTax).$gtext['currency_icon'];
 			$discount = NumberFormat($totalDiscount).$gtext['currency_icon'];
 			$subtotal = NumberFormat($totalAmount).$gtext['currency_icon'];
 			$total_amount = NumberFormat($total_amount_shipping_fee).$gtext['currency_icon'];
+			$commission = NumberFormat($commissionset).$gtext['currency_icon'];
 		}
+
 		
 		if($mdata['payment_status_id'] == 1){
 			$pstatus = '#26c56d'; //Completed = 1
@@ -780,7 +837,7 @@ class CheckoutFrontController extends Controller
 			$InvoiceDownloads .= '<a href="'.route('frontend.order-invoice', [$row['id'], $row['order_no']]).'" style="background:'.$gtext['theme_color'].';display:block;text-align:center;padding:7px 15px;margin:0 10px 10px 0;border-radius:3px;text-decoration:none;color:#fff;float:left;">'.__('Invoice').' ('.$row['order_no'].')</a>';
 			$invoice_index++;
 		}
-		
+
 		if($gtext['ismail'] == 1){
 			try {
 				$mail = new PHPMailer(true);
@@ -874,6 +931,10 @@ class CheckoutFrontController extends Controller
 														<tr>
 															<td style="width:85%;text-align:right;">'.__('Subtotal').':</td>
 															<td style="width:15%;text-align:right;">'.$subtotal.'</td>
+														</tr>
+														<tr>
+															<td style="width:85%;text-align:right;">'.__('Commission').':</td>
+															<td style="width:15%;text-align:right;">'.$commission.'</td>
 														</tr>
 														<tr>
 															<td style="width:85%;text-align:right;">'.__('Total').':</td>

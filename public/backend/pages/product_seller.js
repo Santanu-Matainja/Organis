@@ -210,36 +210,3 @@ function upload_form() {
 		onErrorMsg(TEXT['Sorry only you can upload jpg, png and gif file type']);
 	}
 }
-
-
-$(document).ready(function() {
-    const $perishable = $('#perisible');
-    const $deliveryType = $('#delivarytypeid');
-    const $option4 = $deliveryType.find('option[value="4"]');
-
-    function toggleDeliveryTypeOption() {
-        if ($perishable.is(':checked')) {
-            // hide option 4
-            $option4.hide();
-
-            // if currently selected, reset to first option
-            if ($deliveryType.val() == "4") {
-                $deliveryType.val($deliveryType.find('option:first').val());
-            }
-        } else {
-            // show option 4
-            $option4.show();
-        }
-
-        // refresh chosen dropdown
-        $deliveryType.trigger("chosen:updated");
-    }
-
-    // run on page load
-    toggleDeliveryTypeOption();
-
-    // run when checkbox changes
-    $perishable.on('change', function() {
-        toggleDeliveryTypeOption();
-    });
-});

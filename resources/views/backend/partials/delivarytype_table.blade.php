@@ -7,7 +7,6 @@
 				<th style="width:10%">{{ __('Lable') }}</th>
 				<th style="width:10%">{{ __('Slug') }}</th>
 				<th style="width:10%">{{ __('Perisible') }}</th>
-				<th style="width:10%">{{ __('Shipping Fee') }}</th>
 				<th class="text-center" style="width:10%">{{ __('Status') }}</th>
 				<th class="text-center" style="width:10%">{{ __('Action') }}</th>
 			</tr>
@@ -21,7 +20,6 @@
 				<td class="text-left">{{ $row->lable }}</td> 
 				<td class="text-left">{{ $row->slug }}</td>
 				<td class="text-left">{{ $row->perisible }}</td>
-				<td class="text-left">{{ $row->shipping_fee }}</td>
 				@if ($row->status_id == 1)
 				<td class="text-center"><span class="enable_btn">Active</span></td>
 				@else
@@ -32,7 +30,7 @@
 						<a class="action-btn" href="javascript:void(0);" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fa fa-ellipsis-v"></i></a>
 						<div class="dropdown-menu dropdown-menu-right">
 							<a onclick="onEdit({{ $row->id }})" class="dropdown-item" href="javascript:void(0);">{{ __('Edit') }}</a>
-							<a onclick="onDelete({{ $row->id }})" class="dropdown-item" href="javascript:void(0);">{{ __('Delete') }}</a>
+							<a onclick="onDelete({{ $row->id }})" class="dropdown-item d-none" href="javascript:void(0);">{{ __('Delete') }}</a>
 						</div>
 					</div>
 				</td>

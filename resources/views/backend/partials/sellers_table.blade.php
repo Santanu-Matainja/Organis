@@ -5,8 +5,8 @@
 				<th class="checkboxlist text-center" style="width:5%"><input class="tp-check-all checkAll" type="checkbox"></th>
 				<th class="text-center" style="width:5%">{{ __('Logo') }} </th>
 				<th style="width:20%">{{ __('Name') }}</th>
-				<th style="width:20%">{{ __('Shop Name') }}</th>
-				<th style="width:15%">{{ __('Shop Phone') }}</th>
+				<th style="width:20%">{{ __('Company Name') }}</th>
+				<th style="width:15%">{{ __('Phone') }}</th>
 				<th style="width:15%">{{ __('Email') }}</th>
 				<th class="text-center" style="width:10%">{{ __('Status') }}</th>
 				<th class="text-center" style="width:10%">{{ __('Action') }}</th>

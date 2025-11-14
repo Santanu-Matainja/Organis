@@ -18,7 +18,7 @@
 							<div class="col-lg-6">
 								<span>{{ __('Delivary Types') }}</span>
 							</div>
-							<div class="col-lg-6">
+							<div class="col-lg-6 d-none">
 								<div class="float-right">
 									<a onClick="onFormPanel()" href="javascript:void(0);" class="btn blue-btn btn-form float-right"><i class="fa fa-plus"></i> {{ __('Add New') }}</a>
 								</div>
@@ -103,7 +103,7 @@
                                                 <div class="col-md-6">
                                                     <div class="form-group">
                                                         <label for="slug">{{ __('Slug') }} <span class="red">*</span></label> 
-                                                        <input type="text" name="slug" id="slug" class="form-control parsley-validated" data-required="true" placeholder="Auto generated slug">
+                                                        <input type="text" name="slug" id="slug" class="form-control parsley-validated" data-required="true" placeholder="Auto generated slug" readonly>
                                                     </div>
                                                 </div>
 											</div>
@@ -112,7 +112,7 @@
 												<!-- Perishable -->
                                                 <div class="col-md-6">
                                                     <div class="form-group">
-                                                        <label for="perisible">{{ __('Perishable') }} <span class="red">*</span></label>
+                                                        <label for="perisible">{{ __('Perisible Product') }} <span class="red">*</span></label>
                                                         <select name="perisible" id="perisible" class="form-control parsley-validated" data-required="true">
                                                             <option value="">-- Select --</option>
                                                             <option value="Yes">Yes</option>
@@ -121,7 +121,7 @@
                                                     </div>
                                                 </div>
 
-                                                <div class="col-md-6">
+                                                <div class="col-md-6 d-none">
                                                     <div class="form-group">
                                                         <label for="shipping_fee">{{ __('Shipping Fee') }} <span class="red">*</span></label>
                                                         <input type="number" name="shipping_fee" id="shipping_fee" class="form-control parsley-validated" data-required="true" placeholder="Enter Shipping Fee">

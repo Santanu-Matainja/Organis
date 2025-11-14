@@ -18,12 +18,13 @@
 				<li><a href="{{ route('backend.manage-stock') }}">{{ __('Manage Stock') }}</a></li>
 				<li><a href="{{ route('backend.product-categories') }}">{{ __('Product Categories') }}</a></li>
 				<li><a href="{{ route('backend.brands') }}">{{ __('Brands') }}</a></li>
-				<li><a href="{{ route('backend.shipping') }}">{{ __('Shipping') }}</a></li>
+				<li class="d-none"><a href="{{ route('backend.shipping') }}">{{ __('Shipping') }}</a></li>
 				<li class="dnone"><a href="{{ route('backend.collections') }}">{{ __('Collections') }}</a></li>
 				<li><a href="{{ route('backend.attributes') }}">{{ __('Unit') }}</a></li>
 				<li class="dnone"><a href="{{ route('backend.labels') }}">{{ __('Labels') }}</a></li>
 				<li class="dnone"><a href="{{ route('backend.coupons') }}">{{ __('Coupons') }}</a></li>
 				<li><a href="{{ route('backend.tax') }}">{{ __('Tax') }}</a></li>
+				<li><a href="{{ route('backend.commission') }}">{{ __('Platform Commission') }}</a></li>
 				<li><a href="{{ route('backend.currency') }}">{{ __('Currency') }}</a></li>
 				<li><a href="{{ route('backend.payment-methods') }}">{{ __('Payment Methods') }}</a></li>
 				<li><a href="{{ route('backend.slider') }}">{{ __('Home Slider') }}</a></li>
@@ -32,7 +33,7 @@
 				<li><a href="{{ route('backend.countries') }}">{{ __('Countries') }}</a></li>
 			</ul>
 		</li>
-		<li class="dropdown"><a class="nav-link has-dropdown" href="#" data-toggle="dropdown"><i class="fa fa-pencil-square-o"></i>{{ __('Blog') }}</a>
+		<li class="dropdown d-none"><a class="nav-link has-dropdown" href="#" data-toggle="dropdown"><i class="fa fa-pencil-square-o"></i>{{ __('Blog') }}</a>
 			<ul class="dropdown-menu">
 				<li><a href="{{ route('backend.blog') }}">{{ __('Posts') }}</a></li>
 				<li><a href="{{ route('backend.blog-categories') }}">{{ __('Categories') }}</a></li>

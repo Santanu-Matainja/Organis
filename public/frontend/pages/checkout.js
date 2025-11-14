@@ -90,26 +90,65 @@ $(function () {
 	// 	$(".total_amount").text(TotalShippingfee);
     // });
 	// Trigger shipping fee calculation on page load
-    $(".shipping_method:checked").trigger("click");
+    // $(".shipping_method:checked").trigger("click");
 
-	$(".shipping_method").on("click", function () {
-		var shipping_fee = parseFloat($(this).data('shippingfee')) || 0;
-		var totalWithoutShipping = parseFloat(removeCommas($(this).data('total'))) || 0;
+	// $(".shipping_method").on("click", function () {
+	// 	var shipping_fee = parseFloat($(this).data('shippingfee')) || 0;
+	// 	var totalWithoutShipping = parseFloat(removeCommas($(this).data('total'))) || 0;
 
-		var productRow = $(this).closest("tr").prevAll("tr").has(".total-price").first();
+	// 	var productRow = $(this).closest("tr").prevAll("tr").has(".total-price").first();
 
-		productRow.find(".shipping_fee").text("$" + addCommas(shipping_fee.toFixed(2)));
+	// 	productRow.find(".shipping_fee").text("€" + addCommas(shipping_fee.toFixed(2)));
 
-		var newTotal = totalWithoutShipping + shipping_fee;
-		productRow.find(".total-price").text("$" + addCommas(newTotal.toFixed(2)));
+	// 	var newTotal = totalWithoutShipping + shipping_fee;
+	// 	productRow.find(".total-price").text("€" + addCommas(newTotal.toFixed(2)));
 
-		var grandTotal = 0;
+	// 	var grandTotal = 0;
+	// 	$(".total-price").each(function () {
+	// 		var val = parseFloat(removeCommas($(this).text().replace('€',''))) || 0;
+	// 		grandTotal += val;
+	// 	});
+	// 	$(".grand_total_value").text(addCommas(grandTotal.toFixed(2)));
+	// });
+
+	$(".shipping_method").on("change", function () {
+		const shipping_fee = parseFloat($(this).data("shippingfee")) || 0;
+		const totalWithoutShipping = parseFloat($(this).data("total")) || 0;
+
+		const shippingSection = $(this).closest("tr");
+		const totalRow = shippingSection.prevAll("tr").has(".total-price").first();
+		const shippingRow = shippingSection.prevAll("tr").has(".shipping_fee").first();
+
+		// Update shipping and total
+		shippingRow.find(".shipping_fee").text("€" + formatCurrency(shipping_fee));
+		const newTotal = totalWithoutShipping + shipping_fee;
+		totalRow.find(".total-price").text("€" + formatCurrency(newTotal));
+
+		// Recalculate grand total
+		let grandTotal = 0;
 		$(".total-price").each(function () {
-			var val = parseFloat(removeCommas($(this).text().replace('$',''))) || 0;
+			const val = parseCurrency($(this).text());
 			grandTotal += val;
 		});
-		$(".grand_total_value").text("$" + addCommas(grandTotal.toFixed(2)));
+		let commission = parseFloat($("#commission").val()) || 0;
+		$(".grand_total_value").text(formatCurrency(grandTotal + commission));
 	});
+
+	function parseCurrency(value) {
+		value = value.replace(/[^\d,.-]/g, '')
+					.replace(/\./g, '')
+					.replace(',', '.');
+		return parseFloat(value) || 0;
+	}
+
+	function formatCurrency(value) {
+		return new Intl.NumberFormat('de-DE', {
+			minimumFractionDigits: 2,
+			maximumFractionDigits: 2
+		}).format(value);
+	}
+
+
 
 
 

@@ -251,7 +251,7 @@ function onExcelExport() {
 	$.ajax({
 		url:FinalPath,
 		success:function(data){
-			var filePath = base_url+'/public/export/'+data;
+			var filePath = base_url+'/export/'+data;
 			window.open(filePath);
 		}
 	});
@@ -267,7 +267,7 @@ function onCSVExport() {
 	$.ajax({
 		url:FinalPath,
 		success:function(data){
-			var filePath = base_url+'/public/export/'+data;
+			var filePath = base_url+'/export/'+data;
 			window.open(filePath);
 		}
 	});

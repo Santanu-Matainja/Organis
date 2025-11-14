@@ -94,13 +94,13 @@
 												<div class="col-md-6">
 													<div class="form-group">
 														<label for="name">{{ __('Name') }}<span class="red">*</span></label>
-														<input type="text" name="name" id="name" class="form-control parsley-validated" data-required="true">
+														<input type="text" name="name" id="name" class="form-control parsley-validated" data-required="true" >
 													</div>
 												</div>
 												<div class="col-md-6">
 													<div class="form-group">
 														<label for="email">{{ __('Email Address') }}<span class="red">*</span></label>
-														<input type="email" name="email" id="email" class="form-control parsley-validated" data-required="true">
+														<input type="email" name="email" id="email" class="form-control parsley-validated" data-required="true" >
 													</div>
 												</div>
 											</div>
@@ -109,13 +109,13 @@
 													<div class="form-group relative">
 														<label for="password">{{ __('Password') }}<span class="red">*</span></label>
 														<span toggle="#password" class="fa fa-eye field-icon toggle-password"></span>
-														<input type="password" name="password" id="password" class="form-control parsley-validated" data-required="true">
+														<input type="password" name="password" id="password" class="form-control parsley-validated" data-required="true" >
 													</div>
 												</div>
 												<div class="col-md-6">
 													<div class="form-group">
-														<label for="shop_name">{{ __('Shop Name') }}<span class="red">*</span></label>
-														<input type="text" name="shop_name" id="shop_name" class="form-control parsley-validated" data-required="true">
+														<label for="shop_name">{{ __('Company Name') }}<span class="red">*</span></label>
+														<input type="text" name="shop_name" id="shop_name" class="form-control parsley-validated" data-required="true" >
 													</div>
 												</div>
 											</div>
@@ -123,14 +123,14 @@
 											<div class="row">
 												<div class="col-md-6">
 													<div class="form-group">
-														<label for="shop_url">{{ __('Shop URL') }}<span class="red">*</span></label>
-														<input type="text" name="shop_url" id="shop_url" class="form-control parsley-validated" data-required="true">
+														<label for="shop_url">{{ __('Company URL') }}<span class="red">*</span></label>
+														<input type="text" name="shop_url" id="shop_url" class="form-control parsley-validated" data-required="true" >
 													</div>
 												</div>
 												<div class="col-md-6">
 													<div class="form-group">
-														<label for="phone">{{ __('Shop Phone') }}<span class="red">*</span></label>
-														<input type="text" name="phone" id="phone" class="form-control parsley-validated" data-required="true">
+														<label for="phone">{{ __('Phone') }}<span class="red">*</span></label>
+														<input type="text" name="phone" id="phone" class="form-control parsley-validated" data-required="true" >
 													</div>
 												</div>
 											</div>
@@ -139,13 +139,13 @@
 												<div class="col-md-6">
 													<div class="form-group">
 														<label for="address">{{ __('Address') }}<span class="red">*</span></label>
-														<input type="text" name="address" id="address" class="form-control parsley-validated" data-required="true">
+														<input type="text" name="address" id="address" class="form-control parsley-validated" data-required="true" >
 													</div>
 												</div>
 												<div class="col-md-6">
 													<div class="form-group">
 														<label for="city">{{ __('City') }}<span class="red">*</span></label>
-														<input type="text" name="city" id="city" class="form-control parsley-validated" data-required="true">
+														<input type="text" name="city" id="city" class="form-control parsley-validated" data-required="true" >
 													</div>
 												</div>
 											</div>
@@ -154,13 +154,28 @@
 												<div class="col-md-6">
 													<div class="form-group">
 														<label for="state">{{ __('State') }}<span class="red">*</span></label>
-														<input type="text" name="state" id="state" class="form-control parsley-validated" data-required="true">
+														<input type="text" name="state" id="state" class="form-control parsley-validated" data-required="true" >
 													</div>
 												</div>
 												<div class="col-md-6">
 													<div class="form-group">
 														<label for="zip_code">{{ __('Zip Code') }}<span class="red">*</span></label>
-														<input type="text" name="zip_code" id="zip_code" class="form-control parsley-validated" data-required="true">
+														<input type="text" name="zip_code" id="zip_code" class="form-control parsley-validated" data-required="true" >
+													</div>
+												</div>
+											</div>
+
+											<div class="row">
+												<div class="col-md-6">
+													<div class="form-group">
+														<label for="vat_number">{{ __('Vat Number') }}<span class="red">*</span></label>
+														<input type="text" name="vat_number" id="vat_number" class="form-control parsley-validated" data-required="true" >
+													</div>
+												</div>
+												<div class="col-md-6">
+													<div class="form-group">
+														<label for="trade_register_number">{{ __('Trade Register Number') }}<span class="red">*</span></label>
+														<input type="text" name="trade_register_number" id="trade_register_number" class="form-control parsley-validated" data-required="true" >
 													</div>
 												</div>
 											</div>
@@ -197,7 +212,7 @@
 													<div class="form-group">
 														<label for="photo_thumbnail">{{ __('Logo') }}</label>
 														<div class="tp-upload-field">
-															<input type="text" name="photo" id="photo_thumbnail" class="form-control" readonly>
+															<input type="text" name="photo" id="photo_thumbnail" class="form-control" >
 															<a id="on_thumbnail" href="javascript:void(0);" class="tp-upload-btn"><i class="fa fa-window-restore"></i>{{ __('Browse') }}</a>
 														</div>
 														<em>Recommended image size width: 200px and height: 200px.</em>
@@ -207,7 +222,12 @@
 														</div>
 													</div>
 												</div>
-												<div class="col-md-6"></div>
+												<div class="col-md-6">
+													<div class="form-group">
+														<label for="shipping_fee">{{ __('Shipping Fee') }}<span class="red">*</span></label>
+														<input type="text" name="shipping_fee" id="shipping_fee" class="form-control parsley-validated" data-required="true" >
+													</div>
+												</div>
 											</div>
 											
 											<input type="text" id="RecordId" name="RecordId" class="dnone"/>
@@ -228,13 +248,13 @@
 												<div class="col-md-6">
 													<div class="form-group">
 														<label for="bank_name">{{ __('Bank Name') }}</label>
-														<input type="text" name="bank_name" id="bank_name" class="form-control">
+														<input type="text" name="bank_name" id="bank_name" class="form-control" >
 													</div>
 												</div>
 												<div class="col-md-6">
 													<div class="form-group">
-														<label for="bank_code">{{ __('Bank Code/IFSC') }}</label>
-														<input type="text" name="bank_code" id="bank_code" class="form-control">
+														<label for="bank_code">{{ __('Bank Code/BIC') }}</label>
+														<input type="text" name="bank_code" id="bank_code" class="form-control" >
 													</div>
 												</div>
 											</div>
@@ -242,14 +262,14 @@
 											<div class="row">
 												<div class="col-md-6">
 													<div class="form-group">
-														<label for="account_number">{{ __('Account Number') }}</label>
-														<input type="text" name="account_number" id="account_number" class="form-control">
+														<label for="account_number">{{ __('Account Number/IBAN') }}</label>
+														<input type="text" name="account_number" id="account_number" class="form-control" >
 													</div>
 												</div>
 												<div class="col-md-6">
 													<div class="form-group">
 														<label for="account_holder">{{ __('Account Holder Name') }}</label>
-														<input type="text" name="account_holder" id="account_holder" class="form-control">
+														<input type="text" name="account_holder" id="account_holder" class="form-control" >
 													</div>
 												</div>
 											</div>
@@ -258,7 +278,7 @@
 												<div class="col-md-12">
 													<div class="form-group">
 														<label for="paypal_id">{{ __('PayPal ID') }}</label>
-														<input type="text" name="paypal_id" id="paypal_id" class="form-control">
+														<input type="text" name="paypal_id" id="paypal_id" class="form-control" >
 													</div>
 												</div>
 											</div>
@@ -267,7 +287,7 @@
 												<div class="col-md-12">
 													<div class="form-group">
 														<label for="description">{{ __('Description') }}</label>
-														<textarea name="description" id="description" class="form-control" rows="3"></textarea>
+														<textarea name="description" id="description" class="form-control" rows="3" ></textarea>
 													</div>
 												</div>
 											</div>

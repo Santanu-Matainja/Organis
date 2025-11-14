@@ -126,14 +126,12 @@ class DeliveryTypeController extends Controller
 			'lable' => $request->input('lable'),
 			'slug' => $request->input('slug'),
 			'perisible' => $request->input('perisible'),
-			'shipping_fee' => $request->input('shipping_fee'),
 		);
 		
 		$validator = Validator::make($validator_array, [
 			'lable' => 'required|max:191',
 			'slug' => 'required|max:191',
 			'perisible' => 'required',
-			'shipping_fee' => 'required',
 		]);
 
 		$errors = $validator->errors();
@@ -155,13 +153,6 @@ class DeliveryTypeController extends Controller
 		if($errors->has('perisible')){
 			$res['msgType'] = 'error';
 			$res['msg'] = $errors->first('perisible');
-			$res['id'] = '';
-			return response()->json($res);
-		}
-
-		if($errors->has('shipping_fee')){
-			$res['msgType'] = 'error';
-			$res['msg'] = $errors->first('shipping_fee');
 			$res['id'] = '';
 			return response()->json($res);
 		}

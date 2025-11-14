@@ -57,7 +57,7 @@
 									<div class="col-lg-12">
 										<div class="form-group">
 											<label for="slug">{{ __('Slug') }}<span class="red">*</span></label>
-											<input value="{{ $datalist['slug'] }}" type="text" name="slug" id="slug" class="form-control parsley-validated" data-required="true">
+											<input value="{{ $datalist['slug'] }}" type="text" name="slug" id="slug" class="form-control parsley-validated" data-required="true" readonly>
 										</div>
 									</div>
 								</div>
@@ -129,7 +129,7 @@
 								<div class="row">
 									<div class="col-lg-6">
 										<div class="form-group">
-											<label for="storeid">{{ __('Store') }}<span class="red">*</span></label>
+											<label for="storeid">{{ __('Company') }}<span class="red">*</span></label>
 											<select name="storeid" id="storeid" class="chosen-select form-control">
 											@foreach($storeList as $row)
 												<option {{ $row->id == $datalist['user_id'] ? "selected=selected" : '' }} value="{{ $row->id }}">
@@ -170,6 +170,27 @@
 												<option {{ 1 == $datalist['collection_id'] ? "selected=selected" : '' }} value="1">{{ __('YES') }}</option>
 												<option {{ 0 == $datalist['collection_id'] ? "selected=selected" : '' }} value="0">{{ __('NO') }}</option>
 											</select>
+										</div>
+									</div>
+								</div>
+
+								<div class="row">
+									<div class="col-lg-4">
+										<div class="form-group">
+											<label for="manufacture_date">{{ __('Manufacture Date') }}</label>
+											<input value="{{ $datalist['manufacture_date'] }}" name="manufacture_date" id="manufacture_date" type="date" class="form-control parsley-validated" min="{{ date('Y-m-d') }}">
+										</div>
+									</div>
+									<div class="col-lg-4">
+										<div class="form-group">
+											<label for="exdate">{{ __('Expire Date') }}</label>
+											<input value="{{ $datalist['exdate'] }}" name="exdate" id="exdate" type="date" class="form-control parsley-validated" min="{{ date('Y-m-d') }}">
+										</div>
+									</div>
+									<div class="col-lg-4">
+										<div class="form-group">
+											<label for="maxorderqty">{{ __('Maximum Order Quantity') }}<span class="red">*</span></label>
+											<input value="{{ $datalist['maxorderqty'] }}" name="maxorderqty" id="maxorderqty" type="text" class="form-control parsley-validated">
 										</div>
 									</div>
 								</div>

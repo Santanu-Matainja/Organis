@@ -12,7 +12,7 @@
 			<div class="loginsignup-area">
 				<div class="loginsignup text-center">
 					<div class="logo">
-						<a href="{{ url('/login') }}">
+						<a href="{{ url('/user/login') }}">
 							<img src="{{ $gtext['back_logo'] ? asset_path('media/'.$gtext['back_logo']) : asset_path('backend/images/backend-logo.png') }}" alt="logo">
 						</a>
 					</div>
@@ -47,7 +47,7 @@
 						@endif
 						<input type="submit" class="btn login-btn" value="{{ __('Send Password Reset Link') }}">
 					</form>
-					<h3><a href="{{ url('/login') }}">{{ __('Back to login') }}</a></h3>
+					<h3><a href="{{ url('/user/login') }}">{{ __('Back to login') }}</a></h3>
 				</div>
 			</div>
 		</div>

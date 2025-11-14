@@ -23,6 +23,8 @@ use App\Models\Order_item;
 use App\Models\Order_master;
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
+use Carbon\Carbon;
+use App\Models\PendingUser;
 
 class SellerController extends Controller
 {
@@ -92,15 +94,27 @@ class SellerController extends Controller
 			'role_id' => 3
 		);
 		
-		$response = User::create($data);
-		
-		if ($response) {
-			$this->registerNotify($response);
+		$otp = rand(100000, 999999);
+		$data['otp_code'] = $otp;
+		$data['otp_expires_at'] = Carbon::now()->addMinutes(10);
 
-			return redirect()->back()->withSuccess(__('Thanks! You have registered successfully. Please login.'));
-		} else {
-			return redirect()->back()->withFail(__('Oops! Registration failed. Please try again.'));
-		}
+		// Save to pending_users
+		$pending = PendingUser::create($data);
+
+		// Send OTP Mail via PHPMailer
+		$this->sendVerificationMail($pending, $otp);
+		
+		return redirect()->route('frontend.emailverification')->with('email', $pending->email);
+
+		// $response = User::create($data);
+		
+		// if ($response) {
+		// 	$this->registerNotify($response);
+
+		// 	return redirect()->back()->withSuccess(__('Thanks! You have registered successfully. Please login.'));
+		// } else {
+		// 	return redirect()->back()->withFail(__('Oops! Registration failed. Please try again.'));
+		// }
 		// if($response){
 
 		// 	if($gtext['is_mailchimp'] == 1){
@@ -229,6 +243,110 @@ class SellerController extends Controller
 
 		return 0;
 	}
+
+	private function sendVerificationMail($user, $otp)
+	{
+		$gtext = gtext();
+		$base_url = url('/');
+
+		if ($gtext['ismail'] == 1) {
+			try {
+				$mail = new PHPMailer(true);
+				$mail->CharSet = "UTF-8";
+
+				if ($gtext['mailer'] == 'smtp') {
+					$mail->SMTPDebug = 0;
+					$mail->isSMTP();
+					$mail->Host       = $gtext['smtp_host'];
+					$mail->SMTPAuth   = true;
+					$mail->Username   = $gtext['smtp_username'];
+					$mail->Password   = $gtext['smtp_password'];
+					$mail->SMTPSecure = $gtext['smtp_security'];
+					$mail->Port       = $gtext['smtp_port'];
+				}
+
+				$mail->setFrom($gtext['from_mail'], $gtext['from_name']);
+				$mail->addAddress($user->email, $user->name);
+				$mail->isHTML(true);
+				$mail->CharSet = "utf-8";
+				$mail->Subject = __('Verify your email - ') . $gtext['company'];
+
+				$mail->Body = '
+				<table style="background-color:#edf2f7;color:#111;padding:40px 0;line-height:24px;font-size:14px;" border="0" cellpadding="0" cellspacing="0" width="100%">
+					<tr>
+						<td>
+							<table style="background-color:#fff;max-width:800px;margin:0 auto;padding:30px;" border="0" cellpadding="0" cellspacing="0" width="100%">
+								<tr><td style="font-size:35px;border-bottom:1px solid #ddd;padding-bottom:20px;font-weight:bold;text-align:center;">'.$gtext['company'].'</td></tr>
+								<tr><td style="font-size:22px;font-weight:bold;padding:30px 0 10px 0;">Hi '.$user->name.',</td></tr>
+								<tr><td>Please verify your email address to complete your registration.</td></tr>
+								<tr><td style="padding-top:20px;">Your verification code is:</td></tr>
+								<tr><td style="padding-top:10px;font-size:28px;font-weight:bold;text-align:center;">'.$otp.'</td></tr>
+								<tr><td style="padding-top:30px;text-align:center;">This code will expire in 10 minutes.</td></tr>
+								<tr><td style="padding-top:40px;text-align:center;font-size:13px;color:#777;">If you did not register on '.$gtext['company'].', please ignore this email.</td></tr>
+							</table>
+						</td>
+					</tr>
+				</table>';
+
+				$mail->send();
+
+			} catch (Exception $e) {
+				\Log::error('Email not sent: '.$e->getMessage());
+			}
+		}
+	}
+
+	public function emailverification()
+    {
+        return view('auth.email.emailverification');
+    }
+
+	public function verifyemailOtp(Request $request)
+	{
+		$request->validate([
+			'email' => 'required|email',
+			'otp' => 'required|numeric',
+		]);
+
+		$pending = PendingUser::where('email', $request->email)
+			->where('otp_code', $request->otp)
+			->where('otp_expires_at', '>=', now())
+			->first();
+
+		if ($pending->otp_code != $request->otp) {
+			return redirect()->back()->withFail(__('Oops! Invalid OTP.'));
+		}
+		if ($pending->otp_expires_at >= now()) {
+			return redirect()->back()->withFail(__('Oops! Otp Expired.'));
+		}
+
+		// Move data to users table
+		$response = User::create([
+			'name' => $pending->name,
+			'email' => $pending->email,
+			'password' => $pending->password,
+			'bactive' => $pending->bactive,
+			'shop_name' => $pending->shop_name,
+			'shop_url' => $pending->shop_url,
+			'phone' => $pending->phone,
+			'address' => $pending->address,
+			'vat_number' => $pending->vat_number,
+			'trade_register_number' => $pending->trade_register_number,
+			'status_id' => 1,
+			'role_id' => 2,
+		]);
+
+		if ($response) {
+			$this->registerNotify($response);
+			
+			// Delete pending record
+			$pending->delete();
+			
+			return redirect()->back()->withSuccess(__('Thanks! You have registered successfully. Please login.'));
+		} else {
+			return redirect()->back()->withFail(__('Oops! Registration failed. Please try again.'));
+		}
+	}
 	
 	//has shop url Slug
     public function hasShopSlug(Request $request){
@@ -338,6 +456,9 @@ class SellerController extends Controller
 		$country_id = $request->input('country_id');
 		$status_id = $request->input('status_id');
 		$photo = $request->input('photo');
+		$vat_number = $request->input('vat_number');
+		$trade_register_number = $request->input('trade_register_number');
+		$shipping_fee = $request->input('shipping_fee');
 		
 		$validator_array = array(
 			'name' => $request->input('name'),
@@ -351,6 +472,9 @@ class SellerController extends Controller
 			'state' => $request->input('state'),
 			'zip_code' => $request->input('zip_code'),
 			'country_id' => $request->input('country_id'),
+			'vat_number' => $request->input('vat_number'),
+			'trade_register_number' => $request->input('trade_register_number'),
+			'shipping_fee' => $request->input('shipping_fee'),
 		);
 		$rId = $id == '' ? '' : ','.$id;
 		$validator = Validator::make($validator_array, [
@@ -365,6 +489,9 @@ class SellerController extends Controller
 			'state' => 'required',
 			'zip_code' => 'required',
 			'country_id' => 'required',
+			'trade_register_number' => 'required',
+			'vat_number' => 'required',
+			'shipping_fee' => 'required',
 		]);
 
 		$errors = $validator->errors();
@@ -445,6 +572,27 @@ class SellerController extends Controller
 			$res['id'] = '';
 			return response()->json($res);
 		}
+		
+		if($errors->has('trade_register_number')){
+			$res['msgType'] = 'error';
+			$res['msg'] = $errors->first('trade_register_number');
+			$res['id'] = '';
+			return response()->json($res);
+		}
+		
+		if($errors->has('vat_number')){
+			$res['msgType'] = 'error';
+			$res['msg'] = $errors->first('vat_number');
+			$res['id'] = '';
+			return response()->json($res);
+		}
+		
+		if($errors->has('shipping_fee')){
+			$res['msgType'] = 'error';
+			$res['msg'] = $errors->first('shipping_fee');
+			$res['id'] = '';
+			return response()->json($res);
+		}
 
 		$data = array(
 			'name' => $name,
@@ -461,12 +609,25 @@ class SellerController extends Controller
 			'status_id' => $status_id,
 			'photo' => $photo,
 			'role_id' => 3,
+			'trade_register_number' => $trade_register_number,
+			'vat_number' => $vat_number,
 			'bactive' => base64_encode($password)
+		);
+
+		$shippingfee = array(
+			'seller_id' => $id,
+			'shipping_fee' => $shipping_fee,
 		);
 
 		if($id ==''){
 			$response = User::create($data)->id;
-			if($response){
+			$shippingfee['seller_id'] = $response;
+			$shippingfee['created_at'] = now();
+			$shippingfee['updated_at'] = now();
+
+			$response2 = DB::table('sellerdelivaryfees')->where('seller_id', $id)->insert($shippingfee);
+
+			if($response && $response2){
 				$res['msgType'] = 'success';
 				$res['msg'] = __('New Data Added Successfully');
 				$res['id'] = $response;
@@ -477,7 +638,10 @@ class SellerController extends Controller
 			}
 		}else{
 			$response = User::where('id', $id)->update($data);
-			if($response){
+			$shippingfee['created_at'] = now();
+			$shippingfee['updated_at'] = now();
+			$response2 = DB::table('sellerdelivaryfees')->where('seller_id', $id)->update($shippingfee);
+			if($response && $response2){
 				$res['msgType'] = 'success';
 				$res['msg'] = __('Data Updated Successfully');
 				$res['id'] = $id;
@@ -600,6 +764,11 @@ class SellerController extends Controller
 		AND lan = '".$lan."';";
 		$aRow2 = DB::select($sql2);
 		$datalist['TotalProducts'] = $aRow2[0]->TotalProducts;
+
+		$sellerdelivaryfees = DB::table('sellerdelivaryfees')->where('seller_id', $id)->first();
+		$sellerdelivaryfee = $sellerdelivaryfees->shipping_fee;
+
+		$datalist['sellerdelivaryfee'] = $sellerdelivaryfee;
 		
 		return response()->json($datalist);
 	}

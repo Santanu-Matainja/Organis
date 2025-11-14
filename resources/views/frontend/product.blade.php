@@ -134,8 +134,8 @@
 							@endif
 						</div>
 						<div class="pr_buy_cart">
-							<a class="btn theme-btn cart product_addtocart" data-id="{{ $data->id }}" data-stockqty="{{ $data->stock_qty ? $data->stock_qty : 0 }}" href="javascript:void(0);">{{ __('Add To Cart') }}</a>
-							<a class="btn theme-btn cart product_buy_now" data-id="{{ $data->id }}" data-stockqty="{{ $data->stock_qty ? $data->stock_qty : 0 }}" href="javascript:void(0);">{{ __('Buy Now') }}</a>
+							<a class="btn theme-btn cart product_addtocart" data-id="{{ $data->id }}" data-stockqty="{{ $data->stock_qty ? $data->stock_qty : 0 }}" data-maxorderqty="{{ $data->maxorderqty }}" href="javascript:void(0);">{{ __('Add To Cart') }}</a>
+							<a class="btn theme-btn cart product_buy_now" data-id="{{ $data->id }}" data-stockqty="{{ $data->stock_qty ? $data->stock_qty : 0 }}" data-maxorderqty="{{ $data->maxorderqty }}" href="javascript:void(0);">{{ __('Buy Now') }}</a>
 							<a class="btn theme-btn cart wishlist addtowishlist" data-id="{{ $data->id }}" href="javascript:void(0);"><i class="bi bi-heart-fill"></i></a>
 						</div>
 						
@@ -470,6 +470,7 @@ var TEXT = [];
 	TEXT['The value must be less than or equal to'] = "{{ __('The value must be less than or equal to') }} {{ $data->is_stock == 1 ? $data->stock_qty : '' }}";	
 	TEXT['This product out of stock.'] = "{{ __('This product out of stock.') }}";	
 	TEXT['This Product Dont Have Price.'] = "{{ __('This Product Dont Have Price.') }}";
+	TEXT['Maximum order limit cross.'] = "{{ __('Maximum Order Limit Crossed') }}";
 </script>
 <script src="{{asset_path('frontend/pages/product.js')}}"></script>
 @endpush	

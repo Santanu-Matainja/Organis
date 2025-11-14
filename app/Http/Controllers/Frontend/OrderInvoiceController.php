@@ -100,19 +100,34 @@ class OrderInvoiceController extends Controller
 				</tr>';
 		}
 		
-		$total_amount_shipping_fee = $mdata->total_amount+$mdata->shipping_fee+$mdata->tax;
+		if ($mdata->shipping_fee === '') {
+			$mdata->shipping_fee = 0.00;
+		} elseif (strpos($mdata->shipping_fee, ',') !== false) {
+			$mdata->shipping_fee = array_map('trim', explode(',', $mdata->shipping_fee));
+			$mdata->shipping_fee = array_map('floatval', $mdata->shipping_fee);
+			$mdata->shipping_fee = array_sum($mdata->shipping_fee);
+		} else {
+			$mdata->shipping_fee = (float)$mdata->shipping_fee;
+		}
+
+		$commisiontable = DB::table('commissions')->limit(1)->first();
+		$commissions = $commisiontable->commission;
+		
+		$total_amount_shipping_fee = $mdata->total_amount+$mdata->shipping_fee+$mdata->tax+$commissions;
 
 		if($gtext['currency_position'] == 'left'){
 			$shipping_fee = $gtext['currency_icon'].NumberFormat($mdata->shipping_fee);
 			$tax = $gtext['currency_icon'].NumberFormat($mdata->tax);
 			$discount = $gtext['currency_icon'].NumberFormat($mdata->discount);
 			$subtotal = $gtext['currency_icon'].NumberFormat($mdata->total_amount);
+			$commissions = $gtext['currency_icon'].NumberFormat($commissions);
 			$total_amount = $gtext['currency_icon'].NumberFormat($total_amount_shipping_fee);
 		}else{
 			$shipping_fee = NumberFormat($mdata->shipping_fee).$gtext['currency_icon'];
 			$tax = NumberFormat($mdata->tax).$gtext['currency_icon'];
 			$discount = NumberFormat($mdata->discount).$gtext['currency_icon'];
 			$subtotal = NumberFormat($mdata->total_amount).$gtext['currency_icon'];
+			$commissions = NumberFormat($commissions).$gtext['currency_icon'];
 			$total_amount = NumberFormat($total_amount_shipping_fee).$gtext['currency_icon'];
 		}
 
@@ -300,6 +315,11 @@ class OrderInvoiceController extends Controller
 				<td class="w-50" align="left"></td>  
 				<td class="w-25" align="right"><strong>'.__('Tax').'</strong>: </td>  
 				<td class="w-25" align="right"><strong>'.$tax.'</strong></td>  
+			</tr>
+			<tr>
+				<td class="w-50" align="left"></td>  
+				<td class="w-25" align="right"><strong>'.__('Commission').'</strong>: </td>  
+				<td class="w-25" align="right"><strong>'.$commissions.'</strong></td>  
 			</tr>
 			<tr>
 				<td class="w-50" align="left"></td>  

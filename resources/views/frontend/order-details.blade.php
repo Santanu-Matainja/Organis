@@ -139,18 +139,30 @@
 								</div>
 								
 								@php	
-									$total_amount_shipping_fee = $mdata->total_amount+$mdata->shipping_fee+$mdata->tax;
+									if ($mdata->shipping_fee === '') {
+										$mdata->shipping_fee = 0.00;
+									} elseif (strpos($mdata->shipping_fee, ',') !== false) {
+										$mdata->shipping_fee = array_map('trim', explode(',', $mdata->shipping_fee));
+										$mdata->shipping_fee = array_map('floatval', $mdata->shipping_fee);
+										$mdata->shipping_fee = array_sum($mdata->shipping_fee);
+									} else {
+										$mdata->shipping_fee = (float)$mdata->shipping_fee;
+									}
+
+									$total_amount_shipping_fee = $mdata->total_amount+$mdata->shipping_fee+$mdata->tax+$commissions;
 
 									if($gtext['currency_position'] == 'left'){
 										$shipping_fee = $gtext['currency_icon'].NumberFormat($mdata->shipping_fee);
 										$tax = $gtext['currency_icon'].NumberFormat($mdata->tax);
 										$subtotal = $gtext['currency_icon'].NumberFormat($mdata->total_amount);
+										$commissions = $gtext['currency_icon'].NumberFormat($commissions);
 										$total_amount = $gtext['currency_icon'].NumberFormat($total_amount_shipping_fee);
 										
 									}else{
 										$shipping_fee = NumberFormat($mdata->shipping_fee).$gtext['currency_icon'];
 										$tax = NumberFormat($mdata->tax).$gtext['currency_icon'];
 										$subtotal = NumberFormat($mdata->total_amount).$gtext['currency_icon'];
+										$commissions = NumberFormat($commissions).$gtext['currency_icon'];
 										$total_amount = NumberFormat($total_amount_shipping_fee).$gtext['currency_icon'];
 									}
 								@endphp
@@ -166,6 +178,7 @@
 													<tbody>
 														<tr><td><span class="title">{{ __('Shipping Fee') }}</span><span class="price">{{ $shipping_fee }}</span></td></tr>
 														<tr><td><span class="title">{{ __('Tax') }}</span><span class="price">{{ $tax }}</span></td></tr>
+														<tr><td><span class="title">{{ __('Commission') }}</span><span class="price">{{ $commissions }}</span></td></tr>
 														<tr><td><span class="title">{{ __('Subtotal') }}</span><span class="price">{{ $subtotal }}</span></td></tr>
 														<tr><td><span class="total">{{ __('Total') }}</span><span class="total-price">{{ $total_amount }}</span></td></tr>
 													</tbody>

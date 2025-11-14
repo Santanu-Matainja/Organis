@@ -203,7 +203,7 @@ class WithdrawalController extends Controller
 			$data['seller_info'] = '<p><strong>'. __('Joined At') .'</strong>: '.$created_at.'</p>
 				<p><strong>'. __('Status') .'</strong>: <span class="'.$statusClass.'">'.$status.'</span></p>
 				<p><strong>'. __('Name') .'</strong>: '.$row->name.'</p>
-				<p><strong>'. __('Shop Name') .'</strong>: '.$row->shop_name.'</p>
+				<p><strong>'. __('Company Name') .'</strong>: '.$row->shop_name.'</p>
 				<p><strong>'. __('Email Address') .'</strong>: '.$row->email.'</p>
 				<p><strong>'. __('Shop Phone') .'</strong>: '.$row->phone.'</p>
 				<p><strong>'. __('Address') .'</strong>: '.$row->address.'</p>';

@@ -6,7 +6,7 @@
 				<th class="text-left" style="width:21%">{{ __('Product Name') }}</th>
 				<th class="text-left" style="width:15%">{{ __('Category') }}</th>
 				<th class="text-left" style="width:15%">{{ __('Brand') }}</th>
-				<th class="text-center" style="width:10%">{{ __('Store') }}</th>
+				<th class="text-center" style="width:10%">{{ __('Company') }}</th>
 				<th class="text-center" style="width:10%">{{ __('Language') }}</th>
 				<th class="text-center" style="width:8%">{{ __('Image') }} </th>
 				<th class="text-center" style="width:8%">{{ __('Status') }}</th>
@@ -46,7 +46,7 @@
 						<a class="action-btn" href="javascript:void(0);" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fa fa-ellipsis-v"></i></a>
 						<div class="dropdown-menu dropdown-menu-right">
 							<a class="dropdown-item" href="{{ route('backend.product', [$row->id]) }}">{{ __('Edit') }}</a>
-							<a onclick="onDelete({{ $row->id }})" class="dropdown-item" href="javascript:void(0);">{{ __('Delete') }}</a>
+							<a onclick="onDelete({{ $row->id }})" class="dropdown-item d-none" href="javascript:void(0);">{{ __('Delete') }}</a>
 						</div>
 					</div>
 				</td>
