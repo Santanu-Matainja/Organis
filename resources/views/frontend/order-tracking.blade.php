@@ -217,24 +217,36 @@
 											<tbody>
 											@foreach($masterData as $mdata)
 												@php	
-													$total_amount_shipping_fee = $mdata->total_amount+$mdata->shipping_fee+$mdata->tax;
+													if ($mdata->shipping_fee === '') {
+														$mdata->shipping_fee = 0.00;
+													} elseif (strpos($mdata->shipping_fee, ',') !== false) {
+														$mdata->shipping_fee = array_map('trim', explode(',', $mdata->shipping_fee));
+														$mdata->shipping_fee = array_map('floatval', $mdata->shipping_fee);
+														$mdata->shipping_fee = array_sum($mdata->shipping_fee);
+													} else {
+														$mdata->shipping_fee = (float)$mdata->shipping_fee;
+													}
+													$total_amount_shipping_fee = $mdata->total_amount+$mdata->shipping_fee+$mdata->tax+$commissionset;
 
 													if($gtext['currency_position'] == 'left'){
 														$shipping_fee = $gtext['currency_icon'].NumberFormat($mdata->shipping_fee);
 														$tax = $gtext['currency_icon'].NumberFormat($mdata->tax);
 														$subtotal = $gtext['currency_icon'].NumberFormat($mdata->total_amount);
 														$total_amount = $gtext['currency_icon'].NumberFormat($total_amount_shipping_fee);
-														
+														$commission = $gtext['currency_icon'].NumberFormat($commissionset);
 													}else{
 														$shipping_fee = NumberFormat($mdata->shipping_fee).$gtext['currency_icon'];
 														$tax = NumberFormat($mdata->tax).$gtext['currency_icon'];
 														$subtotal = NumberFormat($mdata->total_amount).$gtext['currency_icon'];
 														$total_amount = NumberFormat($total_amount_shipping_fee).$gtext['currency_icon'];
+														$commission = NumberFormat($commissionset).$gtext['currency_icon'];
+
 													}
 												@endphp
 												
 												<tr><td><span class="title">{{ __('Shipping Fee') }}<br>({{ $mdata->shipping_title }})</span><span class="price">{{ $shipping_fee }}</span></td></tr>
 												<tr><td><span class="title">{{ __('Tax') }}</span><span class="price">{{ $tax }}</span></td></tr>
+												<tr><td><span class="title">{{ __('Commission') }}</span><span class="price">{{ $commission }}</span></td></tr>
 												<tr><td><span class="title">{{ __('Subtotal') }}</span><span class="price">{{ $subtotal }}</span></td></tr>
 												<tr><td><span class="total">{{ __('Total') }}</span><span class="total-price">{{ $total_amount }}</span></td></tr>
 												@endforeach

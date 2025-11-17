@@ -87,6 +87,8 @@ class OrderTrackingController extends Controller
 			$order_status_list[$row->id] = $row->ostatus_name;
 		}
 
-        return view('frontend.order-tracking', compact('masterData', 'datalist', 'isfind', 'order_status_list'));
+		$commisiontable = DB::table('commissions')->limit(1)->first();
+		$commissionset = $commisiontable->commission;
+        return view('frontend.order-tracking', compact('masterData', 'datalist', 'isfind', 'order_status_list', 'commissionset'));
     }	
 }

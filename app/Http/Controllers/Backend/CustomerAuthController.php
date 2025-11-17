@@ -94,13 +94,16 @@ class CustomerAuthController extends Controller
 		$data['otp_code'] = $otp;
 		$data['otp_expires_at'] = Carbon::now()->addMinutes(10);
 
-		// Save to pending_users
-		$pending = PendingUser::create($data);
+		$pending = PendingUser::updateOrCreate(
+			['email' => $request->input('email')], 
+			$data 
+		);
+
 
 		// Send OTP Mail via PHPMailer
 		$this->sendVerificationMail($pending, $otp);
 		
-		return redirect()->route('frontend.emailverification')->with('email', $pending->email);
+		return redirect()->route('frontend.emailverification', ['email' => $pending->email])->withSuccess('OTP Sent successfully.');
 
 		// $response = User::create($data);
 		
@@ -482,9 +485,11 @@ class CustomerAuthController extends Controller
 		}
 	}
 
-	public function emailverification()
+	public function emailverification($email)
     {
-        return view('auth.email.emailverification');
+		$pending = PendingUser::where('email', $email)->first();
+		$expires_at = $pending->otp_expires_at;
+        return view('auth.email.emailverification', compact('email', 'expires_at'));
     }
 
 	public function verifyemailOtp(Request $request)
@@ -495,15 +500,18 @@ class CustomerAuthController extends Controller
 		]);
 
 		$pending = PendingUser::where('email', $request->email)
-			->where('otp_code', $request->otp)
-			->where('otp_expires_at', '>=', now())
 			->first();
 
-		if ($pending->otp_code != $request->otp) {
-			return redirect()->back()->withFail(__('Oops! Invalid OTP.'));
+		if (! $pending) {
+			return redirect()->back()->withFail('Invalid Email.');
 		}
-		if ($pending->otp_expires_at >= now()) {
-			return redirect()->back()->withFail(__('Oops! Otp Expired Code.'));
+
+		if ($pending->otp_code != $request->otp) {
+			return redirect()->back()->withFail('Oops! Invalid OTP.');
+		}
+
+		if ($pending->otp_expires_at < now()) {
+			return redirect()->back()->withFail('Oops! OTP Expired.');
 		}
 
 		// Move data to users table
@@ -522,9 +530,37 @@ class CustomerAuthController extends Controller
 			// Delete pending record
 			$pending->delete();
 			
-			return redirect()->back()->withSuccess(__('Thanks! You have registered successfully. Please login.'));
+			return redirect()->route('frontend.login')->withSuccess(__('Thanks! You have registered successfully. Please login.'));
 		} else {
 			return redirect()->back()->withFail(__('Oops! Registration failed. Please try again.'));
 		}
 	}
+
+	public function resendOtp(Request $request)
+	{
+		$request->validate([
+			'email' => 'required|email'
+		]);
+
+		$pending = PendingUser::where('email', $request->email)->first();
+
+		if (!$pending) {
+			return response()->json(['status' => 'fail', 'msg' => 'User not found']);
+		}
+
+		$otp = rand(100000, 999999);
+
+		// update
+		$pending->otp_code = $otp;
+		$pending->otp_expires_at = now()->addMinutes(10);
+		$pending->save();
+
+		$this->sendVerificationMail($pending, $otp);
+
+		return response()->json([
+			'status' => 'success',
+			'msg' => 'OTP Sent successfully.'
+		]);
+	}
+
 }

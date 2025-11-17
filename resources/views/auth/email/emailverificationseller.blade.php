@@ -30,7 +30,7 @@
 					</div>
 					@endif
 					<div id="alert-box"></div>
-					<form class="text-left" id="login_form" method="POST" action="{{ route('frontend.verifyemail') }}">
+					<form class="text-left" id="login_form" method="POST" action="{{ route('frontend.verifyemailseller') }}">
 						@csrf
 						
                         <div class="form-group">
@@ -63,14 +63,13 @@
 
 @push('scripts')
 <script>
- 
+  
 let resendBtn = document.getElementById("resendOtpBtn");
 
-// ==== RESEND OTP ====
 resendBtn.addEventListener("click", function () {
-   let email = "{{ $email }}";
+    let email = "{{ $email }}";
 
-    fetch("{{ route('frontend.resendOtp') }}", {
+    fetch("{{ route('frontend.resendOtpseller') }}", {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
@@ -82,10 +81,10 @@ resendBtn.addEventListener("click", function () {
     .then(data => {
         if (data.status === "success") {
 
-			let msgDiv = document.getElementById("successMessage");
+          	let msgDiv = document.getElementById("successMessage");
 			msgDiv.style.display = "block";
-			msgDiv.innerText = data.msg;  
-  
+			msgDiv.innerText = data.msg; 
+
         }
     });
 });

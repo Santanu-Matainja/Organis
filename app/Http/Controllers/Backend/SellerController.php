@@ -99,12 +99,15 @@ class SellerController extends Controller
 		$data['otp_expires_at'] = Carbon::now()->addMinutes(10);
 
 		// Save to pending_users
-		$pending = PendingUser::create($data);
+		$pending = PendingUser::updateOrCreate(
+			['email' => $request->input('email')], 
+			$data 
+		);
 
 		// Send OTP Mail via PHPMailer
 		$this->sendVerificationMail($pending, $otp);
 		
-		return redirect()->route('frontend.emailverification')->with('email', $pending->email);
+		return redirect()->route('frontend.emailverificationseller', ['email' => $pending->email])->withSuccess('OTP Sent successfully.');
 
 		// $response = User::create($data);
 		
@@ -221,7 +224,7 @@ class SellerController extends Controller
 							<table style="background-color:#fff;max-width:800px;margin:0 auto;padding:30px;" border="0" cellpadding="0" cellspacing="0" width="100%">
 								<tr><td style="font-size:35px;border-bottom:1px solid #ddd;padding-bottom:20px;font-weight:bold;text-align:center;">'.$gtext['company'].'</td></tr>
 								<tr><td style="font-size:22px;font-weight:bold;padding:30px 0 10px 0;">'.__('Hi').' '.$user->name.',</td></tr>
-								<tr><td>'.__('Welcome to').' '.$gtext['company'].'! '.__('Your account has been successfully created.').'</td></tr>
+								<tr><td>'.__('Welcome to').' '.$gtext['company'].'! '.__('Your Seller account has been successfully created.').'</td></tr>
 								<tr><td style="padding-top:20px;">'.__('You can now log in and start exploring our platform.').'</td></tr>
 								<tr><td style="padding-top:30px;padding-bottom:40px;text-align:center;">
 									<a href="'.$base_url.'/login" style="background:'.$gtext['theme_color'].';color:#fff;padding:12px 25px;text-decoration:none;border-radius:5px;">'.__('Login Now').'</a>
@@ -296,9 +299,11 @@ class SellerController extends Controller
 		}
 	}
 
-	public function emailverification()
+	public function emailverification($email)
     {
-        return view('auth.email.emailverification');
+		$pending = PendingUser::where('email', $email)->first();
+		$expires_at = $pending->otp_expires_at;
+        return view('auth.email.emailverificationseller', compact('email', 'expires_at'));
     }
 
 	public function verifyemailOtp(Request $request)
@@ -309,15 +314,18 @@ class SellerController extends Controller
 		]);
 
 		$pending = PendingUser::where('email', $request->email)
-			->where('otp_code', $request->otp)
-			->where('otp_expires_at', '>=', now())
 			->first();
 
-		if ($pending->otp_code != $request->otp) {
-			return redirect()->back()->withFail(__('Oops! Invalid OTP.'));
+		if (! $pending) {
+			return redirect()->back()->withFail('Invalid Email.');
 		}
-		if ($pending->otp_expires_at >= now()) {
-			return redirect()->back()->withFail(__('Oops! Otp Expired.'));
+
+		if ($pending->otp_code != $request->otp) {
+			return redirect()->back()->withFail('Oops! Invalid OTP.');
+		}
+
+		if ($pending->otp_expires_at < now()) {
+			return redirect()->back()->withFail('Oops! OTP Expired.');
 		}
 
 		// Move data to users table
@@ -332,8 +340,8 @@ class SellerController extends Controller
 			'address' => $pending->address,
 			'vat_number' => $pending->vat_number,
 			'trade_register_number' => $pending->trade_register_number,
-			'status_id' => 1,
-			'role_id' => 2,
+			'status_id' => $pending->status_id,
+			'role_id' => $pending->role_id,
 		]);
 
 		if ($response) {
@@ -342,10 +350,37 @@ class SellerController extends Controller
 			// Delete pending record
 			$pending->delete();
 			
-			return redirect()->back()->withSuccess(__('Thanks! You have registered successfully. Please login.'));
+			return redirect()->route('frontend.login')->withSuccess(__('Thanks! You have registered successfully. Please login.'));
 		} else {
 			return redirect()->back()->withFail(__('Oops! Registration failed. Please try again.'));
 		}
+	}
+
+	public function resendOtp(Request $request)
+	{
+		$request->validate([
+			'email' => 'required|email'
+		]);
+
+		$pending = PendingUser::where('email', $request->email)->first();
+
+		if (!$pending) {
+			return response()->json(['status' => 'fail', 'msg' => 'User not found']);
+		}
+
+		$otp = rand(100000, 999999);
+
+		// update
+		$pending->otp_code = $otp;
+		$pending->otp_expires_at = now()->addMinutes(10);
+		$pending->save();
+
+		$this->sendVerificationMail($pending, $otp);
+
+		return response()->json([
+			'status' => 'success',
+			'msg' => 'OTP Sent successfully.'
+		]);
 	}
 	
 	//has shop url Slug
@@ -614,43 +649,36 @@ class SellerController extends Controller
 			'bactive' => base64_encode($password)
 		);
 
-		$shippingfee = array(
-			'seller_id' => $id,
-			'shipping_fee' => $shipping_fee,
+		if ($id == '') {
+
+			$response = User::create($data)->id;  
+			$sellerId = $response;
+
+		} else {
+
+			$response = User::where('id', $id)->update($data); 
+			$sellerId = $id;
+		}
+
+		$shippingfeeinsert = DB::table('sellerdelivaryfees')->updateOrInsert(
+			['seller_id' => $sellerId],
+			[
+				'shipping_fee' => $shipping_fee,
+				'updated_at' => now(),
+				'created_at' => now()
+			]
 		);
 
-		if($id ==''){
-			$response = User::create($data)->id;
-			$shippingfee['seller_id'] = $response;
-			$shippingfee['created_at'] = now();
-			$shippingfee['updated_at'] = now();
-
-			$response2 = DB::table('sellerdelivaryfees')->where('seller_id', $id)->insert($shippingfee);
-
-			if($response && $response2){
-				$res['msgType'] = 'success';
-				$res['msg'] = __('New Data Added Successfully');
-				$res['id'] = $response;
-			}else{
-				$res['msgType'] = 'error';
-				$res['msg'] = __('Data insert failed');
-				$res['id'] = '';
-			}
-		}else{
-			$response = User::where('id', $id)->update($data);
-			$shippingfee['created_at'] = now();
-			$shippingfee['updated_at'] = now();
-			$response2 = DB::table('sellerdelivaryfees')->where('seller_id', $id)->update($shippingfee);
-			if($response && $response2){
-				$res['msgType'] = 'success';
-				$res['msg'] = __('Data Updated Successfully');
-				$res['id'] = $id;
-			}else{
-				$res['msgType'] = 'error';
-				$res['msg'] = __('Data update failed');
-				$res['id'] = '';
-			}
+		if ($response && $shippingfeeinsert) {
+			$res['msgType'] = 'success';
+			$res['msg'] = ($id == '') ? __('New Data Added Successfully') : __('Data Updated Successfully');
+			$res['id'] = $sellerId;
+		} else {
+			$res['msgType'] = 'error';
+			$res['msg'] = __('Operation failed');
+			$res['id'] = '';
 		}
+
 		
 		return response()->json($res);
     }
@@ -766,7 +794,7 @@ class SellerController extends Controller
 		$datalist['TotalProducts'] = $aRow2[0]->TotalProducts;
 
 		$sellerdelivaryfees = DB::table('sellerdelivaryfees')->where('seller_id', $id)->first();
-		$sellerdelivaryfee = $sellerdelivaryfees->shipping_fee;
+		$sellerdelivaryfee = $sellerdelivaryfees->shipping_fee ?? '' ;
 
 		$datalist['sellerdelivaryfee'] = $sellerdelivaryfee;
 		

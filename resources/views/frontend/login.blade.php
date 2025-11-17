@@ -66,6 +66,11 @@
 						<h4>{{ __('login') }}</h4>
 						<p>{{ __('Please enter your email address and password') }}</p>
 
+						@if(Session::has('success'))
+							<div class="alert alert-success">
+								{{Session::get('success')}}
+							</div>
+						@endif
 						@if(Session::has('fail'))
 						<div class="alert alert-danger">
 							{{Session::get('fail')}}

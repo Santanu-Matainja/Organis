@@ -66,13 +66,17 @@ Route::get('/user/reset', [App\Http\Controllers\Backend\CustomerAuthController::
 Route::post('/user/resetPassword', [App\Http\Controllers\Backend\CustomerAuthController::class, 'resetPassword'])->name('frontend.resetPassword');
 Route::post('/user/resetPasswordUpdate', [App\Http\Controllers\Backend\CustomerAuthController::class, 'resetPasswordUpdate'])->name('frontend.resetPasswordUpdate');
 // Email Verify
-Route::get('/user/email', [App\Http\Controllers\Backend\CustomerAuthController::class, 'emailverification'])->name('frontend.emailverification');
+Route::get('/user/email/{email}', [App\Http\Controllers\Backend\CustomerAuthController::class, 'emailverification'])->name('frontend.emailverification');
 Route::post('/user/emailverify', [App\Http\Controllers\Backend\CustomerAuthController::class, 'verifyemailOtp'])->name('frontend.verifyemail');
+Route::post('/resend-otp', [App\Http\Controllers\Backend\CustomerAuthController::class, 'resendOtp'])->name('frontend.resendOtp');
 
 //Seller Authentication
 Route::get('/seller/register', [App\Http\Controllers\Backend\SellerController::class, 'LoadSellerRegister'])->name('frontend.seller-register');
 Route::post('/seller/seller-register', [App\Http\Controllers\Backend\SellerController::class, 'SellerRegister'])->name('frontend.sellerRegister');
 Route::post('/frontend/hasShopSlug', [App\Http\Controllers\Backend\SellerController::class, 'hasShopSlug'])->name('frontend.hasShopSlug');
+Route::get('/seller/email/{email}', [App\Http\Controllers\Backend\SellerController::class, 'emailverification'])->name('frontend.emailverificationseller');
+Route::post('/seller/emailverify', [App\Http\Controllers\Backend\SellerController::class, 'verifyemailOtp'])->name('frontend.verifyemailseller');
+Route::post('/resend-otp-seller', [App\Http\Controllers\Backend\SellerController::class, 'resendOtp'])->name('frontend.resendOtpseller');
 
 //My Dashboard
 Route::get('/user/my-dashboard', [App\Http\Controllers\Frontend\MyDashboardController::class, 'LoadMyDashboard'])->name('frontend.my-dashboard')->middleware('auth');
