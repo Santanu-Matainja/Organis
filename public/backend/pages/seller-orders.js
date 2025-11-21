@@ -133,6 +133,11 @@ function onConfirmOrderStatus() {
 			if (msgType == "success") {
 				onPaymentOrderStatusData();
 				onSuccessMsg(msg);
+				
+				setTimeout(function () {
+					location.reload();
+				}, 1000); 
+
 			} else {
 				onErrorMsg(msg);
 			}

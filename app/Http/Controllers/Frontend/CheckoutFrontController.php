@@ -113,6 +113,7 @@ class CheckoutFrontController extends Controller
 		// $shipping_method_id = $request->input('shipping_method');
 		
 		$shipping_methods_by_product = $request->input('shipping_method', []); 
+		$shipping_id = $request->input('shipping_id', []); 
 
 		if($new_account == 1){
 			
@@ -216,9 +217,11 @@ class CheckoutFrontController extends Controller
 			$seller_subtotal = 0;
 
 			// get selected shipping id from frontend
-			$selected_shipid = $request->shipping_method[$seller_id] ?? null;
+			$selected_shipid = $shipping_id[$seller_id] ?? null;
 			$selected_shipping = DeliveryType::find($selected_shipid);
 			$titles[] = $selected_shipping->lable ?? '';
+
+			$finalShippingFee = floatval($shipping_methods_by_product[$seller_id] ?? 0);
 
 			foreach ($CartDataList as $cartRow) {
 				if ($cartRow['seller_id'] == $seller_id) {
@@ -232,64 +235,35 @@ class CheckoutFrontController extends Controller
 					$seller_total_price += $total_price;
 					$seller_tax += $tax;
 
-					// calculate slab shipping for this product
-					$productShippingFee = 0;
-					$productShipping = DB::table('product_shippings')->where('product_id', $pId)->first();
+					// shipping price 
+					$seller_fee = $finalShippingFee;
 
-					if ($productShipping && !empty($productShipping->slab)) {
-						$slabs = json_decode($productShipping->slab, true);
-						if (is_string($slabs)) $slabs = json_decode($slabs, true);
-
-						if (is_array($slabs) && count($slabs) > 0) {
-							foreach ($slabs as $slab) {
-								$min = (int)$slab['min_qty'];
-								$max = (int)$slab['max_qty'];
-								$price = (float)$slab['price'];
-								if ($qty >= $min && $qty <= $max) {
-									$productShippingFee = $price;
-									break;
-								}
-							}
-						}
-					}
-
-					if ($selected_shipid == 2) {
-						$seller_fee += $productShippingFee;
-					} elseif ($selected_shipid == 3) {
-						$seller_fee += 0;
-					} elseif ($selected_shipid == 4) {
-						$base_fee = $selected_shipping->shipping_fee ?? 0;
-						$seller_fee += $base_fee + $productShippingFee;
-					} else {
-						$seller_fee += $selected_shipping->shipping_fee ?? 0;
-					}
-
-					$shippingfee[] = $productShippingFee;
+    				$shippingfee = $finalShippingFee;
 				}
 			}
-
+		
 			$perSellerShippingFee[$seller_id] = $seller_fee;
 			$perSellerShippingTitle[$seller_id] = implode(', ', $titles);
-			$ShippingTitle[$seller_id] = implode(', ', $shippingfee);
+			$ShippingTitle[$seller_id] = $shippingfee;
 
 			$seller_subtotal = $seller_total_price + $seller_tax;
 			
 			$commision = DB::table('commissions')->limit(1)->first();
-			$seller_total_amount = $seller_subtotal + ($perSellerShippingFee[$seller_id] ?? 0) - $seller_discount + $commision->commission;
+			$seller_total_amount = $seller_subtotal + ($perSellerShippingFee[$seller_id] ?? 0) - $seller_discount;
 
 			$perSellerTotals[$seller_id] = [
 				'total_qty' => $seller_total_qty,
 				'total_price' => $seller_total_price,
 				'discount' => $seller_discount,
 				'tax' => $seller_tax,
+				'commission' => $commision->commission,
 				'subtotal' => $seller_subtotal,
 				'total_amount' => $seller_total_amount,
 			];
 		}
 
-		$MasterData = array();
 		$OrderNoArr = array();
-		
+		$master_order_no = 'MORD-' . random_int(100000, 999999);
 		$i = 1;
 		foreach($UniqueDataList as $row){
 			
@@ -306,6 +280,7 @@ class CheckoutFrontController extends Controller
 			$totals = $perSellerTotals[$seller_id];
 
 			$data = array(
+				'master_order_no' => $master_order_no,
 				'order_no' => $order_no,
 				'customer_id' => $customer_id,
 				'seller_id' => $seller_id,
@@ -328,10 +303,11 @@ class CheckoutFrontController extends Controller
 				'total_price' => $totals['total_price'],
 				'discount' => $totals['discount'],
 				'tax' => $totals['tax'],
+				'commission' => $totals['commission'],
 				'subtotal' => $totals['subtotal'],
 				'total_amount' => $totals['total_amount'],
 			);
-			
+
 			$order_master_id = Order_master::create($data)->id;
 			
 			$i++;
@@ -362,7 +338,10 @@ class CheckoutFrontController extends Controller
 				'quantity' => comma_remove($row['qty']),
 				'price' => comma_remove($row['price']),
 				'total_price' => comma_remove($total_price),
-				'tax' => comma_remove($total_tax)
+				'tax' => comma_remove($total_tax),
+
+				'shipping_fee' => $perSellerShippingFee[$seller_id] ?? 0,
+    			'commission'   => $totals['commission'] ?? 0
 			);
 			
 			Order_item::create($OrderItemData);
@@ -390,10 +369,12 @@ class CheckoutFrontController extends Controller
 				// sum per-seller shipping fees
 			$shippingFeeTotal = array_sum($perSellerShippingFee);
 			$t_amount = comma_remove($total_amount);
+			$commisiontable = DB::table('commissions')->limit(1)->first();
+			$totalCommission = $commisiontable->commission;
 			
 			// $totalAmount = $t_amount + $shippingFee;
 			
-			$totalAmount = $t_amount + $shippingFeeTotal;
+			$totalAmount = $t_amount + $shippingFeeTotal + $totalCommission;
 
 			//Stripe
 			if($payment_method_id == 3){
@@ -631,333 +612,681 @@ class CheckoutFrontController extends Controller
     }
 	
     //Order Notify
+      //Order Notify
+//     public function orderNotify($MasterData) {
+// 		$gtext = gtext();
+		
+//  		$datalist = DB::table('order_masters as a')
+// 			->join('order_items as b', 'a.id', '=', 'b.order_master_id')
+// 			->join('users as c', 'a.seller_id', '=', 'c.id')
+// 			->join('payment_method as d', 'a.payment_method_id', '=', 'd.id')
+// 			->join('payment_status as e', 'a.payment_status_id', '=', 'e.id')
+// 			->join('order_status as f', 'a.order_status_id', '=', 'f.id')
+// 			->join('products as g', 'b.product_id', '=', 'g.id')
+// 			->select(
+// 				'a.id', 
+// 				'a.customer_id', 
+// 				'a.seller_id', 
+// 				'a.payment_status_id', 
+// 				'a.order_status_id', 
+// 				'a.order_no', 
+// 				'a.created_at', 
+// 				'a.shipping_title', 
+// 				'a.shipping_fee',
+// 				'g.title', 
+// 				'b.quantity', 
+// 				'b.price', 
+// 				'b.total_price', 
+// 				'b.tax', 
+// 				'b.discount',
+// 				'b.variation_color',
+// 				'b.variation_size',
+// 				'a.email as customer_email', 
+// 				'a.name as customer_name', 
+// 				'a.phone as customer_phone', 
+// 				'a.country', 
+// 				'a.state', 
+// 				'a.zip_code', 
+// 				'a.city', 
+// 				'a.address as customer_address',  
+// 				'c.shop_name',  
+// 				'c.shop_url',  
+// 				'c.email as seller_email',  
+// 				'd.method_name', 
+// 				'e.pstatus_name', 
+// 				'f.ostatus_name')
+// 			->whereIn('a.id', $MasterData)
+// 			->orderBy('a.seller_id', 'ASC')
+// 			->get();
+
+// 		$index = 0;
+// 		$mdata = array();
+// 		$orderDataArr = array();
+// 		$tempSellerId = ''; 
+// 		$SellerCount = 0;
+// 		$totalAmount = 0;
+// 		$totalTax = 0;
+// 		$totalDiscount = 0;
+// 		$shippingTitles = [];
+// 		$shippingFees = [];
+
+// 		$item_list = '';
+// 		foreach($datalist as $row){
+// 			if($index == 0){
+// 				$mdata['payment_status_id'] = $row->payment_status_id;
+// 				$mdata['order_status_id'] = $row->order_status_id;
+// 				$mdata['customer_name'] = $row->customer_name;
+// 				$mdata['customer_email'] = $row->customer_email;
+// 				$mdata['customer_address'] = $row->customer_address;
+// 				$mdata['city'] = $row->city;
+// 				$mdata['state'] = $row->state;
+// 				$mdata['zip_code'] = $row->zip_code;
+// 				$mdata['country'] = $row->country;
+// 				$mdata['customer_phone'] = $row->customer_phone;
+// 				$mdata['order_no'] = 'order_no888';
+// 				$mdata['created_at'] = $row->created_at;
+// 				$mdata['method_name'] = $row->method_name;
+// 				$mdata['pstatus_name'] = $row->pstatus_name;
+// 				$mdata['ostatus_name'] = $row->ostatus_name;
+// 				// $mdata['shipping_title'] = $row->shipping_title;
+// 				// $mdata['shipping_fee'] = $row->shipping_fee;
+// 			}
+// 			// collect shipping titles and fees
+// 			$shippingTitles[] = $row->shipping_title;
+// 			$shippingFees[]   = (float)$row->shipping_fee;
+
+// 			$totalAmount +=$row->total_price;
+// 			$totalTax +=$row->tax;
+// 			$totalDiscount +=$row->discount;
+			
+// 			if($gtext['currency_position'] == 'left'){
+// 				$price = $gtext['currency_icon'].NumberFormat($row->price);
+// 				$total_price = $gtext['currency_icon'].NumberFormat($row->total_price);
+// 			}else{
+// 				$price = NumberFormat($row->price).$gtext['currency_icon'];
+// 				$total_price = NumberFormat($row->total_price).$gtext['currency_icon'];
+// 			}
+
+// 			if($row->variation_size == '0'){
+// 				$size = '';
+// 			}else{
+// 				$size = $row->quantity.' '.$row->variation_size;
+// 			}
+			
+// 			if($tempSellerId != $row->seller_id){
+
+// 				$orderDataArr[$row->seller_id]['id'] = $row->id;
+// 				$orderDataArr[$row->seller_id]['order_no'] = $row->order_no;
+// 				$orderDataArr[$row->seller_id]['seller_id'] = $row->seller_id;
+// 				$orderDataArr[$row->seller_id]['seller_email'] = $row->seller_email;
+// 				$orderDataArr[$row->seller_id]['shop_name'] = $row->shop_name;
+				
+// 				$item_list .= '<tr>
+// 								<td colspan="3" style="width:100%;text-align:left;border:1px solid #ddd;background-color:#f7f7f7;font-weight:bold;">'.__('Sold By').': <a href="'.route('frontend.stores', [$row->seller_id, str_slug($row->shop_url)]).'"> '.$row->shop_name.'</a>, '.__('Order#').': <a href="'.route('frontend.order-invoice', [$row->id, $row->order_no]).'"> '.$row->order_no.'</a></td>
+// 							</tr>';
+
+// 				$tempSellerId=$row->seller_id; 
+// 				$SellerCount++;		
+// 			}
+			
+// 			$item_list .= '<tr>
+// 							<td style="width:70%;text-align:left;border:1px solid #ddd;">'.$row->title.'<br>'.$size.'</td>
+// 							<td style="width:15%;text-align:center;border:1px solid #ddd;">'.$price.' x '.$row->quantity.'</td>
+// 							<td style="width:15%;text-align:right;border:1px solid #ddd;">'.$total_price.'</td>
+// 						</tr>';
+			
+// 			$index++;
+// 		}
+
+// 		$mdata['shipping_title'] = implode(', ', $shippingTitles);
+// 		$mdata['shipping_fee']   = implode(', ', $shippingFees);
+
+		
+// 		$shippingDetails = [];
+// 		foreach ($shippingTitles as $i => $title) {
+// 			$fee = isset($shippingFees[$i]) ? $shippingFees[$i] : 0;
+// 			$shippingDetails[] = "{$title} (" . $gtext['currency_icon'] . NumberFormat($fee) . ")";
+// 		}
+// 		$shippingDisplay = implode(', ', $shippingDetails);
+// 		$totalShippingFee = array_sum($shippingFees);
+
+// 		$commisiontable = DB::table('commissions')->limit(1)->first();
+// 		$commissionset = $commisiontable->commission;
+
+// 		$total_amount_shipping_fee = $totalAmount + $totalShippingFee + $totalTax + $commissionset;
+
+// 		// $shipping_fee = $mdata['shipping_fee'] * $SellerCount;
+// 		// $total_amount_shipping_fee = $totalAmount + $shipping_fee + $totalTax;
+		
+// 		if($gtext['currency_position'] == 'left'){
+// 			// $shippingFee = $gtext['currency_icon'].NumberFormat($mdata['shipping_fee']);
+// 			// $shipping_fee = $gtext['currency_icon'].NumberFormat($shipping_fee);
+// 			$shippingFee = $shippingDisplay;
+// 			$shipping_fee = $gtext['currency_icon'].NumberFormat($totalShippingFee);
+// 			$tax = $gtext['currency_icon'].NumberFormat($totalTax);
+// 			$discount = $gtext['currency_icon'].NumberFormat($totalDiscount);
+// 			$subtotal = $gtext['currency_icon'].NumberFormat($totalAmount);
+// 			$total_amount = $gtext['currency_icon'].NumberFormat($total_amount_shipping_fee);
+// 			$commission = $gtext['currency_icon'].NumberFormat($commissionset);
+			
+// 		}else{
+// 			// $shippingFee = NumberFormat($mdata['shipping_fee']).$gtext['currency_icon'];
+// 			// $shipping_fee = NumberFormat($shipping_fee).$gtext['currency_icon'];
+// 			$shippingFee = $shippingDisplay;
+// 			$shipping_fee = NumberFormat($totalShippingFee) . $gtext['currency_icon'];
+// 			$tax = NumberFormat($totalTax).$gtext['currency_icon'];
+// 			$discount = NumberFormat($totalDiscount).$gtext['currency_icon'];
+// 			$subtotal = NumberFormat($totalAmount).$gtext['currency_icon'];
+// 			$total_amount = NumberFormat($total_amount_shipping_fee).$gtext['currency_icon'];
+// 			$commission = NumberFormat($commissionset).$gtext['currency_icon'];
+// 		}
+
+		
+// 		if($mdata['payment_status_id'] == 1){
+// 			$pstatus = '#26c56d'; //Completed = 1
+// 		}elseif($mdata['payment_status_id'] == 2){
+// 			$pstatus = '#fe9e42'; //Pending = 2
+// 		}elseif($mdata['payment_status_id'] == 3){
+// 			$pstatus = '#f25961'; //Canceled = 3
+// 		}elseif($mdata['payment_status_id'] == 4){
+// 			$pstatus = '#f25961'; //Incompleted 4
+// 		}
+		
+// 		if($mdata['order_status_id'] == 1){
+// 			$ostatus = '#fe9e42'; //Awaiting processing = 1
+// 		}elseif($mdata['order_status_id'] == 2){
+// 			$ostatus = '#fe9e42'; //Processing = 2
+// 		}elseif($mdata['order_status_id'] == 3){
+// 			$ostatus = '#fe9e42'; //Ready for pickup = 3
+// 		}elseif($mdata['order_status_id'] == 4){
+// 			$ostatus = '#26c56d'; //Completed 4
+// 		}elseif($mdata['order_status_id'] == 5){
+// 			$ostatus = '#f25961'; //Canceled 5
+// 		}
+
+// 		$base_url = url('/');
+
+// 		$InvoiceDownloads = '';
+// 		$orderNos = '';
+// 		$invoice_index = 1;
+// 		$f = 0;
+// 		foreach($orderDataArr as $row){
+// 			if($f++){
+// 				$orderNos .= ', ';
+// 			}
+// 			$orderNos .= $row['order_no'];
+			
+// 			$InvoiceDownloads .= '<a href="'.route('frontend.order-invoice', [$row['id'], $row['order_no']]).'" style="background:'.$gtext['theme_color'].';display:block;text-align:center;padding:7px 15px;margin:0 10px 10px 0;border-radius:3px;text-decoration:none;color:#fff;float:left;">'.__('Invoice').' ('.$row['order_no'].')</a>';
+// 			$invoice_index++;
+// 		}
+
+// 		if($gtext['ismail'] == 1){
+// 			try {
+// 				$mail = new PHPMailer(true);
+// 				$mail->CharSet = "UTF-8";
+
+// 				if($gtext['mailer'] == 'smtp'){
+// 					$mail->SMTPDebug = 0; //0 = off (for production use), 1 = client messages, 2 = client and server messages
+// 					$mail->isSMTP();
+// 					$mail->Host       = $gtext['smtp_host'];
+// 					$mail->SMTPAuth   = true;
+// 					$mail->Username   = $gtext['smtp_username'];
+// 					$mail->Password   = $gtext['smtp_password'];
+// 					$mail->SMTPSecure = $gtext['smtp_security'];
+// 					$mail->Port       = $gtext['smtp_port'];
+// 				}
+
+// 				//Get mail
+// 				$mail->setFrom($gtext['from_mail'], $gtext['from_name']);
+// 				$mail->addAddress($mdata['customer_email'], $mdata['customer_name']);
+// 				foreach($orderDataArr as $row){
+// 				$mail->addAddress($row['seller_email'], $row['shop_name']);
+// 				// $mail->addCC($row['seller_email'], $row['shop_name']);
+// 				}
+// 				$mail->isHTML(true);
+// 				$mail->CharSet = "utf-8";
+// 				$mail->Subject = $orderNos.' - '. __('Your order is successfully.');
+				
+// 				$mail->Body = '<table style="background-color:#edf2f7;color:#111111;padding:40px 0px;line-height:24px;font-size:14px;" border="0" cellpadding="0" cellspacing="0" width="100%">	
+// 								<tr>
+// 									<td>
+// 										<table style="background-color:#fff;max-width:1000px;margin:0 auto;padding:30px;" border="0" cellpadding="0" cellspacing="0" width="100%">
+// 											<tr><td style="font-size:40px;border-bottom:1px solid #ddd;padding-bottom:25px;font-weight:bold;text-align:center;">'.$gtext['company'].'</td></tr>
+// 											<tr><td style="font-size:25px;font-weight:bold;padding:30px 0px 5px 0px;">'.__('Hi').' '.$mdata['customer_name'].'</td></tr>
+// 											<tr><td>'.__('We have received your order and will contact you as soon as your package is shipped. You can find your purchase information below.').'</td></tr>
+// 											<tr>
+// 												<td style="padding-top:30px;padding-bottom:20px;">
+// 													<table border="0" cellpadding="0" cellspacing="0" width="100%">
+// 														<tr>
+// 															<td style="vertical-align: top;">
+// 																<table border="0" cellpadding="3" cellspacing="0" width="100%">
+// 																	<tr><td style="font-size:16px;font-weight:bold;">'.__('BILL TO').':</td></tr>
+// 																	<tr><td><strong>'.$mdata['customer_name'].'</strong></td></tr>
+// 																	<tr><td>'.$mdata['customer_address'].'</td></tr>
+// 																	<tr><td>'.$mdata['city'].', '.$mdata['state'].', '.$mdata['zip_code'].', '.$mdata['country'].'</td></tr>
+// 																	<tr><td>'.$mdata['customer_email'].'</td></tr>
+// 																	<tr><td>'.$mdata['customer_phone'].'</td></tr>
+// 																</table>
+// 																<table style="padding:30px 0px;" border="0" cellpadding="3" cellspacing="0" width="100%">
+// 																	<tr><td style="font-size:16px;font-weight:bold;">'.__('BILL FROM').':</td></tr>
+// 																	<tr><td><strong>'.$gtext['company'].'</strong></td></tr>
+// 																	<tr><td>'.$gtext['invoice_address'].'</td></tr>
+// 																	<tr><td>'.$gtext['invoice_email'].'</td></tr>
+// 																	<tr><td>'.$gtext['invoice_phone'].'</td></tr>
+// 																</table>
+// 															</td>
+// 															<td style="vertical-align: top;">
+// 																<table style="text-align:right;" border="0" cellpadding="3" cellspacing="0" width="100%">
+// 																	<tr><td><strong>'.__('Order Date').'</strong>: '.date('d-m-Y', strtotime($mdata['created_at'])).'</td></tr>
+// 																	<tr><td><strong>'.__('Payment Method').'</strong>: '.$mdata['method_name'].'</td></tr>
+// 																	<tr><td><strong>'.__('Payment Status').'</strong>: <span style="color:'.$pstatus.'">'.$mdata['pstatus_name'].'</span></td></tr>
+// 																	<tr><td><strong>'.__('Order Status').'</strong>: <span style="color:'.$ostatus.'">'.$mdata['ostatus_name'].'</span></td></tr>
+// 																</table>
+// 															</td>
+// 														</tr>
+// 													</table>
+// 												</td>
+// 											</tr>
+// 											<tr>
+// 												<td>
+// 													<table style="border-collapse:collapse;" border="0" cellpadding="5" cellspacing="0" width="100%">
+// 														<tr>
+// 															<th style="width:70%;text-align:left;border:1px solid #ddd;">'.__('Product').'</th>
+// 															<th style="width:15%;text-align:center;border:1px solid #ddd;">'.__('Price').'</th>
+// 															<th style="width:15%;text-align:right;border:1px solid #ddd;">'.__('Total').'</th>
+// 														</tr>
+// 														'.$item_list.'
+// 													</table>
+// 												</td>
+// 											</tr>
+// 											<tr>
+// 												<td style="padding-top:5px;padding-bottom:20px;">
+// 													<table style="font-weight:bold;" border="0" cellpadding="5" cellspacing="0" width="100%">
+// 														<tr>
+// 															<td style="width:85%;text-align:left;">'.$mdata['shipping_title'].': '.$shippingFee.' <span style="float:right">'.__('Shipping Fee').':</span></td>
+// 															<td style="width:15%;text-align:right;">'.$shipping_fee.'</td>
+// 														</tr>
+// 														<tr>
+// 															<td style="width:85%;text-align:right;">'.__('Tax').':</td>
+// 															<td style="width:15%;text-align:right;">'.$tax.'</td>
+// 														</tr>
+// 														<tr>
+// 															<td style="width:85%;text-align:right;">'.__('Subtotal').':</td>
+// 															<td style="width:15%;text-align:right;">'.$subtotal.'</td>
+// 														</tr>
+// 														<tr>
+// 															<td style="width:85%;text-align:right;">'.__('Commission').':</td>
+// 															<td style="width:15%;text-align:right;">'.$commission.'</td>
+// 														</tr>
+// 														<tr>
+// 															<td style="width:85%;text-align:right;">'.__('Total').':</td>
+// 															<td style="width:15%;text-align:right;">'.$total_amount.'</td>
+// 														</tr>
+// 													</table>
+// 												</td>
+// 											</tr>
+// 											<tr><td style="padding-top:30px;padding-bottom:50px;">'.$InvoiceDownloads.'</td></tr>
+// 											<tr><td style="padding-top:10px;border-top:1px solid #ddd;text-align:center;">'.__('Thank you for purchasing our products.').'</td></tr>
+// 											<tr><td style="padding-top:5px;text-align:center;">'.__('If you have any questions about this invoice, please contact us').'</td></tr>
+// 											<tr><td style="padding-top:5px;text-align:center;"><a href="'.$base_url.'">'.$base_url.'</a></td></tr>
+// 										</table>
+// 									</td>
+// 								</tr>
+// 							</table>';
+
+// 				$mail->send();
+				
+// 				return 1;
+// 			} catch (Exception $e) {
+// 				return 0;
+// 			}
+// 		}
+// 	}	
+
     public function orderNotify($MasterData) {
-		$gtext = gtext();
-		
- 		$datalist = DB::table('order_masters as a')
-			->join('order_items as b', 'a.id', '=', 'b.order_master_id')
-			->join('users as c', 'a.seller_id', '=', 'c.id')
-			->join('payment_method as d', 'a.payment_method_id', '=', 'd.id')
-			->join('payment_status as e', 'a.payment_status_id', '=', 'e.id')
-			->join('order_status as f', 'a.order_status_id', '=', 'f.id')
-			->join('products as g', 'b.product_id', '=', 'g.id')
-			->select(
-				'a.id', 
-				'a.customer_id', 
-				'a.seller_id', 
-				'a.payment_status_id', 
-				'a.order_status_id', 
-				'a.order_no', 
-				'a.created_at', 
-				'a.shipping_title', 
-				'a.shipping_fee',
-				'g.title', 
-				'b.quantity', 
-				'b.price', 
-				'b.total_price', 
-				'b.tax', 
-				'b.discount',
-				'b.variation_color',
-				'b.variation_size',
-				'a.email as customer_email', 
-				'a.name as customer_name', 
-				'a.phone as customer_phone', 
-				'a.country', 
-				'a.state', 
-				'a.zip_code', 
-				'a.city', 
-				'a.address as customer_address',  
-				'c.shop_name',  
-				'c.shop_url',  
-				'c.email as seller_email',  
-				'd.method_name', 
-				'e.pstatus_name', 
-				'f.ostatus_name')
-			->whereIn('a.id', $MasterData)
-			->orderBy('a.seller_id', 'ASC')
-			->get();
-
-		$index = 0;
-		$mdata = array();
-		$orderDataArr = array();
-		$tempSellerId = ''; 
-		$SellerCount = 0;
-		$totalAmount = 0;
-		$totalTax = 0;
-		$totalDiscount = 0;
-		$shippingTitles = [];
-		$shippingFees = [];
-
-		$item_list = '';
-		foreach($datalist as $row){
-			if($index == 0){
-				$mdata['payment_status_id'] = $row->payment_status_id;
-				$mdata['order_status_id'] = $row->order_status_id;
-				$mdata['customer_name'] = $row->customer_name;
-				$mdata['customer_email'] = $row->customer_email;
-				$mdata['customer_address'] = $row->customer_address;
-				$mdata['city'] = $row->city;
-				$mdata['state'] = $row->state;
-				$mdata['zip_code'] = $row->zip_code;
-				$mdata['country'] = $row->country;
-				$mdata['customer_phone'] = $row->customer_phone;
-				$mdata['order_no'] = 'order_no888';
-				$mdata['created_at'] = $row->created_at;
-				$mdata['method_name'] = $row->method_name;
-				$mdata['pstatus_name'] = $row->pstatus_name;
-				$mdata['ostatus_name'] = $row->ostatus_name;
-				// $mdata['shipping_title'] = $row->shipping_title;
-				// $mdata['shipping_fee'] = $row->shipping_fee;
-			}
-			// collect shipping titles and fees
-			$shippingTitles[] = $row->shipping_title;
-			$shippingFees[]   = (float)$row->shipping_fee;
-
-			$totalAmount +=$row->total_price;
-			$totalTax +=$row->tax;
-			$totalDiscount +=$row->discount;
-			
-			if($gtext['currency_position'] == 'left'){
-				$price = $gtext['currency_icon'].NumberFormat($row->price);
-				$total_price = $gtext['currency_icon'].NumberFormat($row->total_price);
-			}else{
-				$price = NumberFormat($row->price).$gtext['currency_icon'];
-				$total_price = NumberFormat($row->total_price).$gtext['currency_icon'];
-			}
-
-			if($row->variation_size == '0'){
-				$size = '';
-			}else{
-				$size = $row->quantity.' '.$row->variation_size;
-			}
-			
-			if($tempSellerId != $row->seller_id){
-
-				$orderDataArr[$row->seller_id]['id'] = $row->id;
-				$orderDataArr[$row->seller_id]['order_no'] = $row->order_no;
-				$orderDataArr[$row->seller_id]['seller_id'] = $row->seller_id;
-				$orderDataArr[$row->seller_id]['seller_email'] = $row->seller_email;
-				$orderDataArr[$row->seller_id]['shop_name'] = $row->shop_name;
-				
-				$item_list .= '<tr>
-								<td colspan="3" style="width:100%;text-align:left;border:1px solid #ddd;background-color:#f7f7f7;font-weight:bold;">'.__('Sold By').': <a href="'.route('frontend.stores', [$row->seller_id, str_slug($row->shop_url)]).'"> '.$row->shop_name.'</a>, '.__('Order#').': <a href="'.route('frontend.order-invoice', [$row->id, $row->order_no]).'"> '.$row->order_no.'</a></td>
-							</tr>';
-
-				$tempSellerId=$row->seller_id; 
-				$SellerCount++;		
-			}
-			
-			$item_list .= '<tr>
-							<td style="width:70%;text-align:left;border:1px solid #ddd;">'.$row->title.'<br>'.$size.'</td>
-							<td style="width:15%;text-align:center;border:1px solid #ddd;">'.$price.' x '.$row->quantity.'</td>
-							<td style="width:15%;text-align:right;border:1px solid #ddd;">'.$total_price.'</td>
-						</tr>';
-			
-			$index++;
-		}
-
-		$mdata['shipping_title'] = implode(', ', $shippingTitles);
-		$mdata['shipping_fee']   = implode(', ', $shippingFees);
-
-		
-		$shippingDetails = [];
-		foreach ($shippingTitles as $i => $title) {
-			$fee = isset($shippingFees[$i]) ? $shippingFees[$i] : 0;
-			$shippingDetails[] = "{$title} (" . $gtext['currency_icon'] . NumberFormat($fee) . ")";
-		}
-		$shippingDisplay = implode(', ', $shippingDetails);
-		$totalShippingFee = array_sum($shippingFees);
-
-		$commisiontable = DB::table('commissions')->limit(1)->first();
-		$commissionset = $commisiontable->commission;
-
-		$total_amount_shipping_fee = $totalAmount + $totalShippingFee + $totalTax + $commissionset;
-
-		// $shipping_fee = $mdata['shipping_fee'] * $SellerCount;
-		// $total_amount_shipping_fee = $totalAmount + $shipping_fee + $totalTax;
-		
-		if($gtext['currency_position'] == 'left'){
-			// $shippingFee = $gtext['currency_icon'].NumberFormat($mdata['shipping_fee']);
-			// $shipping_fee = $gtext['currency_icon'].NumberFormat($shipping_fee);
-			$shippingFee = $shippingDisplay;
-			$shipping_fee = $gtext['currency_icon'].NumberFormat($totalShippingFee);
-			$tax = $gtext['currency_icon'].NumberFormat($totalTax);
-			$discount = $gtext['currency_icon'].NumberFormat($totalDiscount);
-			$subtotal = $gtext['currency_icon'].NumberFormat($totalAmount);
-			$total_amount = $gtext['currency_icon'].NumberFormat($total_amount_shipping_fee);
-			$commission = $gtext['currency_icon'].NumberFormat($commissionset);
-			
-		}else{
-			// $shippingFee = NumberFormat($mdata['shipping_fee']).$gtext['currency_icon'];
-			// $shipping_fee = NumberFormat($shipping_fee).$gtext['currency_icon'];
-			$shippingFee = $shippingDisplay;
-			$shipping_fee = NumberFormat($totalShippingFee) . $gtext['currency_icon'];
-			$tax = NumberFormat($totalTax).$gtext['currency_icon'];
-			$discount = NumberFormat($totalDiscount).$gtext['currency_icon'];
-			$subtotal = NumberFormat($totalAmount).$gtext['currency_icon'];
-			$total_amount = NumberFormat($total_amount_shipping_fee).$gtext['currency_icon'];
-			$commission = NumberFormat($commissionset).$gtext['currency_icon'];
-		}
-
-		
-		if($mdata['payment_status_id'] == 1){
-			$pstatus = '#26c56d'; //Completed = 1
-		}elseif($mdata['payment_status_id'] == 2){
-			$pstatus = '#fe9e42'; //Pending = 2
-		}elseif($mdata['payment_status_id'] == 3){
-			$pstatus = '#f25961'; //Canceled = 3
-		}elseif($mdata['payment_status_id'] == 4){
-			$pstatus = '#f25961'; //Incompleted 4
-		}
-		
-		if($mdata['order_status_id'] == 1){
-			$ostatus = '#fe9e42'; //Awaiting processing = 1
-		}elseif($mdata['order_status_id'] == 2){
-			$ostatus = '#fe9e42'; //Processing = 2
-		}elseif($mdata['order_status_id'] == 3){
-			$ostatus = '#fe9e42'; //Ready for pickup = 3
-		}elseif($mdata['order_status_id'] == 4){
-			$ostatus = '#26c56d'; //Completed 4
-		}elseif($mdata['order_status_id'] == 5){
-			$ostatus = '#f25961'; //Canceled 5
-		}
-
-		$base_url = url('/');
-
-		$InvoiceDownloads = '';
-		$orderNos = '';
-		$invoice_index = 1;
-		$f = 0;
-		foreach($orderDataArr as $row){
-			if($f++){
-				$orderNos .= ', ';
-			}
-			$orderNos .= $row['order_no'];
-			
-			$InvoiceDownloads .= '<a href="'.route('frontend.order-invoice', [$row['id'], $row['order_no']]).'" style="background:'.$gtext['theme_color'].';display:block;text-align:center;padding:7px 15px;margin:0 10px 10px 0;border-radius:3px;text-decoration:none;color:#fff;float:left;">'.__('Invoice').' ('.$row['order_no'].')</a>';
-			$invoice_index++;
-		}
-
-		if($gtext['ismail'] == 1){
-			try {
-				$mail = new PHPMailer(true);
-				$mail->CharSet = "UTF-8";
-
-				if($gtext['mailer'] == 'smtp'){
-					$mail->SMTPDebug = 0; //0 = off (for production use), 1 = client messages, 2 = client and server messages
-					$mail->isSMTP();
-					$mail->Host       = $gtext['smtp_host'];
-					$mail->SMTPAuth   = true;
-					$mail->Username   = $gtext['smtp_username'];
-					$mail->Password   = $gtext['smtp_password'];
-					$mail->SMTPSecure = $gtext['smtp_security'];
-					$mail->Port       = $gtext['smtp_port'];
-				}
-
-				//Get mail
-				$mail->setFrom($gtext['from_mail'], $gtext['from_name']);
-				$mail->addAddress($mdata['customer_email'], $mdata['customer_name']);
-				foreach($orderDataArr as $row){
-				$mail->addAddress($row['seller_email'], $row['shop_name']);
-				// $mail->addCC($row['seller_email'], $row['shop_name']);
-				}
-				$mail->isHTML(true);
-				$mail->CharSet = "utf-8";
-				$mail->Subject = $orderNos.' - '. __('Your order is successfully.');
-				
-				$mail->Body = '<table style="background-color:#edf2f7;color:#111111;padding:40px 0px;line-height:24px;font-size:14px;" border="0" cellpadding="0" cellspacing="0" width="100%">	
-								<tr>
-									<td>
-										<table style="background-color:#fff;max-width:1000px;margin:0 auto;padding:30px;" border="0" cellpadding="0" cellspacing="0" width="100%">
-											<tr><td style="font-size:40px;border-bottom:1px solid #ddd;padding-bottom:25px;font-weight:bold;text-align:center;">'.$gtext['company'].'</td></tr>
-											<tr><td style="font-size:25px;font-weight:bold;padding:30px 0px 5px 0px;">'.__('Hi').' '.$mdata['customer_name'].'</td></tr>
-											<tr><td>'.__('We have received your order and will contact you as soon as your package is shipped. You can find your purchase information below.').'</td></tr>
-											<tr>
-												<td style="padding-top:30px;padding-bottom:20px;">
-													<table border="0" cellpadding="0" cellspacing="0" width="100%">
-														<tr>
-															<td style="vertical-align: top;">
-																<table border="0" cellpadding="3" cellspacing="0" width="100%">
-																	<tr><td style="font-size:16px;font-weight:bold;">'.__('BILL TO').':</td></tr>
-																	<tr><td><strong>'.$mdata['customer_name'].'</strong></td></tr>
-																	<tr><td>'.$mdata['customer_address'].'</td></tr>
-																	<tr><td>'.$mdata['city'].', '.$mdata['state'].', '.$mdata['zip_code'].', '.$mdata['country'].'</td></tr>
-																	<tr><td>'.$mdata['customer_email'].'</td></tr>
-																	<tr><td>'.$mdata['customer_phone'].'</td></tr>
-																</table>
-																<table style="padding:30px 0px;" border="0" cellpadding="3" cellspacing="0" width="100%">
-																	<tr><td style="font-size:16px;font-weight:bold;">'.__('BILL FROM').':</td></tr>
-																	<tr><td><strong>'.$gtext['company'].'</strong></td></tr>
-																	<tr><td>'.$gtext['invoice_address'].'</td></tr>
-																	<tr><td>'.$gtext['invoice_email'].'</td></tr>
-																	<tr><td>'.$gtext['invoice_phone'].'</td></tr>
-																</table>
-															</td>
-															<td style="vertical-align: top;">
-																<table style="text-align:right;" border="0" cellpadding="3" cellspacing="0" width="100%">
-																	<tr><td><strong>'.__('Order Date').'</strong>: '.date('d-m-Y', strtotime($mdata['created_at'])).'</td></tr>
-																	<tr><td><strong>'.__('Payment Method').'</strong>: '.$mdata['method_name'].'</td></tr>
-																	<tr><td><strong>'.__('Payment Status').'</strong>: <span style="color:'.$pstatus.'">'.$mdata['pstatus_name'].'</span></td></tr>
-																	<tr><td><strong>'.__('Order Status').'</strong>: <span style="color:'.$ostatus.'">'.$mdata['ostatus_name'].'</span></td></tr>
-																</table>
-															</td>
-														</tr>
-													</table>
-												</td>
-											</tr>
-											<tr>
-												<td>
-													<table style="border-collapse:collapse;" border="0" cellpadding="5" cellspacing="0" width="100%">
-														<tr>
-															<th style="width:70%;text-align:left;border:1px solid #ddd;">'.__('Product').'</th>
-															<th style="width:15%;text-align:center;border:1px solid #ddd;">'.__('Price').'</th>
-															<th style="width:15%;text-align:right;border:1px solid #ddd;">'.__('Total').'</th>
-														</tr>
-														'.$item_list.'
-													</table>
-												</td>
-											</tr>
-											<tr>
-												<td style="padding-top:5px;padding-bottom:20px;">
-													<table style="font-weight:bold;" border="0" cellpadding="5" cellspacing="0" width="100%">
-														<tr>
-															<td style="width:85%;text-align:left;">'.$mdata['shipping_title'].': '.$shippingFee.' <span style="float:right">'.__('Shipping Fee').':</span></td>
-															<td style="width:15%;text-align:right;">'.$shipping_fee.'</td>
-														</tr>
-														<tr>
-															<td style="width:85%;text-align:right;">'.__('Tax').':</td>
-															<td style="width:15%;text-align:right;">'.$tax.'</td>
-														</tr>
-														<tr>
-															<td style="width:85%;text-align:right;">'.__('Subtotal').':</td>
-															<td style="width:15%;text-align:right;">'.$subtotal.'</td>
-														</tr>
-														<tr>
-															<td style="width:85%;text-align:right;">'.__('Commission').':</td>
-															<td style="width:15%;text-align:right;">'.$commission.'</td>
-														</tr>
-														<tr>
-															<td style="width:85%;text-align:right;">'.__('Total').':</td>
-															<td style="width:15%;text-align:right;">'.$total_amount.'</td>
-														</tr>
-													</table>
-												</td>
-											</tr>
-											<tr><td style="padding-top:30px;padding-bottom:50px;">'.$InvoiceDownloads.'</td></tr>
-											<tr><td style="padding-top:10px;border-top:1px solid #ddd;text-align:center;">'.__('Thank you for purchasing our products.').'</td></tr>
-											<tr><td style="padding-top:5px;text-align:center;">'.__('If you have any questions about this invoice, please contact us').'</td></tr>
-											<tr><td style="padding-top:5px;text-align:center;"><a href="'.$base_url.'">'.$base_url.'</a></td></tr>
-										</table>
-									</td>
-								</tr>
-							</table>';
-
-				$mail->send();
-				
-				return 1;
-			} catch (Exception $e) {
-				return 0;
-			}
-		}
-	}	
+        $gtext = gtext();
+    
+        // Fetch items for all affected order_masters (MasterData is array of a.id)
+        $datalist = DB::table('order_masters as a')
+            ->join('order_items as b', 'a.id', '=', 'b.order_master_id')
+            ->join('users as c', 'a.seller_id', '=', 'c.id')
+            ->join('payment_method as d', 'a.payment_method_id', '=', 'd.id')
+            ->join('payment_status as e', 'a.payment_status_id', '=', 'e.id')
+            // CORRECT: join order_status on order_items.order_status_id (per-item status)
+            ->leftJoin('order_status as os', 'a.order_status_id', '=', 'os.id')
+            ->join('products as g', 'b.product_id', '=', 'g.id')
+            // delivery type (shipping mode label) — you used a.shipping_title earlier; keep same join
+            ->leftJoin('delivery_types as dt', 'a.shipping_title', '=', 'dt.lable')
+            ->select(
+                'a.id',
+                'a.master_order_no',
+                'a.customer_id',
+                'a.seller_id',
+                'a.payment_status_id',
+                'a.order_status_id',
+                'a.order_no',
+                'a.created_at',
+                'a.shipping_title',
+                'a.shipping_fee',
+                'g.title',
+                'b.quantity',
+                'b.price',
+                'b.total_price',
+                'b.tax',
+                'b.discount',
+                'b.variation_color',
+                'b.variation_size',
+                'a.email as customer_email',
+                'a.name as customer_name',
+                'a.phone as customer_phone',
+                'a.country',
+                'a.state',
+                'a.zip_code',
+                'a.city',
+                'a.address as customer_address',
+                'c.shop_name',
+                'c.shop_url',
+                'c.email as seller_email',
+                'd.method_name',
+                'e.pstatus_name',
+                // per-item order status & shipping mode
+                'os.ostatus_name as item_status',
+                'dt.lable as shipping_mode',
+                'a.master_order_no'
+            )
+            ->whereIn('a.id', $MasterData)
+            ->orderBy('a.seller_id', 'ASC')
+            ->get();
+    
+        // init
+        $index = 0;
+        $mdata = array();
+        $orderDataArr = array();
+        $tempSellerId = '';
+        $SellerCount = 0;
+        $totalAmount = 0;
+        $totalTax = 0;
+        $totalDiscount = 0;
+        $shippingTitles = [];
+        $shippingFees = [];
+    
+        $item_list = '';
+    
+        foreach ($datalist as $row) {
+            // fill master-level info from first row
+            if ($index == 0) {
+                $mdata['payment_status_id'] = $row->payment_status_id;
+                $mdata['order_status_id'] = $row->order_status_id;
+                $mdata['customer_name'] = $row->customer_name;
+                $mdata['customer_email'] = $row->customer_email;
+                $mdata['customer_address'] = $row->customer_address;
+                $mdata['city'] = $row->city;
+                $mdata['state'] = $row->state;
+                $mdata['zip_code'] = $row->zip_code;
+                $mdata['country'] = $row->country;
+                $mdata['customer_phone'] = $row->customer_phone;
+                $mdata['master_order_no'] = $row->master_order_no ?? null;
+                $mdata['created_at'] = $row->created_at;
+                $mdata['method_name'] = $row->method_name;
+                $mdata['pstatus_name'] = $row->pstatus_name;
+                $mdata['ostatus_name'] = $row->item_status ?? $row->ostatus_name ?? '';
+                // don't set shipping arrays here
+            }
+    
+            // collect shipping titles and fees (per row)
+            $shippingTitles[] = $row->shipping_title;
+            // shipping_fee might be stored as string or numeric, convert to float safely
+            if (!isset($shippingFees[$row->seller_id])) {
+                $shippingFees[$row->seller_id] = floatval($row->shipping_fee ?? 0);
+            }
+    
+            // totals
+            $totalAmount += floatval($row->total_price);
+            $totalTax += floatval($row->tax);
+            $totalDiscount += floatval($row->discount);
+    
+            // format prices exactly like your original code
+            if ($gtext['currency_position'] == 'left') {
+                $price = $gtext['currency_icon'] . NumberFormat($row->price);
+                $total_price = $gtext['currency_icon'] . NumberFormat($row->total_price);
+            } else {
+                $price = NumberFormat($row->price) . $gtext['currency_icon'];
+                $total_price = NumberFormat($row->total_price) . $gtext['currency_icon'];
+            }
+    
+            // variation size text
+            if ($row->variation_size == '0' || $row->variation_size === null) {
+                $size = '';
+            } else {
+                $size = $row->quantity . ' ' . $row->variation_size;
+            }
+    
+            // Build seller sections (your existing logic: a header row when seller changes)
+            if ($tempSellerId != $row->seller_id) {
+                $orderDataArr[$row->seller_id]['id'] = $row->id;
+                $orderDataArr[$row->seller_id]['order_no'] = $row->master_order_no;
+                $orderDataArr[$row->seller_id]['seller_id'] = $row->seller_id;
+                $orderDataArr[$row->seller_id]['seller_email'] = $row->seller_email;
+                $orderDataArr[$row->seller_id]['shop_name'] = $row->shop_name;
+    
+                // seller header: keep same format but change invoice link to master_order_no
+                $item_list .= '<tr>
+                    <td colspan="3" style="width:100%;text-align:left;border:1px solid #ddd;background-color:#f7f7f7;font-weight:bold;">'
+                    . __('Sold By') . ': <a href="' . route('frontend.stores', [$row->seller_id, str_slug($row->shop_url)]) . '"> ' . $row->shop_name . '</a>, '
+                    . __('Order#') . ': <a href="' . route('frontend.order-invoice', $row->master_order_no) . '"> ' . $row->master_order_no . '</a></td>
+                    </tr>';
+    
+                $tempSellerId = $row->seller_id;
+                $SellerCount++;
+            }
+    
+            // product row: insert SOLD BY, ITEM STATUS, SHIPPING MODE inside same product cell (no layout change)
+            $item_list .= '<tr>
+                <td style="width:70%;text-align:left;border:1px solid #ddd;">'
+                    . $row->title . '<br>' . $size
+                    . '<br><strong>' . __('Sold By') . ':</strong> ' . $row->shop_name
+                    . '<br><strong>' . __('Order Status') . ':</strong> ' . ($row->item_status ?? '')
+                    . '<br><strong>' . __('Shipping Mode') . ':</strong> ' . ($row->shipping_mode ?? '')
+                . '</td>
+                <td style="width:15%;text-align:center;border:1px solid #ddd;">' . $price . ' x ' . $row->quantity . '</td>
+                <td style="width:15%;text-align:right;border:1px solid #ddd;">' . $total_price . '</td>
+            </tr>';
+    
+            $index++;
+        } // end foreach
+    
+        // Build shipping title display (human readable)
+        $shippingDetails = [];
+        foreach ($shippingTitles as $i => $title) {
+            $fee = isset($shippingFees[$i]) ? $shippingFees[$i] : 0;
+            $shippingDetails[] = "{$title} (" . $gtext['currency_icon'] . NumberFormat($fee) . ")";
+        }
+        $shippingDisplay = implode(', ', $shippingDetails);
+    
+        // numeric sum of shipping fees (use for arithmetic)
+        $totalShippingFee = array_sum($shippingFees);
+    
+        $commisiontable = DB::table('commissions')->limit(1)->first();
+        $commissionset = $commisiontable->commission ?? 0;
+    
+        // TOTAL: use numeric totalShippingFee (not mdata['shipping_fee'] string)
+        $total_amount_shipping_fee = $totalAmount + $commissionset + $totalShippingFee + $totalTax;
+    
+        // Format displayed values (currency position)
+        if ($gtext['currency_position'] == 'left') {
+            $shippingFee = $shippingDisplay; // human readable titles
+            $shipping_fee = $gtext['currency_icon'] . NumberFormat($totalShippingFee);
+            $tax = $gtext['currency_icon'] . NumberFormat($totalTax);
+            $discount = $gtext['currency_icon'] . NumberFormat($totalDiscount);
+            $subtotal = $gtext['currency_icon'] . NumberFormat($totalAmount);
+            $total_amount = $gtext['currency_icon'] . NumberFormat($total_amount_shipping_fee);
+            $commission = $gtext['currency_icon'] . NumberFormat($commissionset);
+        } else {
+            $shippingFee = $shippingDisplay;
+            $shipping_fee = NumberFormat($totalShippingFee) . $gtext['currency_icon'];
+            $tax = NumberFormat($totalTax) . $gtext['currency_icon'];
+            $discount = NumberFormat($totalDiscount) . $gtext['currency_icon'];
+            $subtotal = NumberFormat($totalAmount) . $gtext['currency_icon'];
+            $total_amount = NumberFormat($total_amount_shipping_fee) . $gtext['currency_icon'];
+            $commission = NumberFormat($commissionset) . $gtext['currency_icon'];
+        }
+    
+        // status color badges: keep your logic
+        if ($mdata['payment_status_id'] == 1) {
+            $pstatus = '#26c56d';
+        } elseif ($mdata['payment_status_id'] == 2) {
+            $pstatus = '#fe9e42';
+        } elseif ($mdata['payment_status_id'] == 3) {
+            $pstatus = '#f25961';
+        } else {
+            $pstatus = '#f25961';
+        }
+    
+        if ($mdata['order_status_id'] == 1) {
+            $ostatus = '#fe9e42';
+        } elseif ($mdata['order_status_id'] == 2) {
+            $ostatus = '#fe9e42';
+        } elseif ($mdata['order_status_id'] == 3) {
+            $ostatus = '#fe9e42';
+        } elseif ($mdata['order_status_id'] == 4) {
+            $ostatus = '#26c56d';
+        } else {
+            $ostatus = '#f25961';
+        }
+    
+        $base_url = url('/');
+    
+        // Build invoice download buttons (use master_order_no as requested)
+        $InvoiceDownloads = '<a href="' . route('frontend.order-invoice', $mdata['master_order_no']) . '" 
+    		style="background:' . $gtext['theme_color'] . ';display:block;text-align:center;padding:7px 15px;
+    		margin:0 10px 10px 0;border-radius:3px;text-decoration:none;color:#fff;float:left;">
+    		' . __('Invoice') . ' (' . $mdata['master_order_no'] . ')
+    		</a>';
+    
+        // SEND MAIL (same format as before)
+        if ($gtext['ismail'] == 1) {
+            try {
+                $mail = new PHPMailer(true);
+                $mail->CharSet = "UTF-8";
+    
+                if ($gtext['mailer'] == 'smtp') {
+                    $mail->SMTPDebug = 0;
+                    $mail->isSMTP();
+                    $mail->Host       = $gtext['smtp_host'];
+                    $mail->SMTPAuth   = true;
+                    $mail->Username   = $gtext['smtp_username'];
+                    $mail->Password   = $gtext['smtp_password'];
+                    $mail->SMTPSecure = $gtext['smtp_security'];
+                    $mail->Port       = $gtext['smtp_port'];
+                }
+    
+                // set recipients
+                $mail->setFrom($gtext['from_mail'], $gtext['from_name']);
+                $mail->addAddress($mdata['customer_email'], $mdata['customer_name']);
+                foreach ($orderDataArr as $row) {
+                    $mail->addAddress($row['seller_email'], $row['shop_name']);
+                }
+    
+                $mail->isHTML(true);
+                $mail->CharSet = "utf-8";
+                $mail->Subject = $mdata['master_order_no'] . ' - ' . __('Your order is successfully.');
+    
+                // Build the same email body — replace only the $item_list and totals variables (I keep your HTML)
+                $mail->Body = '<table style="background-color:#edf2f7;color:#111111;padding:40px 0px;line-height:24px;font-size:14px;" border="0" cellpadding="0" cellspacing="0" width="100%">
+                    <tr>
+                        <td>
+                            <table style="background-color:#fff;max-width:1000px;margin:0 auto;padding:30px;" border="0" cellpadding="0" cellspacing="0" width="100%">
+                                <tr><td style="font-size:40px;border-bottom:1px solid #ddd;padding-bottom:25px;font-weight:bold;text-align:center;">' . $gtext['company'] . '</td></tr>
+                                <tr><td style="font-size:25px;font-weight:bold;padding:30px 0px 5px 0px;">' . __('Hi') . ' ' . $mdata['customer_name'] . '</td></tr>
+                                <tr><td>' . __('We have received your order and will contact you as soon as your package is shipped. You can find your purchase information below.') . '</td></tr>
+                                <tr>
+                                    <td style="padding-top:30px;padding-bottom:20px;">
+                                        <table border="0" cellpadding="0" cellspacing="0" width="100%">
+                                            <tr>
+                                                <td style="vertical-align: top;">
+                                                    <table border="0" cellpadding="3" cellspacing="0" width="100%">
+                                                        <tr><td style="font-size:16px;font-weight:bold;">' . __('BILL TO') . ':</td></tr>
+                                                        <tr><td><strong>' . $mdata['customer_name'] . '</strong></td></tr>
+                                                        <tr><td>' . $mdata['customer_address'] . '</td></tr>
+                                                        <tr><td>' . $mdata['city'] . ', ' . $mdata['state'] . ', ' . $mdata['zip_code'] . ', ' . $mdata['country'] . '</td></tr>
+                                                        <tr><td>' . $mdata['customer_email'] . '</td></tr>
+                                                        <tr><td>' . $mdata['customer_phone'] . '</td></tr>
+                                                    </table>
+                                                    <table style="padding:30px 0px;" border="0" cellpadding="3" cellspacing="0" width="100%">
+                                                        <tr><td style="font-size:16px;font-weight:bold;">' . __('BILL FROM') . ':</td></tr>
+                                                        <tr><td><strong>' . $gtext['company'] . '</strong></td></tr>
+                                                        <tr><td>' . $gtext['invoice_address'] . '</td></tr>
+                                                        <tr><td>' . $gtext['invoice_email'] . '</td></tr>
+                                                        <tr><td>' . $gtext['invoice_phone'] . '</td></tr>
+                                                    </table>
+                                                </td>
+                                                <td style="vertical-align: top;">
+                                                    <table style="text-align:right;" border="0" cellpadding="3" cellspacing="0" width="100%">
+                                                        <tr><td><strong>' . __('Order Date') . '</strong>: ' . date('d-m-Y', strtotime($mdata['created_at'])) . '</td></tr>
+                                                        <tr><td><strong>' . __('Payment Method') . '</strong>: ' . $mdata['method_name'] . '</td></tr>
+                                                        <tr><td><strong>' . __('Payment Status') . '</strong>: <span style="color:' . $pstatus . '">' . $mdata['pstatus_name'] . '</span></td></tr>
+                                                       
+                                                    </table>
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <table style="border-collapse:collapse;" border="0" cellpadding="5" cellspacing="0" width="100%">
+                                            <tr>
+                                                <th style="width:70%;text-align:left;border:1px solid #ddd;">' . __('Product') . '</th>
+                                                <th style="width:15%;text-align:center;border:1px solid #ddd;">' . __('Price') . '</th>
+                                                <th style="width:15%;text-align:right;border:1px solid #ddd;">' . __('Total') . '</th>
+                                            </tr>'
+                                            . $item_list .
+                                        '</table>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="padding-top:5px;padding-bottom:20px;">
+                                        <table style="font-weight:bold;" border="0" cellpadding="5" cellspacing="0" width="100%">
+                                            <tr>
+                                                <td style="width:85%;text-align:right;">' . __('Shipping Fee') . ':</td>
+                                                <td style="width:15%;text-align:right;">' . $shipping_fee . '</td>
+                                            </tr>
+                                            <tr>
+                                                <td style="width:85%;text-align:right;">' . __('Tax') . ':</td>
+                                                <td style="width:15%;text-align:right;">' . $tax . '</td>
+                                            </tr>
+                                            <tr>
+                                                <td style="width:85%;text-align:right;">' . __('Subtotal') . ':</td>
+                                                <td style="width:15%;text-align:right;">' . $subtotal . '</td>
+                                            </tr>
+                                            <tr>
+                                                <td style="width:85%;text-align:right;">' . __('Commission') . ':</td>
+                                                <td style="width:15%;text-align:right;">' . $commission . '</td>
+                                            </tr>
+                                            <tr>
+                                                <td style="width:85%;text-align:right;">' . __('Total') . ':</td>
+                                                <td style="width:15%;text-align:right;">' . $total_amount . '</td>
+                                            </tr>
+                                        </table>
+                                    </td>
+                                </tr>
+                                <tr><td style="padding-top:30px;padding-bottom:50px;">' . $InvoiceDownloads . '</td></tr>
+                                <tr><td style="padding-top:10px;border-top:1px solid #ddd;text-align:center;">' . __('Thank you for purchasing our products.') . '</td></tr>
+                                <tr><td style="padding-top:5px;text-align:center;">' . __('If you have any questions about this invoice, please contact us') . '</td></tr>
+                                <tr><td style="padding-top:5px;text-align:center;"><a href="' . $base_url . '">' . $base_url . '</a></td></tr>
+                            </table>
+                        </td>
+                    </tr>
+                </table>';
+    
+                $mail->send();
+    
+                return 1;
+            } catch (Exception $e) {
+                // logging is recommended:
+                // \Log::error('OrderNotify mail error: '.$e->getMessage());
+                return 0;
+            }
+        } // end ismail
+    } // end function
 }

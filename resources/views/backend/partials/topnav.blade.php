@@ -5,7 +5,7 @@
 	@if (Auth::user()->role_id == 1)
 	<a href="{{ url('/') }}" target="_blank" class="view_website">{{ __('View Website') }}</a>
 	@elseif (Auth::user()->role_id == 3)
-	<a href="{{ route('frontend.stores', [Auth::user()->id, str_slug(Auth::user()->shop_url)]) }}" target="_blank" class="view_website">{{ __('View Your Store') }}</a>
+	<a href="{{ route('frontend.stores', [Auth::user()->id, str_slug(Auth::user()->shop_url)]) }}" target="_blank" class="view_website">{{ __('View Your Company') }}</a>
 	@endif
 	
 	<div class="dropdown ml-auto mt-0 mt-lg-0">

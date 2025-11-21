@@ -78,12 +78,12 @@
 										<p class="mb5">{{ $mdata->customer_phone }}</p>
 									</div>
 									<div class="col-lg-6 mb10 order_status">
-										<p class="mb5"><strong>{{ __('Order#') }}</strong>: {{ $mdata->order_no }}</p>
+										<p class="mb5"><strong>{{ __('Order#') }}</strong>: {{ $mdata->master_order_no }}</p>
 										<p class="mb5"><strong>{{ __('Order Date') }}</strong>: {{ date('d-m-Y', strtotime($mdata->created_at)) }}</p>
 										<p class="mb5"><strong>{{ __('Payment Method') }}</strong>: {{ $mdata->method_name }}</p>
 										<p class="mb5"><strong>{{ __('Payment Status') }}</strong>: <span class="status_btn pstatus_{{ $mdata->payment_status_id }}">{{ $mdata->pstatus_name }}</span></p>
-										<p class="mb5"><strong>{{ __('Order Status') }}</strong>: <span class="status_btn ostatus_{{ $mdata->order_status_id }}">{{ $mdata->ostatus_name }}</span></p>
-										<p class="mb5"><strong>{{ __('Sold By') }}</strong>: {{ $mdata->shop_name }}</p>
+										{{-- <p class="mb5"><strong>{{ __('Order Status') }}</strong>: <span class="status_btn ostatus_{{ $mdata->order_status_id }}">{{ $mdata->ostatus_name }}</span></p>
+										<p class="mb5"><strong>{{ __('Sold By') }}</strong>: {{ $mdata->shop_name }}</p> --}}
 									</div>
 								</div>
 								<div class="row mt15">
@@ -94,8 +94,12 @@
 													<tr>
 														<th>{{ __('Image') }}</th>
 														<th>{{ __('Product') }}</th>
+														<th class="text-center">{{ __('Order Status') }}</th>
+														<th class="text-center">{{ __('Sold By') }}</th>
+														<th class="text-center">{{ __('Shipping Mode') }}</th>
 														<th class="text-center">{{ __('Price') }}</th>
 														<th class="text-center">{{ __('Quantity') }}</th>
+														{{-- <th class="text-center">{{ __('Shipping Fee') }}</th> --}}
 														<th class="text-center">{{ __('Total') }}</th>
 													</tr>
 												</thead>
@@ -115,6 +119,14 @@
 														}else{
 															$size = $row->quantity.' '.$row->variation_size;
 														}
+
+														$item_shipping_fee_raw = $row->shipping_fee ?? 0;
+
+														if($gtext['currency_position'] == 'left'){
+															$item_shipping_fee = $gtext['currency_icon'].NumberFormat($item_shipping_fee_raw);
+														} else {
+															$item_shipping_fee = NumberFormat($item_shipping_fee_raw).$gtext['currency_icon'];
+														}
 													@endphp
 													<tr>
 														<td class="pro-image-w">
@@ -127,8 +139,20 @@
 														<td class="pro-name-w">
 															<span class="pro-name"><a href="{{ route('frontend.product', [$row->id, str_slug($row->title)]) }}">{{ $row->title }}</a><br>@php echo $size; @endphp</span>
 														</td>
+														<td class="text-center">{{ $row->ostatus_name }}</td>
+														<td class="text-center">{{ $row->shop_name }}</td>
+														<td class="text-center">{{ $row->item_shipping_title}}
+															<br>
+															@if($row->ostatus_id == 3 && $row->delivaryid == 3 && $row->lat && $row->lng)
+																<a href="https://www.google.com/maps/dir/?api=1&destination={{ $row->lat }},{{ $row->lng }}"
+																	class="btn" style="border: 1px solid black;border-radius: 6px; padding: 6px 12px; margin: 6px 0px 0px 0px;" target="_blank">
+																	Navigate to Seller
+																</a>	
+															@endif 
+														</td>
 														<td class="text-center">{{ $price }}</td>
 														<td class="text-center">{{ $row->quantity }}</td>
+														{{-- <td class="text-center">{{ $item_shipping_fee }}</td> --}}
 														<td class="text-center">{{ $total_price }}</td>
 													</tr>
 													@endforeach
@@ -149,7 +173,7 @@
 										$mdata->shipping_fee = (float)$mdata->shipping_fee;
 									}
 
-									$total_amount_shipping_fee = $mdata->total_amount+$mdata->shipping_fee+$mdata->tax+$commissions;
+									$total_amount_shipping_fee = $mdata->total_amount+$commissions;
 
 									if($gtext['currency_position'] == 'left'){
 										$shipping_fee = $gtext['currency_icon'].NumberFormat($mdata->shipping_fee);
@@ -169,7 +193,7 @@
 								
 								<div class="row">
 									<div class="col-lg-7 mt10">
-										<p>{{ $mdata->shipping_title }}: {{ $shipping_fee }}</p>
+										
 									</div>
 									<div class="col-lg-5 mt10">
 										<div class="carttotals-card">
@@ -178,8 +202,8 @@
 													<tbody>
 														<tr><td><span class="title">{{ __('Shipping Fee') }}</span><span class="price">{{ $shipping_fee }}</span></td></tr>
 														<tr><td><span class="title">{{ __('Tax') }}</span><span class="price">{{ $tax }}</span></td></tr>
-														<tr><td><span class="title">{{ __('Commission') }}</span><span class="price">{{ $commissions }}</span></td></tr>
 														<tr><td><span class="title">{{ __('Subtotal') }}</span><span class="price">{{ $subtotal }}</span></td></tr>
+														<tr><td><span class="title">{{ __('Commission') }}</span><span class="price">{{ $commissions }}</span></td></tr>
 														<tr><td><span class="total">{{ __('Total') }}</span><span class="total-price">{{ $total_amount }}</span></td></tr>
 													</tbody>
 												</table>

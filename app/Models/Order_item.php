@@ -23,5 +23,7 @@ class Order_item extends Model
 		'total_price',
 		'tax',
 		'discount',
+		'commission',
+		'shipping_fee',
     ];		
 }

@@ -110,7 +110,12 @@ $(function () {
 	// 	});
 	// 	$(".grand_total_value").text(addCommas(grandTotal.toFixed(2)));
 	// });
+	$('.shipping_method:checked').each(function () {
+        let sellerId = $(this).data('sellerid');
+        let shippingId = $(this).data('shipid');
 
+        $('input[name="shipping_id['+sellerId+']"]').val(shippingId);
+    });
 	$(".shipping_method").on("change", function () {
 		const shipping_fee = parseFloat($(this).data("shippingfee")) || 0;
 		const totalWithoutShipping = parseFloat($(this).data("total")) || 0;
@@ -119,6 +124,11 @@ $(function () {
 		const totalRow = shippingSection.prevAll("tr").has(".total-price").first();
 		const shippingRow = shippingSection.prevAll("tr").has(".shipping_fee").first();
 
+		const sellerId = $(this).data("sellerid");
+    	const shippingId = $(this).data("shipid");
+
+		// UPDATE THE ONE HIDDEN FIELD
+		$("#shipping_id_" + sellerId).val(shippingId);
 		// Update shipping and total
 		shippingRow.find(".shipping_fee").text("€" + formatCurrency(shipping_fee));
 		const newTotal = totalWithoutShipping + shipping_fee;

@@ -19,7 +19,7 @@
 								<span>{{ __('Orders') }}</span>
 							</div>
 							<div class="col-lg-6">
-								<div class="group-button float-right">
+								<div class="group-button float-right d-none">
 									<button type="button" onClick="onExcelExport()" class="btn btn-theme mb0 btn-padding"><i class="fa fa-download"></i> {{ __('Excel') }}</button>
 									<button type="button" onClick="onCSVExport()" class="btn btn-theme mb0 btn-padding"><i class="fa fa-download"></i> {{ __('CSV') }}</button>
 								</div>

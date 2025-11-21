@@ -36,5 +36,7 @@ class Order_master extends Model
 	  'city',
 	  'address',
 	  'comments',
+	  'commission',
+	  'master_order_no'
     ];	
 }

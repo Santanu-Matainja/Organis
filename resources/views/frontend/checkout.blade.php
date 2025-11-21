@@ -189,9 +189,9 @@ $tax_rate = $gtax['percentage'];
 										</div>
 									</div>
 								</div>
-								@endif
+								@endif --}}
 								
-								@if($gtext['isenable_paypal'] == 1)
+								 @if($gtext['isenable_paypal'] == 1)
 								<div class="payment_card">
 									<div class="checkboxlist">
 										<label class="checkbox-title">
@@ -202,7 +202,7 @@ $tax_rate = $gtax['percentage'];
 								</div>
 								@endif
 								
-								@if($gtext['isenable_razorpay'] == 1)
+								{{-- @if($gtext['isenable_razorpay'] == 1)
 								<div class="payment_card">
 									<div class="checkboxlist">
 										<label class="checkbox-title">
@@ -608,9 +608,10 @@ $tax_rate = $gtax['percentage'];
 																			class="shipping_method"
 																			name="shipping_method[{{ $sellerId }}]"
 																			data-sellerid="{{ $sellerId }}"
+																			data-shipid="{{ $ship->id }}"
 																			data-shippingfee="{{ $shipping_fee }}"
 																			data-total="{{ $sellerTotalPrice }}"
-																			value="{{ $ship->id }}"
+																			value="{{ $shipping_fee }}"
 																			{{ $ship->id == 2 ? 'checked' : '' }}
 																		>
 																		{{ $ship->lable }} : {{ $displayFee }}
@@ -618,6 +619,11 @@ $tax_rate = $gtax['percentage'];
 																</div>
 															@endif
 														@endforeach
+														<input type="hidden"
+															id="shipping_id_{{ $sellerId }}"
+															name="shipping_id[{{ $sellerId }}]"
+															value=""
+														>
 													</td>
 												</tr>
 

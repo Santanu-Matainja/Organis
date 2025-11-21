@@ -1,7 +1,17 @@
 @extends('layouts.backend')
 
 @section('title', __('Settings'))
-
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<style>
+    #map { height: 400px; }
+	.close-btn{
+	font-size: 13px;
+    border: 2px solid gray;
+    padding: 1px 5px;
+    cursor: pointer;
+	}
+</style>
 @section('content')
 <!-- main Section -->
 <div class="main-body">
@@ -108,6 +118,22 @@
 											<input type="text" name="shipping_fee" id="shipping_fee" value="{{ $shippingfee->shipping_fee ?? 0 }}" class="form-control parsley-validated" data-required="true">
 										</div>
 									</div>
+									<div class="col-md-4">
+										<div class="form-group">
+											<label for="lat">{{ __('Latitude') }}<span class="red">*</span></label>
+											<input type="text" name="lat" id="lat" value="{{ $seller_data['lat'] }}" class="form-control parsley-validated" data-required="true" readonly>
+										</div>
+									</div>
+									<div class="col-md-4">
+										<div class="form-group">
+											<label for="lng">{{ __('Longitude') }}<span class="red">*</span></label>
+											<input type="text" name="lng" id="lng" value="{{ $seller_data['lng'] }}" class="form-control parsley-validated" data-required="true" readonly>
+										</div>
+									</div>
+									<div class="col-md-2 mt-3 d-flex align-items-center justify-content-center">
+										<button type="button" class="btn" style="background: var(--backend-theme-color); color: #ffffff;" data-bs-toggle="modal" data-bs-target="#mapModal">Pick Location</button>
+									</div>
+
 									<div class="col-md-6">
 										<div class="form-group">
 											<label for="f_thumbnail_thumbnail"><span class="red">*</span> {{ __('Logo') }}</label>
@@ -152,6 +178,30 @@
 									</div>
 								</div>
 							</form>
+						</div>
+
+						{{-- MAP MODEL  --}}
+						
+						<div class="modal fade" id="mapModal" tabindex="-1">
+							<div class="modal-dialog modal-lg modal-dialog-centered">
+								<div class="modal-content">
+
+								<div class="modal-header">
+									<h5 class="modal-title">Select Location</h5>
+									<a class="close-btn" data-bs-dismiss="modal">X</a>
+								</div>
+
+								<div class="modal-body">
+									<div id="map"></div>
+								</div>
+
+								<div class="modal-footer" style="border: none !important;">
+									<button class="btn btn-success" onclick="selectLocation()">Select</button>
+									<button class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+								</div>
+
+								</div>
+							</div>
 						</div>
 						<!--/Details/-->
 						
@@ -267,4 +317,78 @@ var TEXT = [];
 	TEXT['Inactive'] = "{{ __('Inactive') }}";
 </script>
 <script src="{{asset_path('backend/pages/settings-seller.js')}}"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+let map;
+let marker;
+let selectedLat = null;
+let selectedLng = null;
+
+document.getElementById('mapModal').addEventListener('shown.bs.modal', function () {
+
+    // If map not initialized → initialize
+    if (!map) {
+
+        // Default center (India as fallback)
+        let defaultLat = 20.5937;
+        let defaultLng = 78.9629;
+
+        // Try browser location first
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(position => {
+                defaultLat = position.coords.latitude;
+                defaultLng = position.coords.longitude;
+
+                loadMap(defaultLat, defaultLng);
+
+            }, () => {
+                loadMap(defaultLat, defaultLng); // fallback
+            });
+        } else {
+            loadMap(defaultLat, defaultLng);
+        }
+    }
+
+    setTimeout(() => map.invalidateSize(), 300);
+});
+
+function loadMap(lat, lng) {
+    map = L.map('map').setView([lat, lng], 13);
+
+    L.tileLayer(
+	'https://mt1.google.com/vt/lyrs=m&x={x}&y={y}&z={z}',
+	{ maxZoom: 20 }
+	).addTo(map);
+
+
+    // Marker
+    marker = L.marker([lat, lng], { draggable: true }).addTo(map);
+
+    selectedLat = lat;
+    selectedLng = lng;
+
+    // Update on drag
+    marker.on('dragend', function (e) {
+        let pos = marker.getLatLng();
+        selectedLat = pos.lat;
+        selectedLng = pos.lng;
+    });
+
+    // Click to move marker
+    map.on("click", function (e) {
+        selectedLat = e.latlng.lat;
+        selectedLng = e.latlng.lng;
+        marker.setLatLng([selectedLat, selectedLng]);
+    });
+}
+
+function selectLocation() {
+    document.getElementById("lat").value = selectedLat;
+    document.getElementById("lng").value = selectedLng;
+
+    var modal = bootstrap.Modal.getInstance(document.getElementById("mapModal"));
+    modal.hide();
+}
+</script>
+
 @endpush

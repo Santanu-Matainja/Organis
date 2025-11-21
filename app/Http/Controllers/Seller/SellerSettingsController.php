@@ -34,6 +34,8 @@ class SellerSettingsController extends Controller
 			'background_image' => '',
 			'vat_number' => '',
 			'trade_register_number' => '',
+			'lat' => '',
+			'lng' => '',
 		);
 		
 		foreach ($sellerData as $row){
@@ -50,6 +52,9 @@ class SellerSettingsController extends Controller
 			$seller_data['background_image'] = $row->background_image;
 			$seller_data['vat_number'] = $row->vat_number;
 			$seller_data['trade_register_number'] = $row->trade_register_number;
+			$seller_data['lat'] = $row->lat;
+			$seller_data['lng'] = $row->lng;
+			
 		}
 		
 		$bankInformation = DB::table('bank_informations')->where('seller_id', $id)->get();
@@ -96,6 +101,8 @@ class SellerSettingsController extends Controller
 		$background_image = $request->input('background_image');
 		$vat_number = $request->input('vat_number');
 		$trade_register_number = $request->input('trade_register_number');
+		$lat = $request->input('lat');
+		$lng = $request->input('lng');
 		
 		$validator_array = array(
 			'shop_name' => $request->input('shop_name'),
@@ -109,6 +116,8 @@ class SellerSettingsController extends Controller
 			'shipping_fee' => $request->input('shipping_fee'),
 			'vat_number' => $request->input('vat_number'),
 			'trade_register_number' => $request->input('trade_register_number'),
+			'lat' => $request->input('lat'),
+			'lng' => $request->input('lng'),
 		);
 		$rId = $id == '' ? '' : ','.$id;
 		$validator = Validator::make($validator_array, [
@@ -123,6 +132,8 @@ class SellerSettingsController extends Controller
 			'shipping_fee' => 'required',
 			'vat_number' => 'required',
 			'trade_register_number' => 'required',
+			'lat' => 'required',
+			'lng' => 'required',
 		]);
 
 		$errors = $validator->errors();
@@ -204,6 +215,20 @@ class SellerSettingsController extends Controller
 			return response()->json($res);
 		} 
 
+		if($errors->has('lng')){
+			$res['msgType'] = 'error';
+			$res['msg'] = $errors->first('lng');
+			$res['id'] = '';
+			return response()->json($res);
+		} 
+
+		if($errors->has('lat')){
+			$res['msgType'] = 'error';
+			$res['msg'] = $errors->first('lat');
+			$res['id'] = '';
+			return response()->json($res);
+		} 
+
 		$shippingfee = [
 			'seller_id' => $id,
 			'shipping_fee' => $shipping_fee,
@@ -229,6 +254,8 @@ class SellerSettingsController extends Controller
 			'background_image' => $background_image,
 			'vat_number' => $vat_number,
 			'trade_register_number' => $trade_register_number,
+			'lat' => $lat,
+			'lng' => $lng,
 		);
 
 		$response = User::where('id', $id)->update($data);

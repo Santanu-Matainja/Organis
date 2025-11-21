@@ -36,6 +36,8 @@ class User extends Authenticatable
         'background_image',
         'vat_number',
         'trade_register_number',
+        'lat',
+        'lng',
     ];
 
     /**

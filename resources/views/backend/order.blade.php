@@ -77,7 +77,8 @@
 											$mdata->shipping_fee = (float)$mdata->shipping_fee;
 										}
 
-										$total_amount_shipping_fee = $mdata->total_amount+$mdata->shipping_fee+$mdata->tax+$commissions;
+										// $total_amount_shipping_fee = $mdata->total_amount+$mdata->shipping_fee+$mdata->tax+$commissions;
+										$total_amount_shipping_fee = $mdata->total_amount+$mdata->shipping_fee+$mdata->tax;
 										
 										if($gtext['currency_position'] == 'left'){
 											$shipping_fee = $gtext['currency_icon'].NumberFormat($mdata->shipping_fee);
@@ -106,11 +107,11 @@
 										<td><strong>{{ __('Tax') }}</strong></td>
 										<td class="text-right"><strong>{{ $tax }}</strong></td>
 									</tr>
-									<tr>
+									{{-- <tr>
 										<td></td>
 										<td><strong>{{ __('Commission') }}</strong></td>
 										<td class="text-right"><strong>{{ $commissions }}</strong></td>
-									</tr>
+									</tr> --}}
 									<tr>
 										<td></td>
 										<td><strong>{{ __('Subtotal') }}</strong></td>
@@ -167,7 +168,7 @@
 							<div class="col-lg-12">
 								<input class="dnone" id="order_master_id" name="order_master_id" type="text" value="{{ $mdata->id }}" />
 								<a id="submit-form" href="javascript:void(0);" class="btn btn-theme mr-10 update_btn">{{ __('Update') }}</a>
-								<a href="{{ route('frontend.order-invoice', [$mdata->id, $mdata->order_no]) }}" class="btn btn-theme mr-10">{{ __('Invoice Download') }}</a>
+								<a href="{{ route('frontend.sellerorder-invoice', [$mdata->id, $mdata->order_no]) }}" class="btn btn-theme mr-10">{{ __('Invoice Download') }}</a>
 								<a href="{{ route('backend.orders') }}" class="btn warning-btn"><i class="fa fa-reply"></i> {{ __('Back to List') }}</a>
 							</div>
 						</div>
@@ -187,7 +188,7 @@
 					</div>
 				</div>
 				<div class="card mt-25">
-					<div class="card-header">{{ __('Store') }}</div>
+					<div class="card-header">{{ __('Company') }}</div>
 					<div class="card-body">
 						@if ($mdata->shop_name != '')
 						<p><a href="{{ route('frontend.stores', [$mdata->seller_id, str_slug($mdata->shop_url)]) }}" target="_blank">{{ $mdata->shop_name }}</a></p>

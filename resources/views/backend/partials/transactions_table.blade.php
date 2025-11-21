@@ -6,7 +6,7 @@
 				<th class="text-left" style="width:12%">{{ __('Transaction#') }}</th>
 				<th class="text-left" style="width:10%">{{ __('Order Date') }}</th>
 				<th class="text-left" style="width:15%">{{ __('Customer') }} </th>
-				<th class="text-left" style="width:15%">{{ __('Store') }}</th>
+				<th class="text-left" style="width:15%">{{ __('Company') }}</th>
 				<th class="text-left" style="width:10%">{{ __('Amount') }}</th>
 				<th class="text-center" style="width:13%">{{ __('Payment Method') }}</th>
 				<th class="text-center" style="width:13%">{{ __('Payment Status') }}</th>

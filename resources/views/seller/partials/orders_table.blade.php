@@ -8,7 +8,7 @@
 				<th class="text-center" style="width:10%">{{ __('Subtotal') }}</th>
 				<th class="text-center" style="width:5%">{{ __('Tax') }}</th>
 				<th class="text-center" style="width:10%">{{ __('Shipping Fee') }}</th>
-				<th class="text-center" style="width:5%">{{ __('Commission') }}</th>
+				{{-- <th class="text-center" style="width:5%">{{ __('Commission') }}</th> --}}
 				<th class="text-center" style="width:10%">{{ __('Total Amount') }}</th>
 				<th class="text-center" style="width:10%">{{ __('Payment Method') }}</th>
 				<th class="text-center" style="width:10%">{{ __('Payment Status') }}</th>
@@ -35,7 +35,8 @@
 				$shipping_fee = (float)$shipping_fee;
 			}
 			
-			$total_amount = $row->total_amount + $row->tax + $shipping_fee + $commissions;
+			// $total_amount = $row->total_amount + $row->tax + $shipping_fee + $commissions;
+			$total_amount = $row->total_amount + $row->tax + $shipping_fee;
 			
 			@endphp
 			<tr>
@@ -66,11 +67,11 @@
 				<td class="text-center">{{ NumberFormat($shipping_fee) }}{{ $gtext['currency_icon'] }}</td>
 				@endif
 				
-				@if($gtext['currency_position'] == 'left')
+				{{-- @if($gtext['currency_position'] == 'left')
 				<td class="text-center">{{ $gtext['currency_icon'] }}{{ NumberFormat($commissions) }}</td>
 				@else
 				<td class="text-center">{{ NumberFormat($commissions) }}{{ $gtext['currency_icon'] }}</td>
-				@endif
+				@endif --}}
 				
 				@if($gtext['currency_position'] == 'left')
 				<td class="text-center">{{ $gtext['currency_icon'] }}{{ NumberFormat($total_amount) }}</td>
@@ -87,7 +88,7 @@
 						<a class="action-btn" href="javascript:void(0);" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fa fa-ellipsis-v"></i></a>
 						<div class="dropdown-menu dropdown-menu-right">
 							<a class="dropdown-item" href="{{ route('seller.order', [$row->id]) }}">{{ __('View') }}</a>
-							<a class="dropdown-item" href="{{ route('frontend.order-invoice', [$row->id, $row->order_no]) }}">{{ __('Invoice') }}</a>
+							<a class="dropdown-item" href="{{ route('frontend.sellerorder-invoice', [$row->id, $row->order_no]) }}">{{ __('Invoice') }}</a>
 							<a onclick="onDelete({{ $row->id }})" class="dropdown-item" href="javascript:void(0);">{{ __('Delete') }}</a>
 						</div>
 					</div>

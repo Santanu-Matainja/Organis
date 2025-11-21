@@ -97,10 +97,10 @@
 													$shipping_fee = (float)$shipping_fee;
 												}
 			
-												$total_amount = $row->total_amount+$shipping_fee+$row->tax+$commissions;
+												$total_amount = $row->total_amount+$commissions;
 											@endphp
 											<tr>
-												<td class="text-left"><a href="{{ route('frontend.order-details', [$row->id, $row->order_no]) }}">{{ $row->order_no }}</a></td>
+												<td class="text-left"><a href="{{ route('frontend.order-details',  $row->master_order_no) }}">{{ $row->master_order_no }}</a></td>
 												<td class="text-left">{{ date('d-m-Y', strtotime($row->created_at)) }}</td>
 
 												@if($gtext['currency_position'] == 'left')
@@ -115,8 +115,8 @@
 												<td class="text-center"><span class="status_btn ostatus_{{ $row->order_status_id }}">{{ $row->ostatus_name }}</span></td>
 												
 												<td class="text-center">
-													<a title="{{ __('Invoice') }}" class="mr10" href="{{ route('frontend.order-invoice', [$row->id, $row->order_no]) }}"><i class="bi bi-cloud-arrow-down"></i></a>
-													<a title="{{ __('View') }}" href="{{ route('frontend.order-details', [$row->id, $row->order_no]) }}"><i class="bi bi-eye"></i></a>
+													<a title="{{ __('Invoice') }}" class="mr10" href="{{ route('frontend.order-invoice', $row->master_order_no) }}"><i class="bi bi-cloud-arrow-down"></i></a>
+													<a title="{{ __('View') }}" href="{{ route('frontend.order-details', $row->master_order_no) }}"><i class="bi bi-eye"></i></a>
 												</td>
 											</tr>
 											@endforeach

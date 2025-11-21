@@ -31,9 +31,9 @@ class OrdersSellerController extends Controller
 			->join('payment_status as e', 'a.payment_status_id', '=', 'e.id')
 			->join('order_status as f', 'a.order_status_id', '=', 'f.id')
 			->join('order_items as g', 'a.id', '=', 'g.order_master_id')
-			->select('a.id', 'a.customer_id', 'a.payment_status_id', 'a.order_status_id', 'a.order_no', 'a.created_at', 'a.shipping_fee', DB::raw("SUM(g.total_price) as total_amount"), DB::raw("SUM(g.tax) as tax"), 'b.name', 'c.shop_name', 'd.method_name', 'e.pstatus_name', 'f.ostatus_name')
+			->select('a.id', 'a.customer_id', 'a.payment_status_id', 'a.order_status_id', 'a.master_order_no as order_no', 'a.created_at', 'a.shipping_fee', DB::raw("SUM(g.total_price) as total_amount"), DB::raw("SUM(g.tax) as tax"), 'b.name', 'c.shop_name', 'd.method_name', 'e.pstatus_name', 'f.ostatus_name')
 			->where('a.seller_id', $seller_id)
-			->groupBy('a.customer_id', 'a.payment_status_id', 'a.order_status_id', 'a.created_at', 'f.ostatus_name', 'e.pstatus_name', 'd.method_name', 'a.shipping_fee', 'b.name', 'c.shop_name', 'a.order_no', 'a.id')
+			->groupBy('a.customer_id', 'a.payment_status_id', 'a.order_status_id', 'a.created_at', 'f.ostatus_name', 'e.pstatus_name', 'd.method_name', 'a.shipping_fee', 'b.name', 'c.shop_name', 'a.master_order_no', 'a.id')
 			->orderBy('a.created_at','desc')
 			->paginate(20);
 
@@ -63,9 +63,9 @@ class OrdersSellerController extends Controller
 					->join('payment_status as e', 'a.payment_status_id', '=', 'e.id')
 					->join('order_status as f', 'a.order_status_id', '=', 'f.id')
 					->join('order_items as g', 'a.id', '=', 'g.order_master_id')
-					->select('a.id', 'a.customer_id', 'a.payment_status_id', 'a.order_status_id', 'a.order_no', 'a.created_at', 'a.shipping_fee', DB::raw("SUM(g.total_price) as total_amount"), DB::raw("SUM(g.tax) as tax"), 'b.name', 'c.shop_name', 'd.method_name', 'e.pstatus_name', 'f.ostatus_name')
+					->select('a.id', 'a.customer_id', 'a.payment_status_id', 'a.order_status_id', 'a.master_order_no as order_no', 'a.created_at', 'a.shipping_fee', DB::raw("SUM(g.total_price) as total_amount"), DB::raw("SUM(g.tax) as tax"), 'b.name', 'c.shop_name', 'd.method_name', 'e.pstatus_name', 'f.ostatus_name')
 					->where(function ($query) use ($search){
-						$query->where('a.order_no', 'like', '%'.$search.'%')
+						$query->where('a.master_order_no', 'like', '%'.$search.'%')
 							->orWhere('a.created_at', 'like', '%'.$search.'%')
 							->orWhere('b.name', 'like', '%'.$search.'%')
 							->orWhere('c.shop_name', 'like', '%'.$search.'%')
@@ -75,7 +75,7 @@ class OrdersSellerController extends Controller
 							->orWhere('b.email', 'like', '%'.$search.'%');
 					})
 					->where('a.seller_id', $seller_id)
-					->groupBy('a.customer_id', 'a.payment_status_id', 'a.order_status_id', 'a.created_at', 'f.ostatus_name', 'e.pstatus_name', 'd.method_name', 'a.shipping_fee', 'b.name', 'c.shop_name', 'a.order_no', 'a.id')
+					->groupBy('a.customer_id', 'a.payment_status_id', 'a.order_status_id', 'a.created_at', 'f.ostatus_name', 'e.pstatus_name', 'd.method_name', 'a.shipping_fee', 'b.name', 'c.shop_name', 'a.master_order_no', 'a.id')
 					->orderBy('a.created_at','desc')
 					->paginate(20);
 			}else{
@@ -88,10 +88,10 @@ class OrdersSellerController extends Controller
 						->join('payment_status as e', 'a.payment_status_id', '=', 'e.id')
 						->join('order_status as f', 'a.order_status_id', '=', 'f.id')
 						->join('order_items as g', 'a.id', '=', 'g.order_master_id')
-						->select('a.id', 'a.customer_id', 'a.payment_status_id', 'a.order_status_id', 'a.order_no', 'a.created_at', 'a.shipping_fee', DB::raw("SUM(g.total_price) as total_amount"), DB::raw("SUM(g.tax) as tax"), 'b.name', 'c.shop_name', 'd.method_name', 'e.pstatus_name', 'f.ostatus_name')
+						->select('a.id', 'a.customer_id', 'a.payment_status_id', 'a.order_status_id', 'a.master_order_no as order_no', 'a.created_at', 'a.shipping_fee', DB::raw("SUM(g.total_price) as total_amount"), DB::raw("SUM(g.tax) as tax"), 'b.name', 'c.shop_name', 'd.method_name', 'e.pstatus_name', 'f.ostatus_name')
 						->where('a.seller_id', $seller_id)
 						->whereBetween('a.created_at', [$start_date, $end_date])
-						->groupBy('a.customer_id', 'a.payment_status_id', 'a.order_status_id', 'a.created_at', 'f.ostatus_name', 'e.pstatus_name', 'd.method_name', 'a.shipping_fee', 'b.name', 'c.shop_name', 'a.order_no', 'a.id')
+						->groupBy('a.customer_id', 'a.payment_status_id', 'a.order_status_id', 'a.created_at', 'f.ostatus_name', 'e.pstatus_name', 'd.method_name', 'a.shipping_fee', 'b.name', 'c.shop_name', 'a.master_order_no', 'a.id')
 						->orderBy('a.created_at','desc')
 						->paginate(20);
 				}else{
@@ -104,9 +104,9 @@ class OrdersSellerController extends Controller
 							->join('payment_status as e', 'a.payment_status_id', '=', 'e.id')
 							->join('order_status as f', 'a.order_status_id', '=', 'f.id')
 							->join('order_items as g', 'a.id', '=', 'g.order_master_id')
-							->select('a.id', 'a.customer_id', 'a.payment_status_id', 'a.order_status_id', 'a.order_no', 'a.created_at', 'a.shipping_fee', DB::raw("SUM(g.total_price) as total_amount"), DB::raw("SUM(g.tax) as tax"), 'b.name', 'c.shop_name', 'd.method_name', 'e.pstatus_name', 'f.ostatus_name')
+							->select('a.id', 'a.customer_id', 'a.payment_status_id', 'a.order_status_id', 'a.master_order_no as order_no', 'a.created_at', 'a.shipping_fee', DB::raw("SUM(g.total_price) as total_amount"), DB::raw("SUM(g.tax) as tax"), 'b.name', 'c.shop_name', 'd.method_name', 'e.pstatus_name', 'f.ostatus_name')
 							->where('a.seller_id', $seller_id)
-							->groupBy('a.customer_id', 'a.payment_status_id', 'a.order_status_id', 'a.created_at', 'f.ostatus_name', 'e.pstatus_name', 'd.method_name', 'a.shipping_fee', 'b.name', 'c.shop_name', 'a.order_no', 'a.id')
+							->groupBy('a.customer_id', 'a.payment_status_id', 'a.order_status_id', 'a.created_at', 'f.ostatus_name', 'e.pstatus_name', 'd.method_name', 'a.shipping_fee', 'b.name', 'c.shop_name', 'a.master_order_no', 'a.id')
 							->orderBy('a.created_at','desc')
 							->paginate(20);
 					}else{
@@ -118,10 +118,10 @@ class OrdersSellerController extends Controller
 							->join('payment_status as e', 'a.payment_status_id', '=', 'e.id')
 							->join('order_status as f', 'a.order_status_id', '=', 'f.id')
 							->join('order_items as g', 'a.id', '=', 'g.order_master_id')
-							->select('a.id', 'a.customer_id', 'a.payment_status_id', 'a.order_status_id', 'a.order_no', 'a.created_at', 'a.shipping_fee', DB::raw("SUM(g.total_price) as total_amount"), DB::raw("SUM(g.tax) as tax"), 'b.name', 'c.shop_name', 'd.method_name', 'e.pstatus_name', 'f.ostatus_name')
+							->select('a.id', 'a.customer_id', 'a.payment_status_id', 'a.order_status_id', 'a.master_order_no as order_no', 'a.created_at', 'a.shipping_fee', DB::raw("SUM(g.total_price) as total_amount"), DB::raw("SUM(g.tax) as tax"), 'b.name', 'c.shop_name', 'd.method_name', 'e.pstatus_name', 'f.ostatus_name')
 							->where('a.order_status_id', '=', $status)
 							->where('a.seller_id', $seller_id)
-							->groupBy('a.customer_id', 'a.payment_status_id', 'a.order_status_id', 'a.created_at', 'f.ostatus_name', 'e.pstatus_name', 'd.method_name', 'a.shipping_fee', 'b.name', 'c.shop_name', 'a.order_no', 'a.id')
+							->groupBy('a.customer_id', 'a.payment_status_id', 'a.order_status_id', 'a.created_at', 'f.ostatus_name', 'e.pstatus_name', 'd.method_name', 'a.shipping_fee', 'b.name', 'c.shop_name', 'a.master_order_no', 'a.id')
 							->orderBy('a.created_at','desc')
 							->paginate(20);
 					}
@@ -148,12 +148,13 @@ class OrdersSellerController extends Controller
 			->join('payment_status as e', 'a.payment_status_id', '=', 'e.id')
 			->join('order_status as f', 'a.order_status_id', '=', 'f.id')
 			->join('order_items as g', 'a.id', '=', 'g.order_master_id')
+			->join('delivery_types as dt', 'a.shipping_title', '=', 'dt.lable')
 			->select(
 				'a.id', 
 				'a.customer_id', 
 				'a.payment_status_id', 
 				'a.order_status_id', 
-				'a.order_no', 
+				'a.master_order_no as order_no', 
 				'a.created_at', 
 				'a.shipping_title', 
 				'a.shipping_fee', 
@@ -170,8 +171,12 @@ class OrdersSellerController extends Controller
 				'a.city', 
 				'a.address as customer_address', 
 				'c.shop_name', 
+				'b.lat', 
+				'b.lng', 
 				'd.method_name', 
 				'e.pstatus_name', 
+				'dt.id as delivaryid',
+				'f.id as ostatus_id',
 				'f.ostatus_name')
 			->where('a.id', $id)
 			->where('a.seller_id', $seller_id)
@@ -195,7 +200,11 @@ class OrdersSellerController extends Controller
 				'a.shipping_fee', 
 				'b.name', 
 				'c.shop_name', 
-				'a.order_no', 
+				'a.master_order_no', 
+				'dt.id',
+				'f.id',
+				'b.lat', 
+				'b.lng',  
 				'a.id')
 			->first();
 			
@@ -279,7 +288,7 @@ class OrdersSellerController extends Controller
 				'a.customer_id', 
 				'a.payment_status_id', 
 				'a.order_status_id', 
-				'a.order_no', 
+				'a.master_order_no as order_no', 
 				'a.created_at', 
 				'a.shipping_title', 
 				'a.shipping_fee', 
@@ -318,7 +327,7 @@ class OrdersSellerController extends Controller
 				'a.email', 
 				'a.address', 
 				'a.shipping_fee',  
-				'a.order_no', 
+				'a.master_order_no', 
 				'a.id')
 			->first();
 			
@@ -371,7 +380,9 @@ class OrdersSellerController extends Controller
 		$commisiontable = DB::table('commissions')->limit(1)->first();
 		$commissions = $commisiontable->commission;
 		
-		$total_amount_shipping_fee = $mdata->total_amount+$mdata->shipping_fee+$mdata->tax+$commissions;
+		// $total_amount_shipping_fee = $mdata->total_amount+$mdata->shipping_fee+$mdata->tax+$commissions;
+		
+		$total_amount_shipping_fee = $mdata->total_amount+$mdata->shipping_fee+$mdata->tax;
 		
 		if($gtext['currency_position'] == 'left'){
 			$shipping_fee = $gtext['currency_icon'].NumberFormat($mdata->shipping_fee);
@@ -388,7 +399,11 @@ class OrdersSellerController extends Controller
 			$commissions = NumberFormat($commissions).$gtext['currency_icon'];
 			$total_amount = NumberFormat($total_amount_shipping_fee).$gtext['currency_icon'];
 		}
-		
+		// Add this below after Tax tr
+		// <tr>
+		// 	<td style="width:85%;text-align:right;">'.__('Tax').':</td>
+		// 	<td style="width:15%;text-align:right;">'.$commissions.'</td>
+		// </tr>
 		if($mdata->payment_status_id == 1){
 			$pstatus = '#26c56d'; //Completed = 1
 		}elseif($mdata->payment_status_id == 2){
@@ -503,10 +518,7 @@ class OrdersSellerController extends Controller
 															<td style="width:85%;text-align:right;">'.__('Tax').':</td>
 															<td style="width:15%;text-align:right;">'.$tax.'</td>
 														</tr>
-														<tr>
-															<td style="width:85%;text-align:right;">'.__('Tax').':</td>
-															<td style="width:15%;text-align:right;">'.$commissions.'</td>
-														</tr>
+														
 														<tr>
 															<td style="width:85%;text-align:right;">'.__('Subtotal').':</td>
 															<td style="width:15%;text-align:right;">'.$subtotal.'</td>
@@ -518,7 +530,7 @@ class OrdersSellerController extends Controller
 													</table>
 												</td>
 											</tr>
-											<tr><td style="padding-top:30px;padding-bottom:50px;"><a href="'.route('frontend.order-invoice', [$mdata->id, $mdata->order_no]).'" style="background:'.$gtext['theme_color'].';display:block;text-align:center;padding:10px 30px;border-radius:3px;text-decoration:none;color:#fff;float:left;">'.__('Invoice Download').'</a></td></tr>
+											
 											<tr><td style="padding-top:10px;border-top:1px solid #ddd;text-align:center;">'.__('Thank you for purchasing our products.').'</td></tr>
 											<tr><td style="padding-top:5px;text-align:center;">'.__('If you have any questions about this invoice, please contact us').'</td></tr>
 											<tr><td style="padding-top:5px;text-align:center;"><a href="'.$base_url.'">'.$base_url.'</a></td></tr>
@@ -534,6 +546,7 @@ class OrdersSellerController extends Controller
 				return 0;
 			}
 		}
+		// <tr><td style="padding-top:30px;padding-bottom:50px;"><a href="'.route('frontend.order-invoice', [$mdata->id, $mdata->order_no]).'" style="background:'.$gtext['theme_color'].';display:block;text-align:center;padding:10px 30px;border-radius:3px;text-decoration:none;color:#fff;float:left;">'.__('Invoice Download').'</a></td></tr>
 	}
 	
 	//Delete data for Order

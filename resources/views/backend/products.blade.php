@@ -81,7 +81,7 @@
 							<div class="col-md-3">
 								<div class="form-group mb-10">
 									<select name="store_id" id="store_id" class="chosen-select form-control">
-										<option value="0" selected="selected">{{ __('All Store') }}</option>
+										<option value="0" selected="selected">{{ __('All Company') }}</option>
 										@foreach($storeList as $row)
 											<option value="{{ $row->id }}">
 												{{ $row->shop_name }}
@@ -177,7 +177,7 @@
 								</div>	
 								<div class="col-md-3">
 									<div class="form-group">
-										<label for="storeid">{{ __('Store') }}<span class="red">*</span></label>
+										<label for="storeid">{{ __('Company') }}<span class="red">*</span></label>
 										<select name="storeid" id="storeid" class="chosen-select form-control">
 										@foreach($storeList as $row)
 											<option value="{{ $row->id }}">

@@ -85,7 +85,7 @@ Route::get('/user/my-profile', [App\Http\Controllers\Frontend\MyDashboardControl
 Route::post('/user/UpdateProfile', [App\Http\Controllers\Frontend\MyDashboardController::class, 'UpdateProfile'])->name('frontend.UpdateProfile')->middleware('auth');
 Route::get('/user/change-password', [App\Http\Controllers\Frontend\MyDashboardController::class, 'LoadChangePassword'])->name('frontend.change-password')->middleware('auth');
 Route::post('/user/ChangePassword', [App\Http\Controllers\Frontend\MyDashboardController::class, 'ChangePassword'])->name('frontend.ChangePassword')->middleware('auth');
-Route::get('/order-details/{id}/{order_no}', [App\Http\Controllers\Frontend\MyDashboardController::class, 'MyOrderDetails'])->name('frontend.order-details');
+Route::get('/order-details/{order_no}', [App\Http\Controllers\Frontend\MyDashboardController::class, 'MyOrderDetails'])->name('frontend.order-details');
 
 //Checkout
 Route::get('/checkout', [App\Http\Controllers\Frontend\CheckoutFrontController::class, 'LoadCheckout'])->name('frontend.checkout');
@@ -100,7 +100,8 @@ Route::get('/PayPalpayment-success', [App\Http\Controllers\Frontend\CheckoutFron
 Route::get('/order-tracking', [App\Http\Controllers\Frontend\OrderTrackingController::class, 'getOrderTracking'])->name('frontend.order-tracking');
 
 //Order Invoice
-Route::get('/order-invoice/{id}/{order_no}', [App\Http\Controllers\Frontend\OrderInvoiceController::class, 'getOrderInvoice'])->name('frontend.order-invoice');
+Route::get('/order-invoice/{order_no}', [App\Http\Controllers\Frontend\OrderInvoiceController::class, 'getOrderInvoice'])->name('frontend.order-invoice');
+Route::get('/order-sellerinvoice/{id}/{order_no}', [App\Http\Controllers\Frontend\OrderInvoiceController::class, 'getOrderSellerInvoice'])->name('frontend.sellerorder-invoice');
 
 //Reviews
 Route::post('/frontend/saveReviews', [App\Http\Controllers\Frontend\ReviewsController::class, 'saveReviews'])->name('frontend.saveReviews');
