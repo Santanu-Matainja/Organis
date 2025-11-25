@@ -98,7 +98,7 @@
 								<label for="remember">{{ __('Remember me') }}</label>
 								<span></span>
 							</div>
-							<input type="submit" class="btn theme-btn full" value="{{ __('login') }}">
+							<input type="submit" class="btn theme-btn full reg" value="{{ __('login') }}">
 						</form>
 						@if (Route::has('frontend.reset'))
 						<h3><a href="{{ route('frontend.reset') }}">{{ __('Forgot your password?') }}</a></h3>
@@ -117,4 +117,15 @@
 @endsection
 
 @push('scripts')
+<script>
+$(document).ready(function () {
+    $('.form').on('submit', function () {
+        var btn = $(this).find('.reg');
+		console.log(btn);
+		
+        btn.prop('disabled', true);
+        btn.val('Processing...');
+    });
+});
+</script>
 @endpush	

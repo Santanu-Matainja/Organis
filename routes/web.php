@@ -131,6 +131,12 @@ Route::prefix('backend')->group(function(){
 	Route::get('/getPaymentOrderStatusData', [App\Http\Controllers\Backend\OrdersController::class, 'getPaymentOrderStatusData'])->name('backend.getPaymentOrderStatusData')->middleware(['auth','is_admin']);
 	Route::post('/deleteOrder', [App\Http\Controllers\Backend\OrdersController::class, 'deleteOrder'])->name('backend.deleteOrder')->middleware(['auth','is_admin']);
 	
+	// Admin Orders 
+	Route::get('/Adminorders', [App\Http\Controllers\Backend\OrdersController::class, 'adminorders'])->name('backend.adminorders')->middleware(['auth','is_admin']);
+	Route::get('/Adminorder/{id}', [App\Http\Controllers\Backend\OrdersController::class, 'getAdminOrderData'])->name('backend.Adminorder')->middleware(['auth','is_admin']);
+	Route::post('/AdminbulkActionOrders', [App\Http\Controllers\Backend\OrdersController::class, 'AdminbulkActionOrders'])->name('backend.AdminbulkActionOrders')->middleware(['auth','is_admin']);
+	Route::get('/getAdminOrdersTableData', [App\Http\Controllers\Backend\OrdersController::class, 'getAdminOrdersTableData'])->name('backend.getAdminOrdersTableData')->middleware(['auth','is_admin']);
+
 	//Transactions
 	Route::get('/transactions', [App\Http\Controllers\Backend\TransactionController::class, 'getTransactionsPageLoad'])->name('backend.transactions')->middleware(['auth','is_admin']);
 	Route::get('/getTransactionsTableData', [App\Http\Controllers\Backend\TransactionController::class, 'getTransactionsTableData'])->name('backend.getTransactionsTableData')->middleware(['auth','is_admin']);

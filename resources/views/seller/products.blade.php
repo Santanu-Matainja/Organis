@@ -20,7 +20,7 @@
 							</div>
 							<div class="col-lg-6">
 								<div class="float-right">
-									<a onClick="onBulkFormPanel()" href="javascript:void(0);" class="btn blue-btn btn-bulkform float-left mr-2"><i class="fa fa-plus"></i> {{ __('Bluk Add') }}</a>
+									<a onClick="onBulkFormPanel()" href="javascript:void(0);" class="btn blue-btn btn-bulkform float-left mr-2"><i class="fa fa-plus"></i> {{ __('Bulk Add') }}</a>
 									<a onClick="onFormPanel()" href="javascript:void(0);" class="btn blue-btn btn-form float-right"><i class="fa fa-plus"></i> {{ __('Add New') }}</a>
 									<a onClick="onListPanel()" href="javascript:void(0);" class="btn warning-btn btn-list float-right dnone"><i class="fa fa-reply"></i> {{ __('Back to List') }}</a>
 								</div>
@@ -186,7 +186,7 @@
 
 									</div>
 								</div>
-								<div class="col-md-3">
+								{{-- <div class="col-md-3">
 									<div class="form-check mt-4">
 										<input type="checkbox" name="perisible" id="perisible" class="form-check-input" value="1" style="height: 50px;width: 18px;"> 
 										<label for="perisible" class="form-check-label" style="margin: 18px 7px;">
@@ -206,13 +206,13 @@
 											@endforeach
 										</select>
 									</div>
-								</div>
+								</div> --}}
 							</div>
 							<input type="text" name="user_id" id="user_id" class="dnone" value="{{ Auth::user()->id }}">
 							<input type="text" name="RecordId" id="RecordId" class="dnone">
 							<div class="row tabs-footer mt-15">
 								<div class="col-lg-12">
-									<a id="submit-form" href="javascript:void(0);" class="btn blue-btn mr-10">{{ __('Save') }}</a>
+									<a id="submit-form" href="javascript:void(0);" class="btn blue-btn mr-10 btnblock">{{ __('Save') }}</a>
 									<a onClick="onListPanel()" href="javascript:void(0);" class="btn danger-btn">{{ __('Cancel') }}</a>
 								</div>
 							</div>
@@ -286,7 +286,7 @@
 							<input type="text" name="RecordId" id="RecordId" class="dnone">
 							<div class="row tabs-footer mt-15">
 								<div class="col-lg-12">
-									<a id="bulksubmit-form" href="javascript:void(0);" class="btn blue-btn mr-10">{{ __('Save') }}</a>
+									<a id="bulksubmit-form" href="javascript:void(0);" class="btn blue-btn mr-10 btnblock">{{ __('Save') }}</a>
 									<a onClick="onListPanel()" href="javascript:void(0);" class="btn danger-btn">{{ __('Cancel') }}</a>
 								</div>
 							</div>

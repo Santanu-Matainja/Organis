@@ -110,7 +110,7 @@
 							</div>
 
 							<div class="form-group">
-								<input name="shop_phone" type="text" class="form-control @error('shop_phone') is-invalid @enderror" placeholder="{{ __('Phone') }}" value="{{ old('shop_phone') }}" required />
+								<input name="shop_phone" type="text" class="form-control @error('shop_phone') is-invalid @enderror" placeholder="{{ __('Phone') }}" value="{{ old('shop_phone') }}" required maxlength="10"/>
                                 @if ($errors->has('shop_phone'))
                                 <span class="text-danger">{{ $errors->first('shop_phone') }}</span>
                                 @endif
@@ -167,7 +167,7 @@
 							</div>
 
 							<div class="form-group d-none">
-								<input name="shop_url" id="shop_url" type="text" class="form-control @error('shop_url') is-invalid @enderror" placeholder="{{ __('Shop URL') }}" value="{{ old('shop_url') }}" required />
+								<input name="shop_url" id="shop_url" type="text" class="form-control @error('shop_url') is-invalid @enderror" placeholder="{{ __('Shop URL') }}" value="{{ old('shop_url') }}"/>
 								@if ($errors->has('shop_url'))
                                 <span class="text-danger">{{ $errors->first('shop_url') }}</span>
                                 @endif
@@ -183,7 +183,7 @@
                                 @endif
 							</div>
 							@endif
-							<input type="submit" class="btn theme-btn full" value="{{ __('Register') }}">
+							<input type="submit" class="btn theme-btn full reg" value="{{ __('Register') }}">
 						</form>
 						@if (Route::has('frontend.reset'))
 						<h3><a href="{{ route('frontend.reset') }}">{{ __('Forgot your password?') }}</a></h3>
@@ -206,22 +206,37 @@
 <script src='https://www.google.com/recaptcha/api.js' async defer></script>
 @endif
 <script>
-$("#shop_name").on("blur", function () {
-	var shop_url = $("#shop_name").val();
-	var str_name = shop_url.trim();
-	var strLength = str_name.length;
-	if(strLength>0){
-		$.ajax({
-			type : 'POST',
-			url: base_url + '/frontend/hasShopSlug',
-			data: 'shop_url='+shop_url,
-			success: function (response) {
-				var slug = response.slug;
-				$("#shop_url").val(slug);
-			}
-		});
-	}
+$("input[name='name']").on("blur", function () {
+    if ($("#shop_name").val().trim() === "") {
+        generateSlug();
+    }
 });
+
+function generateSlug() {
+    let shopName = $("#shop_name").val().trim();
+    let userName = $("input[name='name']").val().trim();
+
+    // If shop name empty → use user name
+    let finalName = shopName !== "" ? shopName : userName;
+
+    if(finalName.length > 0){
+        $.ajax({
+            type: 'POST',
+            url: base_url + '/frontend/hasShopSlug',
+            data: {
+                shop_url: finalName,
+                _token: $('meta[name="csrf-token"]').attr('content')
+            },
+            success: function (response) {
+                $("#shop_url").val(response.slug);
+            }
+        });
+    }
+}
+$("#shop_name").on("blur", function () {
+    generateSlug();
+});
+
 
 $(document).ready(function () {
 	function toggleCompanyFields() {
@@ -240,5 +255,23 @@ $(document).ready(function () {
 		toggleCompanyFields();
 	});
 });
+
+$(document).ready(function () {
+    $('.form').on('submit', function () {
+        var btn = $(this).find('.reg');
+		console.log(btn);
+		
+        btn.prop('disabled', true);
+        btn.val('Processing...');
+    });
+});
+
+$(function () {
+    $('[name="shop_phone"]').on('input', function () {
+        this.value = this.value.replace(/\D/g, '');
+    });
+});
+
 </script>
+
 @endpush

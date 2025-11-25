@@ -14,7 +14,7 @@
 		<li class="dropdown"><a class="nav-link has-dropdown" href="#" data-toggle="dropdown"><i class="fa fa-shopping-cart"></i>{{ __('Orders') }}</a>
 			<ul class="dropdown-menu">
 				<li><a href="{{ route('backend.orders') }}">{{ __('Seller Wise Order') }}</a></li>
-				<li><a href="">{{ __('Admin Wise Order') }}</a></li>
+				<li><a href="{{ route('backend.adminorders') }}">{{ __('Admin Wise Order') }}</a></li>
 			</ul>
 		</li>		
 		<li class="dnone"><a href="{{ route('backend.transactions') }}"><i class="fa fa-credit-card"></i>{{ __('Transactions') }}</a></li>

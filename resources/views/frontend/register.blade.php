@@ -113,7 +113,7 @@
                                 @endif
 							</div>
 							@endif
-							<input type="submit" class="btn theme-btn full" value="{{ __('Register') }}">
+							<input type="submit" class="btn theme-btn full reg" value="{{ __('Register') }}">
 						</form>
 						@if (Route::has('frontend.reset'))
 						<h3><a href="{{ route('frontend.reset') }}">{{ __('Forgot your password?') }}</a></h3>
@@ -135,4 +135,15 @@
 @if($gtext['is_recaptcha'] == 1)
 <script src='https://www.google.com/recaptcha/api.js' async defer></script>
 @endif
+<script>
+$(document).ready(function () {
+    $('.form').on('submit', function () {
+        var btn = $(this).find('.reg');
+		console.log(btn);
+		
+        btn.prop('disabled', true);
+        btn.val('Processing...');
+    });
+});
+</script>
 @endpush

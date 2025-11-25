@@ -75,7 +75,7 @@ class ProductsController extends Controller
 							->orWhere('pro_categories.name', 'like', '%'.$search.'%')
 							->orWhere('brands.name', 'like', '%'.$search.'%')
 							->orWhere('languages.language_name', 'like', '%'.$search.'%')
-							->orWhere('cost_price', 'like', '%'.$search.'%');
+							->orWhere('sale_price', 'like', '%'.$search.'%');
 					})
 					
 					->where(function ($query) use ($status){

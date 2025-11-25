@@ -56,6 +56,21 @@
 	var userid = "{{ Auth::user()->id }}";
 	</script>
 	<script src="{{asset_path('backend/js/script.js')}}"></script>
+	<script>
+	$(function () {
+		$('.btnblock').on('click', function (e) {
+			var btn = $(this);
+			var original = btn.is('input,button') ? btn.val() : btn.text();
+			btn.prop('disabled', true).addClass('disabled');
+			(btn.is('input,button') ? btn.val : btn.text).call(btn, 'Processing...');
+			if (btn.is('a')) e.preventDefault();
+			setTimeout(function () {
+				btn.prop('disabled', false).removeClass('disabled');
+				(btn.is('input,button') ? btn.val : btn.text).call(btn, original);
+			}, 3000);
+		});
+	});
+	</script>
 	<div class="custom-popup light width-100 dnone" id="lightCustomModal">
 		<div class="padding-md">
 			<h4 class="m-top-none">{{ __('This is alert message') }}</h4>

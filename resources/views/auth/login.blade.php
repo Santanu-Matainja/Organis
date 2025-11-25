@@ -41,7 +41,7 @@
 							<label for="remember">{{ __('Remember me') }}</label>
 							<span></span>
 						</div>
-						<input type="submit" class="btn login-btn" value="{{ __('Login') }}">
+						<input type="submit" class="btn login-btn reg" value="{{ __('Login') }}">
 					</form>
 					
 					@if (Route::has('password.request'))
@@ -56,4 +56,14 @@
 @endsection
 
 @push('scripts')
+<script>
+$(document).ready(function () {
+    $('#login_form').on('submit', function () {
+        var btn = $(this).find('.reg');
+
+        btn.prop('disabled', true);
+        btn.val('Processing...');
+    });
+});
+</script>
 @endpush

@@ -94,7 +94,7 @@
 						<div class="dropdown-menu dropdown-menu-right">
 							<a class="dropdown-item" href="{{ route('backend.order', [$row->id]) }}">{{ __('View') }}</a>
 							<a class="dropdown-item" href="{{ route('frontend.sellerorder-invoice', [$row->id, $row->order_no]) }}">{{ __('Invoice') }}</a>
-							<a onclick="onDelete({{ $row->id }})" class="dropdown-item" href="javascript:void(0);">{{ __('Delete') }}</a>
+							{{-- <a onclick="onDelete({{ $row->id }})" class="dropdown-item" href="javascript:void(0);">{{ __('Delete') }}</a> --}}
 						</div>
 					</div>
 				</td>

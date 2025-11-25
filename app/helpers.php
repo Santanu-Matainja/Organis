@@ -1339,6 +1339,19 @@ function OrderCount($status_id) {
 	return $count;
 }
 
+function AdminOrderCount($status_id) {
+	if ($status_id == 0) {
+		$count = Order_master::distinct('master_order_no')->count('master_order_no');
+	} else {
+		$count = Order_master::where('order_status_id', $status_id)
+					->distinct('master_order_no')
+					->count('master_order_no');
+	}
+
+	return $count;
+
+}
+
 function OrderCountForSeller($status_id) {
 	
 	$seller_id = Auth::user()->id;

@@ -71,7 +71,7 @@ class ProductsController extends Controller
 							->orWhere('pro_categories.name', 'like', '%'.$search.'%')
 							->orWhere('brands.name', 'like', '%'.$search.'%')
 							->orWhere('languages.language_name', 'like', '%'.$search.'%')
-							->orWhere('cost_price', 'like', '%'.$search.'%');
+							->orWhere('sale_price', 'like', '%'.$search.'%');
 					})
 					->where(function ($query) use ($language_code){
 						$query->whereRaw("products.lan = '".$language_code."' OR '".$language_code."' = '0'");
@@ -157,8 +157,8 @@ class ProductsController extends Controller
 		$user_id = $request->input('user_id');
 		$exdate = $request->input('exdate');
 		$manufacture_date = $request->input('manufacture_date');
-		$perisible = $request->has('perisible') ? 1 : 0;
-		$delivarytypeid = $request->input('delivarytypeid');
+		// $perisible = $request->has('perisible') ? 1 : 0;
+		// $delivarytypeid = $request->input('delivarytypeid');
 
 		$validator_array = array(
 			'product_name' => $request->input('title'),
@@ -166,7 +166,7 @@ class ProductsController extends Controller
 			'language' => $request->input('lan'),
 			'category' => $request->input('categoryid'),
 			'brand' => $request->input('brandid'),
-			'delivarytypeid' => $request->input('delivarytypeid')
+			// 'delivarytypeid' => $request->input('delivarytypeid')
 		);
 		
 		$rId = $id == '' ? '' : ','.$id;
@@ -176,7 +176,7 @@ class ProductsController extends Controller
 			'language' => 'required',
 			'category' => 'required',
 			'brand' => 'required',
-			'delivarytypeid' => 'required',
+			// 'delivarytypeid' => 'required',
 		]);
 
 		$errors = $validator->errors();
@@ -218,11 +218,11 @@ class ProductsController extends Controller
 			$is_publish = 2;
 		}
 
-		if($errors->has('delivarytypeid')){
-			$res['msgType'] = 'error';
-			$res['msg'] = $errors->first('delivarytypeid');
-			return response()->json($res);
-		}
+		// if($errors->has('delivarytypeid')){
+		// 	$res['msgType'] = 'error';
+		// 	$res['msg'] = $errors->first('delivarytypeid');
+		// 	return response()->json($res);
+		// }
 		
 		$data = array(
 			'title' => $title,
@@ -235,8 +235,8 @@ class ProductsController extends Controller
 			'is_publish' => $is_publish,
 			'exdate' => $exdate,
 			'manufacture_date' => $manufacture_date,
-			'perisible' => $perisible,
-			'delivarytypeid' => $delivarytypeid,
+			// 'perisible' => $perisible,
+			// 'delivarytypeid' => $delivarytypeid,
 		);
 
 		if($id ==''){

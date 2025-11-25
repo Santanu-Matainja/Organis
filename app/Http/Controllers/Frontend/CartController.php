@@ -65,18 +65,47 @@ class CartController extends Controller
 			return response()->json($res);
 		}
 
-		// Fetch product and seller details
 		$datalist = Product::where('id', $id)->first();
 		$user = User::where('id', $datalist['user_id'])->first();
 
 		$quantity = $qty == 0 ? 1 : $qty;
 
-		// ✅ Fetch existing cart data from DB (not session)
 		$cartRecord = DB::table('carts')->where('user_id', $userId)->first();
 		$cart = $cartRecord && $cartRecord->cart_data
 			? json_decode($cartRecord->cart_data, true)
 			: [];
 
+		$currentType = $datalist['perisible']; 
+
+		if (!empty($cart)) {
+			$hasPerishable = false;
+			$hasNonPerishable = false;
+
+			foreach ($cart as $item) {
+				if ($item['perisible'] == 1) {
+					$hasPerishable = true;
+				} else {
+					$hasNonPerishable = true;
+				}
+			}
+
+			// If cart already contains perishable & user tries to add non-perishable
+			if ($hasPerishable && $currentType == 0) {
+				return response()->json([
+					'msgType' => 'error',
+					'msg' => __('Cart Contains Perisible Products Cannot Add Non-Perisible Product.')
+				]);
+			}
+
+			// If cart already contains non-perishable & user tries to add perishable
+			if ($hasNonPerishable && $currentType == 1) {
+				return response()->json([
+					'msgType' => 'error',
+					'msg' => __('Cart Contains Non-Perisible Products Cannot Add Perisible Product.')
+				]);
+			}
+		}
+		
 		// ✅ Add or update product in cart
 		if (isset($cart[$id])) {
 			$cart[$id]['qty'] = $cart[$id]['qty'] + $quantity;

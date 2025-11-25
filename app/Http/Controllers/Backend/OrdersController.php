@@ -350,6 +350,7 @@ class OrdersController extends Controller
 				'a.address', 
 				'a.shipping_fee',  
 				'a.order_no', 
+				'a.master_order_no',
 				'a.id')
 			->first();
 			
@@ -396,7 +397,8 @@ class OrdersController extends Controller
 		$commisiontable = DB::table('commissions')->limit(1)->first();
 		$commissions = $commisiontable->commission;
 		
-		$total_amount_shipping_fee = $mdata->total_amount+$mdata->shipping_fee+$mdata->tax+$commissions;
+		// $total_amount_shipping_fee = $mdata->total_amount+$mdata->shipping_fee+$mdata->tax+$commissions;
+		$total_amount_shipping_fee = $mdata->total_amount+$mdata->shipping_fee+$mdata->tax;
 		
 		if($gtext['currency_position'] == 'left'){
 			$shipping_fee = $gtext['currency_icon'].NumberFormat($mdata->shipping_fee);
@@ -528,10 +530,7 @@ class OrdersController extends Controller
 															<td style="width:85%;text-align:right;">'.__('Tax').':</td>
 															<td style="width:15%;text-align:right;">'.$tax.'</td>
 														</tr>
-														<tr>
-															<td style="width:85%;text-align:right;">'.__('Tax').':</td>
-															<td style="width:15%;text-align:right;">'.$commissions.'</td>
-														</tr>
+							
 														<tr>
 															<td style="width:85%;text-align:right;">'.__('Subtotal').':</td>
 															<td style="width:15%;text-align:right;">'.$subtotal.'</td>
@@ -543,7 +542,6 @@ class OrdersController extends Controller
 													</table>
 												</td>
 											</tr>
-											<tr><td style="padding-top:30px;padding-bottom:50px;"><a href="'.route('frontend.order-invoice', [$mdata->id, $mdata->order_no]).'" style="background:'.$gtext['theme_color'].';display:block;text-align:center;padding:10px 30px;border-radius:3px;text-decoration:none;color:#fff;float:left;">'.__('Invoice Download').'</a></td></tr>
 											<tr><td style="padding-top:10px;border-top:1px solid #ddd;text-align:center;">'.__('Thank you for purchasing our products.').'</td></tr>
 											<tr><td style="padding-top:5px;text-align:center;">'.__('If you have any questions about this invoice, please contact us').'</td></tr>
 											<tr><td style="padding-top:5px;text-align:center;"><a href="'.$base_url.'">'.$base_url.'</a></td></tr>
@@ -559,6 +557,8 @@ class OrdersController extends Controller
 				return 0;
 			}
 		}
+		// <tr><td style="padding-top:30px;padding-bottom:50px;"><a href="'.route('frontend.order-invoice', [$mdata->id, $mdata->order_no]).'" style="background:'.$gtext['theme_color'].';display:block;text-align:center;padding:10px 30px;border-radius:3px;text-decoration:none;color:#fff;float:left;">'.__('Invoice Download').'</a></td></tr>
+
 	}
 	
 	//Delete data for Order
@@ -581,4 +581,223 @@ class OrdersController extends Controller
 		
 		return response()->json($res);
 	}	
+	// Admin Wise Order Panel 
+
+	
+	public function AdminOrders()
+	{
+		$order_status_list = DB::table('order_status')->get();
+
+		$datalist = DB::table('order_masters as a')
+			->join('payment_method as d', 'a.payment_method_id', '=', 'd.id')
+			->join('payment_status as e', 'a.payment_status_id', '=', 'e.id')
+			->join('order_status as f', 'a.order_status_id', '=', 'f.id')
+			->leftJoin('users as b', 'a.customer_id', '=', 'b.id')
+			->select(
+				'a.master_order_no',
+				'b.name',
+				DB::raw("MIN(a.id) as id"),
+
+				DB::raw("MIN(a.customer_id) as customer_id"),
+				DB::raw("MIN(a.payment_status_id) as payment_status_id"),
+				DB::raw("MIN(a.order_status_id) as order_status_id"),  
+
+				DB::raw("GROUP_CONCAT(f.ostatus_name SEPARATOR ', ') as ostatus_name"), 
+
+				DB::raw("MIN(a.created_at) as created_at"),
+				DB::raw("MIN(a.shipping_title) as shipping_title"),
+				DB::raw("SUM(a.shipping_fee) as shipping_fee"),
+
+				DB::raw("SUM(a.total_amount) as total_amount"),
+				DB::raw("SUM(a.tax) as tax"),
+				DB::raw("SUM(a.total_qty) as total_qty"),
+
+				DB::raw("MIN(d.method_name) as method_name"),
+				DB::raw("MIN(e.pstatus_name) as pstatus_name"),
+			)
+			
+			->groupBy('a.master_order_no','b.name')
+			->orderBy(DB::raw("MIN(a.created_at)"), 'desc')
+			->paginate(20);
+
+		$commisiontable = DB::table('commissions')->limit(1)->first();
+		$commissions = $commisiontable->commission;
+
+		return view('backend.adminorders', compact('datalist', 'commissions', 'order_status_list'));
+	}
+	
+
+	public function getAdminOrderData($order_no)
+	{
+		$payment_status_list = DB::table('payment_status')->get();
+		$order_status_list   = DB::table('order_status')->get();
+
+		 $mdata = DB::table('order_masters as a')
+			->leftJoin('users as b', 'a.customer_id', '=', 'b.id')
+			->join('users as c', 'a.seller_id', '=', 'c.id')
+			->join('payment_method as d', 'a.payment_method_id', '=', 'd.id')
+			->join('payment_status as e', 'a.payment_status_id', '=', 'e.id')
+			->join('order_status as f', 'a.order_status_id', '=', 'f.id')
+			->join('order_items as g', 'a.id', '=', 'g.order_master_id')
+			->select(
+				DB::raw("MIN(a.id) as id"),
+				'a.master_order_no as order_no',
+				DB::raw("MIN(a.customer_id) as customer_id"),
+				DB::raw("MIN(a.payment_status_id) as payment_status_id"),
+				DB::raw("MIN(a.order_status_id) as order_status_id"),
+				DB::raw("MIN(a.created_at) as created_at"),
+				DB::raw("MIN(a.shipping_title) as shipping_title"),
+
+				DB::raw("SUM(g.total_price) as total_amount"),
+				DB::raw("SUM(g.tax) as tax"),
+				DB::raw("SUM(g.discount) as discount"),
+
+				DB::raw("MIN(b.name) as name"),
+				DB::raw("MIN(a.email) as customer_email"),
+				DB::raw("MIN(a.name) as customer_name"),
+				DB::raw("MIN(a.phone) as customer_phone"),
+				DB::raw("MIN(a.country) as country"),
+				DB::raw("MIN(a.state) as state"),
+				DB::raw("MIN(a.zip_code) as zip_code"),
+				DB::raw("MIN(a.city) as city"),
+				DB::raw("MIN(a.address) as customer_address"),
+				DB::raw("MIN(a.comments) as comments"),
+				DB::raw("MIN(a.seller_id) as seller_id"),
+
+				DB::raw("GROUP_CONCAT(DISTINCT c.shop_name SEPARATOR ', ') as shop_name"),
+				DB::raw("GROUP_CONCAT(DISTINCT c.shop_url SEPARATOR ', ') as shop_url"),
+
+				DB::raw("MIN(d.method_name) as method_name"),
+				DB::raw("MIN(e.pstatus_name) as pstatus_name"),
+				DB::raw("MIN(f.ostatus_name) as ostatus_name"),
+				DB::raw("SUM(a.shipping_fee) AS shipping_fee")
+			)
+			->where('a.master_order_no', $order_no)
+			->groupBy('a.master_order_no') 
+			->first();
+
+		$datalist = DB::table('order_items as b')
+			->join('order_masters as a', 'b.order_master_id', '=', 'a.id')
+			->join('products as p', 'b.product_id', '=', 'p.id')
+			->leftJoin('users as u', 'b.seller_id', '=', 'u.id')
+			->leftJoin('delivery_types as dt', 'a.shipping_title', '=', 'dt.lable')
+			->leftJoin('order_status as s', 'a.order_status_id', '=', 's.id')
+			->select(
+				'b.*',
+				'p.title',
+				'p.f_thumbnail',
+				'p.id as product_id',
+				'u.shop_name',
+				'u.lat',
+				'u.lng',
+				's.ostatus_name',
+				's.id as ostatus_id',
+				'a.order_status_id',
+				'dt.id as delivaryid',
+				'a.shipping_title as item_shipping_title',
+				DB::raw('b.price * b.quantity as total_price')
+			)
+			->where('a.master_order_no', $order_no)
+			->get();
+      
+		$commissiontable = DB::table('commissions')->first();
+		$commissions = $commissiontable->commission ?? 0;
+
+		return view('backend.Adminorder', compact('payment_status_list','order_status_list','mdata','datalist', 'commissions'));
+	}
+	//Bulk Action for Orders
+	public function AdminbulkActionOrders(Request $request){
+		
+		$res = array();
+
+		$idsStr = $request->ids;
+		$idsArray = explode(',', $idsStr);
+		
+		$order_status_id = $request->order_status_id;
+		
+		$response = Order_master::whereIn('id', $idsArray)->update(['order_status_id' => $order_status_id]);
+		if($response){
+			$res['msgType'] = 'success';
+			$res['msg'] = __('Data Updated Successfully');
+		}else{
+			$res['msgType'] = 'error';
+			$res['msg'] = __('Data update failed');
+		}
+		
+		return response()->json($res);
+	}
+	public function getAdminOrdersTableData(Request $request)
+	{
+		$search = $request->search;
+		$status = $request->status;
+		$start_date = $request->start_date;
+		$end_date = $request->end_date;
+
+		if ($request->ajax()) {
+
+			// Base query used in all conditions
+			$query = DB::table('order_masters as a')
+				->leftJoin('users as b', 'a.customer_id', '=', 'b.id')
+				->leftJoin('users as c', 'a.seller_id', '=', 'c.id')
+				->join('payment_method as d', 'a.payment_method_id', '=', 'd.id')
+				->join('payment_status as e', 'a.payment_status_id', '=', 'e.id')
+				->join('order_status as f', 'a.order_status_id', '=', 'f.id')
+				->join('order_items as g', 'a.id', '=', 'g.order_master_id')
+				->select(
+					'a.master_order_no as order_no',
+
+					DB::raw("MIN(a.id) as id"),
+					DB::raw("MIN(a.customer_id) as customer_id"),
+					DB::raw("MIN(a.payment_status_id) as payment_status_id"),
+					DB::raw("MIN(a.order_status_id) as order_status_id"),
+
+					DB::raw("MIN(a.created_at) as created_at"),
+					DB::raw("SUM(a.shipping_fee) as shipping_fee"),
+
+					DB::raw("SUM(g.total_price) as total_amount"),
+					DB::raw("SUM(g.tax) as tax"),
+
+					DB::raw("MIN(b.name) as name"),
+					DB::raw("GROUP_CONCAT(DISTINCT c.shop_name SEPARATOR ', ') AS shop_name"),
+
+					DB::raw("MIN(d.method_name) as method_name"),
+					DB::raw("MIN(e.pstatus_name) as pstatus_name"),
+					DB::raw("MIN(f.ostatus_name) as ostatus_name")
+				)
+				->groupBy('a.master_order_no')
+				->orderBy(DB::raw("MIN(a.created_at)"), 'desc');
+
+			// SEARCH
+			if ($search != '') {
+				$query->where(function ($qr) use ($search) {
+					$qr->where('a.master_order_no', 'like', '%'.$search.'%')
+						->orWhere('a.created_at', 'like', '%'.$search.'%')
+						->orWhere('b.name', 'like', '%'.$search.'%')
+						->orWhere('c.shop_name', 'like', '%'.$search.'%')
+						->orWhere('d.method_name', 'like', '%'.$search.'%')
+						->orWhere('e.pstatus_name', 'like', '%'.$search.'%')
+						->orWhere('f.ostatus_name', 'like', '%'.$search.'%')
+						->orWhere('b.email', 'like', '%'.$search.'%');
+				});
+			}
+
+			// DATE RANGE
+			if ($start_date != '' && $end_date != '') {
+				$query->whereBetween('a.created_at', [$start_date, $end_date]);
+			}
+
+			// STATUS FILTER
+			if ($status != 0) {
+				$query->where('a.order_status_id', $status);
+			}
+
+			$datalist = $query->paginate(25);
+
+			$comm = DB::table('commissions')->first();
+			$commissions = $comm->commission ?? 0;
+
+			return view('backend.partials.orders_table', compact('datalist', 'commissions'))->render();
+		}
+	}
+
 }
