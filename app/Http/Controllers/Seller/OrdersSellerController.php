@@ -148,7 +148,13 @@ class OrdersSellerController extends Controller
 			->join('payment_status as e', 'a.payment_status_id', '=', 'e.id')
 			->join('order_status as f', 'a.order_status_id', '=', 'f.id')
 			->join('order_items as g', 'a.id', '=', 'g.order_master_id')
-			->join('delivery_types as dt', 'a.shipping_title', '=', 'dt.lable')
+			->leftJoin('delivery_types as dt', DB::raw("
+				SUBSTRING_INDEX(
+					TRIM(SUBSTRING(a.shipping_title, LOCATE(':', a.shipping_title) + 1)),
+					',',
+					1
+				)
+			"), '=', 'dt.lable')
 			->select(
 				'a.id', 
 				'a.customer_id', 
@@ -156,7 +162,7 @@ class OrdersSellerController extends Controller
 				'a.order_status_id', 
 				'a.master_order_no as order_no', 
 				'a.created_at', 
-				'a.shipping_title', 
+				
 				'a.shipping_fee', 
 				DB::raw("SUM(g.total_price) as total_amount"), 
 				DB::raw("SUM(g.tax) as tax"), 
@@ -188,7 +194,7 @@ class OrdersSellerController extends Controller
 				'f.ostatus_name', 
 				'e.pstatus_name', 
 				'd.method_name', 
-				'a.shipping_title', 
+				 
 				'a.name', 
 				'a.phone', 
 				'a.country', 
@@ -210,7 +216,8 @@ class OrdersSellerController extends Controller
 			
 		$datalist = DB::table('order_items')
 			->join('products', 'order_items.product_id', '=', 'products.id')
-			->select('order_items.*', 'products.title')
+			->join('order_masters as a', 'order_items.order_master_id', '=', 'a.id')
+			->select('order_items.*', 'products.title', 'a.shipping_title as item_shipping_title')
 			->where('order_items.order_master_id', $id)
 			->where('order_items.seller_id', $seller_id)
 			->get();
@@ -331,10 +338,11 @@ class OrdersSellerController extends Controller
 				'a.id')
 			->first();
 			
-		$datalist = DB::table('order_items')
-			->join('products', 'order_items.product_id', '=', 'products.id')
-			->select('order_items.*', 'products.title')
-			->where('order_items.order_master_id', $id)
+		$datalist = DB::table('order_items as b')
+			->join('products as p', 'b.product_id', '=', 'p.id')
+			->join('order_masters as a', 'b.order_master_id', '=', 'a.id')
+			->select('b.*', 'p.title', 'a.shipping_title')
+			->where('b.order_master_id', $id)
 			->get();
 
 		$item_list = '';
@@ -359,9 +367,23 @@ class OrdersSellerController extends Controller
 			}else{
 				$size = 'Size: '.$row->variation_size;
 			}
-			
+
+			$shippingMode = 'N/A';
+			if(!empty($row->shipping_title)){
+				$pairs = explode(',', $row->shipping_title);
+				foreach($pairs as $pair){
+					$pair = trim($pair);
+					if(strpos($pair, $row->product_id . ':') === 0){
+						$shippingMode = trim(substr($pair, strlen($row->product_id) + 1));
+						break;
+					}
+				}
+			}
 			$item_list .= '<tr>
-							<td style="width:70%;text-align:left;border:1px solid #ddd;">'.$row->title.'<br>'.$color.$size.'</td>
+							<td style="width:70%;text-align:left;border:1px solid #ddd;">'
+								.$row->title.'<br>'.$color.$size
+								.'<br>Shipping Mode: '.$shippingMode.
+							'</td>
 							<td style="width:15%;text-align:center;border:1px solid #ddd;">'.$price.' x '.$row->quantity.'</td>
 							<td style="width:15%;text-align:right;border:1px solid #ddd;">'.$total_price.'</td>
 						</tr>';
@@ -511,7 +533,7 @@ class OrdersSellerController extends Controller
 												<td style="padding-top:5px;padding-bottom:20px;">
 													<table style="font-weight:bold;" border="0" cellpadding="5" cellspacing="0" width="100%">
 														<tr>
-															<td style="width:85%;text-align:right;">'.$mdata->shipping_title.' - '.__('Shipping Fee').':</td>
+															<td style="width:85%;text-align:right;">'.__('Shipping Fee').':</td>
 															<td style="width:15%;text-align:right;">'.$shipping_fee.'</td>
 														</tr>
 														<tr>
@@ -546,6 +568,7 @@ class OrdersSellerController extends Controller
 				return 0;
 			}
 		}
+		// <td style="width:85%;text-align:right;">'.$mdata->shipping_title.' - '.__('Shipping Fee').':</td>
 		// <tr><td style="padding-top:30px;padding-bottom:50px;"><a href="'.route('frontend.order-invoice', [$mdata->id, $mdata->order_no]).'" style="background:'.$gtext['theme_color'].';display:block;text-align:center;padding:10px 30px;border-radius:3px;text-decoration:none;color:#fff;float:left;">'.__('Invoice Download').'</a></td></tr>
 	}
 	

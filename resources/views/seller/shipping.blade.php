@@ -210,9 +210,10 @@ margin-bottom: 0rem !important;
                                 <hr>
                                 <p class="text-info"><i class="fa fa-exclamation-circle mr-1" aria-hidden="true"></i>Your Maximum Order Quantity is {{$datalist['maxorderqty']}}, Set The Highest Quantity To {{$datalist['maxorderqty']}}</p>
                                     @php
-                                        $slabs = is_string($shippingMethod->slab)
-                                            ? json_decode($shippingMethod->slab, true)
-                                            : $shippingMethod->slab;
+                                        $slabs = !empty($shippingMethod->slab)
+                                        ? (is_string($shippingMethod->slab) ? json_decode($shippingMethod->slab, true) : $shippingMethod->slab)
+                                        : [];
+
                                     @endphp
 
                                     <div id="slabContainer">

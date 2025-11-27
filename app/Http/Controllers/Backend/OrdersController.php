@@ -218,7 +218,8 @@ class OrdersController extends Controller
 			
 		$datalist = DB::table('order_items')
 			->join('products', 'order_items.product_id', '=', 'products.id')
-			->select('order_items.*', 'products.title')
+			->join('order_masters as a', 'order_items.order_master_id', '=', 'a.id')
+			->select('order_items.*', 'products.title', 'a.shipping_title as item_shipping_title')
 			->where('order_items.order_master_id', $id)
 			->get();
 
@@ -356,7 +357,8 @@ class OrdersController extends Controller
 			
 		$datalist = DB::table('order_items')
 			->join('products', 'order_items.product_id', '=', 'products.id')
-			->select('order_items.*', 'products.title')
+			->join('order_masters as a', 'order_items.order_master_id', '=', 'a.id')
+			->select('order_items.*', 'products.title', 'a.shipping_title')
 			->where('order_items.order_master_id', $id)
 			->get();
 
@@ -376,9 +378,19 @@ class OrdersController extends Controller
 			}else{
 				$size = $row->quantity.' '.$row->variation_size;
 			}
-			
+			$shippingMode = 'N/A';
+			if(!empty($row->shipping_title)){
+				$pairs = explode(',', $row->shipping_title);
+				foreach($pairs as $pair){
+					$pair = trim($pair);
+					if(strpos($pair, $row->product_id . ':') === 0){
+						$shippingMode = trim(substr($pair, strlen($row->product_id) + 1));
+						break;
+					}
+				}
+			}
 			$item_list .= '<tr>
-							<td style="width:70%;text-align:left;border:1px solid #ddd;">'.$row->title.'<br>'.$size.'</td>
+							<td style="width:70%;text-align:left;border:1px solid #ddd;">'.$row->title.'<br>'.$size.'<br>Shipping Mode: '.$shippingMode.'</td>
 							<td style="width:15%;text-align:center;border:1px solid #ddd;">'.$price.' x '.$row->quantity.'</td>
 							<td style="width:15%;text-align:right;border:1px solid #ddd;">'.$total_price.'</td>
 						</tr>';
@@ -523,7 +535,7 @@ class OrdersController extends Controller
 												<td style="padding-top:5px;padding-bottom:20px;">
 													<table style="font-weight:bold;" border="0" cellpadding="5" cellspacing="0" width="100%">
 														<tr>
-															<td style="width:85%;text-align:right;">'.$mdata->shipping_title.' - '.__('Shipping Fee').':</td>
+															<td style="width:85%;text-align:right;">'.__('Shipping Fee').':</td>
 															<td style="width:15%;text-align:right;">'.$shipping_fee.'</td>
 														</tr>
 														<tr>

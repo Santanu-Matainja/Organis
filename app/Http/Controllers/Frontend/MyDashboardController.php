@@ -209,7 +209,7 @@ class MyDashboardController extends Controller
 			->join('order_masters as a', 'b.order_master_id', '=', 'a.id')
 			->join('products as p', 'b.product_id', '=', 'p.id')
 			->leftJoin('users as u', 'b.seller_id', '=', 'u.id')            // seller of the item
-			->leftJoin('delivery_types as dt', 'a.shipping_title', '=', 'dt.lable')            // seller of the item
+
 			->leftJoin('order_status as s', 'a.order_status_id', '=', 's.id') // order status for that order_master row
 			->select(
 				'b.*',
@@ -220,7 +220,7 @@ class MyDashboardController extends Controller
 				's.ostatus_name',
 				's.id as ostatus_id',
 				'a.order_status_id',
-				'dt.id as delivaryid',
+				
 				'a.shipping_title as item_shipping_title',
 				'u.lat',
 				'u.lng',

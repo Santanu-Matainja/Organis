@@ -110,13 +110,19 @@ $(function () {
 	// 	});
 	// 	$(".grand_total_value").text(addCommas(grandTotal.toFixed(2)));
 	// });
+	// Set default shipping_id values for all checked radios
 	$('.shipping_method:checked').each(function () {
-        let sellerId = $(this).data('sellerid');
-        let shippingId = $(this).data('shipid');
+		let sellerId = $(this).data('sellerid');
+		let isPerishable = $(this).data('perishable');
+		let shippingId = $(this).data('shipid');
 
-        $('input[name="shipping_id['+sellerId+']"]').val(shippingId);
-    });
+		$('input[name="shipping_id['+sellerId+']['+isPerishable+']"]').val(shippingId);
+	});
+
+	calculateGrandTotal();
+
 	$(".shipping_method").on("change", function () {
+
 		const shipping_fee = parseFloat($(this).data("shippingfee")) || 0;
 		const totalWithoutShipping = parseFloat($(this).data("total")) || 0;
 
@@ -125,24 +131,34 @@ $(function () {
 		const shippingRow = shippingSection.prevAll("tr").has(".shipping_fee").first();
 
 		const sellerId = $(this).data("sellerid");
-    	const shippingId = $(this).data("shipid");
+		const isPerishable = $(this).data("perishable");
+		const shippingId = $(this).data("shipid");
 
-		// UPDATE THE ONE HIDDEN FIELD
-		$("#shipping_id_" + sellerId).val(shippingId);
+		// UPDATE THE CORRECT HIDDEN FIELD (seller + perishability)
+		$("#shipping_id_" + sellerId + "_" + isPerishable).val(shippingId);
+
 		// Update shipping and total
 		shippingRow.find(".shipping_fee").text("€" + formatCurrency(shipping_fee));
 		const newTotal = totalWithoutShipping + shipping_fee;
 		totalRow.find(".total-price").text("€" + formatCurrency(newTotal));
 
 		// Recalculate grand total
+		calculateGrandTotal();
+	});
+
+
+	function calculateGrandTotal() {
 		let grandTotal = 0;
+
 		$(".total-price").each(function () {
 			const val = parseCurrency($(this).text());
 			grandTotal += val;
 		});
+
 		let commission = parseFloat($("#commission").val()) || 0;
 		$(".grand_total_value").text(formatCurrency(grandTotal + commission));
-	});
+	}
+
 
 	function parseCurrency(value) {
 		value = value.replace(/[^\d,.-]/g, '')
@@ -157,12 +173,6 @@ $(function () {
 			maximumFractionDigits: 2
 		}).format(value);
 	}
-
-
-
-
-
-
 
 
 	$("#checkout_submit_form").on("click", function () {

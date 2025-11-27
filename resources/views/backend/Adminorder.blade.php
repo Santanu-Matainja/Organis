@@ -19,7 +19,7 @@
 						<li class="order_no_date"><strong>{{ __('Order Date') }}</strong>: {{ date('d-m-Y', strtotime($mdata->created_at)) }}</li>
 						<li class="order_no_date"><strong>{{ __('Payment Method') }}</strong>: {{ $mdata->method_name }}</li>
 						<li id="payment_status_class" class="pstatus_{{ $mdata->payment_status_id }}"><strong>{{ __('Payment Status') }}</strong>: <span id="pstatus_name">{{ $mdata->pstatus_name }}</span></li>
-						<li id="order_status_class" class="ostatus_{{ $mdata->order_status_id }}"><strong>{{ __('Order Status') }}</strong>: <span id="ostatus_name">{{ $mdata->ostatus_name }}</span></li>
+						{{-- <li id="order_status_class" class="ostatus_{{ $mdata->order_status_id }}"><strong>{{ __('Order Status') }}</strong>: <span id="ostatus_name">{{ $mdata->ostatus_name }}</span></li> --}}
 					</ul>
 					</div>
 				</div>
@@ -54,28 +54,40 @@
 										}else{
 											$size = $row->quantity.' '.$row->variation_size;
 										}
-										
+										$item_shipping_fee_raw = $row->shipping_fee ?? 0;
+
+										if($gtext['currency_position'] == 'left'){
+											$item_shipping_fee = $gtext['currency_icon'].NumberFormat($item_shipping_fee_raw);
+										} else {
+											$item_shipping_fee = NumberFormat($item_shipping_fee_raw).$gtext['currency_icon'];
+										}
 									@endphp
 									<tr>
 										<td>
 											<h5>{{ $row->title }}</h5>
 											<p>@php echo $size @endphp</p>
-											@php
-												$shippingTitle = 'N/A';
-												$pairs = explode(',', $row->item_shipping_title);
-												foreach ($pairs as $pair) {
-													$pair = trim($pair); 
-													if (strpos($pair, $row->product_id . ':') === 0) {
-														$shippingTitle = trim(substr($pair, strlen($row->product_id) + 1));
-														break;
-													}
-												}
-											@endphp
-											<p> Shipping Mode : {{ $shippingTitle}} </p>
 										</td>
 										<td class="text-center">{{ $price }} x {{ $row->quantity }}</td>
 										<td class="text-right">{{ $total_price }}</td>
 									</tr>
+									<tr>
+										@php
+											$shippingTitle = 'N/A';
+											$pairs = explode(',', $row->item_shipping_title);
+											foreach ($pairs as $pair) {
+												$pair = trim($pair); 
+												if (strpos($pair, $row->product_id . ':') === 0) {
+													$shippingTitle = trim(substr($pair, strlen($row->product_id) + 1));
+													break;
+												}
+											}
+										@endphp
+										<td class="text-left" style="border: none;">Shipping Mode : {{ $shippingTitle }}</td>
+									</tr>
+									<tr>
+										<td class="text-left" style="border: none;padding: 0rem .75rem .75rem;">Order Status : {{ $row->ostatus_name }}</td>
+									</tr>
+								
 									@endforeach
 									
 									@php
@@ -89,8 +101,8 @@
 											$mdata->shipping_fee = (float)$mdata->shipping_fee;
 										}
 
-										// $total_amount_shipping_fee = $mdata->total_amount+$mdata->shipping_fee+$mdata->tax+$commissions;
-										$total_amount_shipping_fee = $mdata->total_amount+$mdata->shipping_fee+$mdata->tax;
+										$total_amount_shipping_fee = $mdata->total_amount+$mdata->shipping_fee+$mdata->tax+$commissions;
+										// $total_amount_shipping_fee = $mdata->total_amount+$mdata->shipping_fee+$mdata->tax;
 										
 										if($gtext['currency_position'] == 'left'){
 											$shipping_fee = $gtext['currency_icon'].NumberFormat($mdata->shipping_fee);
@@ -110,7 +122,6 @@
 									@endphp
 										
 									<tr>
-										{{-- <td>{{ $mdata->shipping_title }}: {{ $shipping_fee }}</td> --}}
 										<td></td>
 										<td><strong>{{ __('Shipping Fee') }}</strong></td>
 										<td class="text-right"><strong>{{ $shipping_fee }}</strong></td>
@@ -120,11 +131,11 @@
 										<td><strong>{{ __('Tax') }}</strong></td>
 										<td class="text-right"><strong>{{ $tax }}</strong></td>
 									</tr>
-									{{-- <tr>
+									<tr>
 										<td></td>
 										<td><strong>{{ __('Commission') }}</strong></td>
 										<td class="text-right"><strong>{{ $commissions }}</strong></td>
-									</tr> --}}
+									</tr>
 									<tr>
 										<td></td>
 										<td><strong>{{ __('Subtotal') }}</strong></td>
@@ -141,7 +152,7 @@
 						</div>
 						
 						<form novalidate="" data-validate="parsley" id="DataEntry_formId">
-						<div class="row mt-25">
+						{{-- <div class="row mt-25">
 							<div class="col-lg-4">
 								<div class="form-group">
 									<label for="payment_status_id">{{ __('Payment Status') }}<span class="red">*</span></label>
@@ -167,8 +178,8 @@
 								</div>
 							</div>
 							<div class="col-lg-4"></div>
-						</div>
-						<div class="row">
+						</div> --}}
+						{{-- <div class="row">
 							<div class="col-lg-12">
 								<div class="tw_checkbox checkbox_group">
 									<input id="isnotify" name="isnotify" type="checkbox">
@@ -176,13 +187,13 @@
 									<span></span>
 								</div>
 							</div>
-						</div>
+						</div> --}}
 						<div class="row mt-25">
 							<div class="col-lg-12">
 								<input class="dnone" id="order_master_id" name="order_master_id" type="text" value="{{ $mdata->id }}" />
-								<a id="submit-form" href="javascript:void(0);" class="btn btn-theme mr-10 update_btn">{{ __('Update') }}</a>
-								<a href="{{ route('frontend.sellerorder-invoice', [$mdata->id, $mdata->order_no]) }}" class="btn btn-theme mr-10">{{ __('Invoice Download') }}</a>
-								<a href="{{ route('backend.orders') }}" class="btn warning-btn"><i class="fa fa-reply"></i> {{ __('Back to List') }}</a>
+								{{-- <a id="submit-form" href="javascript:void(0);" class="btn btn-theme mr-10 update_btn">{{ __('Update') }}</a> --}}
+								<a href="{{ route('frontend.order-invoice', $mdata->order_no) }}" class="btn btn-theme mr-10">{{ __('Invoice Download') }}</a>
+								<a href="{{ route('backend.adminorders') }}" class="btn warning-btn"><i class="fa fa-reply"></i> {{ __('Back to List') }}</a>
 							</div>
 						</div>
 						</form>

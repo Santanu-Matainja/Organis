@@ -66,6 +66,18 @@
 										<td>
 											<h5>{{ $row->title }}</h5>
 											<p>@php echo $color @endphp @php echo $size @endphp</p>
+											@php
+												$shippingTitle = 'N/A';
+												$pairs = explode(',', $row->item_shipping_title);
+												foreach ($pairs as $pair) {
+													$pair = trim($pair); 
+													if (strpos($pair, $row->product_id . ':') === 0) {
+														$shippingTitle = trim(substr($pair, strlen($row->product_id) + 1));
+														break;
+													}
+												}
+											@endphp
+											<p> Shipping Mode : {{ $shippingTitle}} </p>
 										</td>
 										<td class="text-center">{{ $price }} x {{ $row->quantity }}</td>
 										<td class="text-right">{{ $total_price }}</td>
@@ -104,7 +116,8 @@
 									@endphp
 										
 									<tr>
-										<td>{{ $mdata->shipping_title }}: {{ $shipping_fee }}</td>
+										{{-- <td>{{ $mdata->shipping_title }}: {{ $shipping_fee }}</td> --}}
+										<td></td>
 										<td><strong>{{ __('Shipping Fee') }}</strong></td>
 										<td class="text-right"><strong>{{ $shipping_fee }}</strong></td>
 									</tr>

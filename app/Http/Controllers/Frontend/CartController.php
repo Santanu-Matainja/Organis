@@ -75,36 +75,36 @@ class CartController extends Controller
 			? json_decode($cartRecord->cart_data, true)
 			: [];
 
-		$currentType = $datalist['perisible']; 
+		// $currentType = $datalist['perisible']; 
 
-		if (!empty($cart)) {
-			$hasPerishable = false;
-			$hasNonPerishable = false;
+		// if (!empty($cart)) {
+		// 	$hasPerishable = false;
+		// 	$hasNonPerishable = false;
 
-			foreach ($cart as $item) {
-				if ($item['perisible'] == 1) {
-					$hasPerishable = true;
-				} else {
-					$hasNonPerishable = true;
-				}
-			}
+		// 	foreach ($cart as $item) {
+		// 		if ($item['perisible'] == 1) {
+		// 			$hasPerishable = true;
+		// 		} else {
+		// 			$hasNonPerishable = true;
+		// 		}
+		// 	}
 
-			// If cart already contains perishable & user tries to add non-perishable
-			if ($hasPerishable && $currentType == 0) {
-				return response()->json([
-					'msgType' => 'error',
-					'msg' => __('Cart Contains Perisible Products Cannot Add Non-Perisible Product.')
-				]);
-			}
+		// 	// If cart already contains perishable & user tries to add non-perishable
+		// 	if ($hasPerishable && $currentType == 0) {
+		// 		return response()->json([
+		// 			'msgType' => 'error',
+		// 			'msg' => __('Cart Contains Perisible Products Cannot Add Non-Perisible Product.')
+		// 		]);
+		// 	}
 
-			// If cart already contains non-perishable & user tries to add perishable
-			if ($hasNonPerishable && $currentType == 1) {
-				return response()->json([
-					'msgType' => 'error',
-					'msg' => __('Cart Contains Non-Perisible Products Cannot Add Perisible Product.')
-				]);
-			}
-		}
+		// 	// If cart already contains non-perishable & user tries to add perishable
+		// 	if ($hasNonPerishable && $currentType == 1) {
+		// 		return response()->json([
+		// 			'msgType' => 'error',
+		// 			'msg' => __('Cart Contains Non-Perisible Products Cannot Add Perisible Product.')
+		// 		]);
+		// 	}
+		// }
 		
 		// ✅ Add or update product in cart
 		if (isset($cart[$id])) {

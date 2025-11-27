@@ -141,9 +141,32 @@
 														</td>
 														<td class="text-center">{{ $row->ostatus_name }}</td>
 														<td class="text-center">{{ $row->shop_name }}</td>
-														<td class="text-center">{{ $row->item_shipping_title}}
+														@php
+															$shippingTitle = 'N/A';
+															$shippingDeliveryId = null;
+															$pairs = explode(',', $row->item_shipping_title);
+
+															foreach ($pairs as $pair) {
+																$pair = trim($pair);
+
+																if (strpos($pair, $row->product_id . ':') === 0) {
+
+																	$shippingTitle = trim(substr($pair, strlen($row->product_id) + 1));
+
+																	$dt = DB::table('delivery_types')->where('lable', $shippingTitle)->first();
+
+																	if ($dt) {
+																		$shippingDeliveryId = $dt->id;
+																	}
+
+																	break;
+																}
+															}
+														@endphp
+
+														<td class="text-center">{{ $shippingTitle }}
 															<br>
-															@if($row->ostatus_id == 3 && $row->delivaryid == 3 && $row->lat && $row->lng)
+															@if($row->ostatus_id == 3 && $shippingDeliveryId == 3 && $row->lat && $row->lng)
 																<a href="https://www.google.com/maps/dir/?api=1&destination={{ $row->lat }},{{ $row->lng }}"
 																	class="btn" style="border: 1px solid black;border-radius: 6px; padding: 6px 12px; margin: 6px 0px 0px 0px;" target="_blank">
 																	Navigate to Seller

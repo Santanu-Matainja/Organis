@@ -69,9 +69,15 @@ class OrderInvoiceController extends Controller
 			
 		$datalist = DB::table('order_items')
 			->join('products', 'order_items.product_id', '=', 'products.id')
-			->select('order_items.*', 'products.title')
+			->join('order_masters', 'order_items.order_master_id', '=', 'order_masters.id')
+			->select(
+				'order_items.*',
+				'products.title',
+				'order_masters.shipping_title'
+			)
 			->where('order_items.order_master_id', $id)
 			->get();
+
 
 		$item_list = '';
 		foreach($datalist as $row){
@@ -89,11 +95,23 @@ class OrderInvoiceController extends Controller
 			}else{
 				$size = $row->quantity.' '.$row->variation_size;
 			}
-			
+
+			$shippingLabel = 'N/A';
+			$pairs = explode(',', $row->shipping_title);
+
+			foreach ($pairs as $pair) {
+				$pair = trim($pair);
+
+				if (strpos($pair, $row->product_id . ':') === 0) {
+					$shippingLabel = trim(substr($pair, strlen($row->product_id) + 1));
+					break;
+				}
+			}
 			$item_list .= '<tr>
 					<td class="w-60" align="left">
 						<p>'.$row->title.'</p>
 						<p class="color_size">'.$size.'</p>
+						<p>Shipping: '.$shippingLabel.'</p>
 					</td>
 					<td class="w-20" align="center">'.$price.' x '.$row->quantity.'</td> 
 					<td class="w-20" align="right">'.$total_price.'</td>  
@@ -308,7 +326,7 @@ class OrderInvoiceController extends Controller
 		</table>
 		<table class="border-none" width="100%" cellpadding="6" cellspacing="0">
 			<tr>
-				<td class="w-50" align="left">'.$mdata->shipping_title.': '.$shipping_fee.'</td>  
+				<td class="w-50" align="left"></td>  
 				<td class="w-25" align="right"><strong>'.__('Shipping Fee').'</strong>: </td>  
 				<td class="w-25" align="right"><strong>'.$shipping_fee.'</strong></td>  
 			</tr>
@@ -346,6 +364,8 @@ class OrderInvoiceController extends Controller
 
 		//Close and output PDF document
 		PDF::Output('invoice-'.$mdata->order_no.'.pdf', 'D');
+
+		// <td class="w-50" align="left">'.$mdata->shipping_title.': '.$shipping_fee.'</td>  
 	}
 
 
@@ -421,6 +441,16 @@ class OrderInvoiceController extends Controller
 				$size = $row->quantity.' '.$row->variation_size;
 			}
 			
+			$shippingLabel = 'N/A';
+			$pairs = explode(',', $row->item_shipping_title);
+			foreach ($pairs as $pair) {
+				$pair = trim($pair);
+				if (strpos($pair, $row->product_id . ':') === 0) {
+					$shippingLabel = trim(substr($pair, strlen($row->product_id) + 1));
+					break;
+				}
+			}
+
 			$item_list .= '<tr>
 				<td class="w-25" align="left">
 					<p>'.$row->title.'</p>
@@ -428,7 +458,7 @@ class OrderInvoiceController extends Controller
 				</td>
 				<td class="w-13" align="center"><span class="ostatus_'.$row->order_status_id.'">'.$row->ostatus_name.'</span></td>
 				<td class="w-13" align="center">'.$row->shop_name.'</td>
-				<td class="w-13" align="center">'.$row->item_shipping_title.'</td>
+				<td class="w-13" align="center">'.$shippingLabel.'</td>
 				<td class="w-12" align="center">'.$price.'</td>
 				<td class="w-8" align="center">'.$row->quantity.'</td>
 				<td class="w-16" align="right">'.$total_price.'</td>
