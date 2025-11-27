@@ -644,7 +644,7 @@ class OrdersController extends Controller
 		$payment_status_list = DB::table('payment_status')->get();
 		$order_status_list   = DB::table('order_status')->get();
 
-		 $mdata = DB::table('order_masters as a')
+		  $mdata = DB::table('order_masters as a')
 			->leftJoin('users as b', 'a.customer_id', '=', 'b.id')
 			->join('users as c', 'a.seller_id', '=', 'c.id')
 			->join('payment_method as d', 'a.payment_method_id', '=', 'd.id')
@@ -682,7 +682,8 @@ class OrdersController extends Controller
 				DB::raw("MIN(d.method_name) as method_name"),
 				DB::raw("MIN(e.pstatus_name) as pstatus_name"),
 				DB::raw("MIN(f.ostatus_name) as ostatus_name"),
-				DB::raw("SUM(a.shipping_fee) AS shipping_fee")
+				DB::raw("SUM(DISTINCT a.shipping_fee) AS shipping_fee")
+
 			)
 			->where('a.master_order_no', $order_no)
 			->groupBy('a.master_order_no') 
