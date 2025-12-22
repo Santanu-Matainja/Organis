@@ -149,8 +149,18 @@
 										<div class="col-md-6">
 											<div class="mb-3">
 												<label for="zip_code">{{ __('Zip Code') }}</label>
-												<input type="number" id="zip_code" name="zip_code" class="form-control" placeholder="{{ __('Zip Code') }}"
-													value="{{ old('phone', Auth::user()->zip_code ?? '') }}">
+												<input
+                                                    type="text"
+                                                    id="zip_code"
+                                                    name="zip_code"
+                                                    class="form-control"
+                                                    placeholder="{{ __('Zip Code') }}"
+                                                    value="{{ old('zip_code', Auth::user()->zip_code ?? '') }}"
+                                                    maxlength="6"
+                                                    pattern="[0-9]{6}"
+                                                    inputmode="numeric"
+                                                    oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 6);"
+                                                />
 											</div>
 										</div>
 										<div class="col-md-6">

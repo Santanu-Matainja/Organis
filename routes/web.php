@@ -228,6 +228,22 @@ Route::prefix('backend')->group(function(){
 	Route::post('/bulkActionMenu', [App\Http\Controllers\Backend\MenuController::class, 'bulkActionMenu'])->name('backend.bulkActionMenu')->middleware(['auth','is_admin']);
 
 	//Menu Builder Page
+	Route::get('/menu-builderaa', [App\Http\Controllers\Backend\MenuBuilderController2::class, 'newpage'])->name('backend.newpage')->middleware(['auth','is_admin']);
+	Route::get('/menu-builderr/{lan}/{id}', [App\Http\Controllers\Backend\MenuBuilderController2::class, 'getMenuBuilderPageLoad'])->name('backend.menu-builderr')->middleware(['auth','is_admin']);
+	Route::get('/getPageMenuBuilderDataa', [App\Http\Controllers\Backend\MenuBuilderController2::class, 'getPageMenuBuilderData'])->name('backend.getPageMenuBuilderDataa')->middleware(['auth','is_admin']);
+	Route::get('/getBrandMenuBuilderDataa', [App\Http\Controllers\Backend\MenuBuilderController2::class, 'getBrandMenuBuilderData'])->name('backend.getBrandMenuBuilderDataa')->middleware(['auth','is_admin']);
+	Route::get('/getProductMenuBuilderDataa', [App\Http\Controllers\Backend\MenuBuilderController2::class, 'getProductMenuBuilderData'])->name('backend.getProductMenuBuilderDataa')->middleware(['auth','is_admin']);
+	Route::get('/getProductCategoryMenuBuilderDataa', [App\Http\Controllers\Backend\MenuBuilderController2::class, 'getProductCategoryMenuBuilderData'])->name('backend.getProductCategoryMenuBuilderDataa')->middleware(['auth','is_admin']);
+	Route::get('/getBlogCategoryMenuBuilderDataa', [App\Http\Controllers\Backend\MenuBuilderController2::class, 'getBlogCategoryMenuBuilderData'])->name('backend.getBlogCategoryMenuBuilderDataa')->middleware(['auth','is_admin']);
+	Route::post('/SaveParentMenuu', [App\Http\Controllers\Backend\MenuBuilderController2::class, 'SaveParentMenu'])->name('backend.SaveParentMenuu')->middleware(['auth','is_admin']);
+	Route::get('/ajaxMakeMenuListt', [App\Http\Controllers\Backend\MenuBuilderController2::class, 'ajaxMakeMenuList'])->name('backend.ajaxMakeMenuListt')->middleware(['auth','is_admin']);
+	Route::post('/UpdateMenuSettingss', [App\Http\Controllers\Backend\MenuBuilderController2::class, 'UpdateMenuSettings'])->name('backend.UpdateMenuSettingss')->middleware(['auth','is_admin']);
+	Route::post('/deleteParentChildMenuu', [App\Http\Controllers\Backend\MenuBuilderController2::class, 'deleteParentChildMenu'])->name('backend.deleteParentChildMenuu')->middleware(['auth','is_admin']);
+	Route::post('/getMegaMenuTitleByIdd', [App\Http\Controllers\Backend\MenuBuilderController2::class, 'getMegaMenuTitleById'])->name('backend.getMegaMenuTitleByIdd')->middleware(['auth','is_admin']);
+	Route::post('/UpdateMegaMenuTitlee', [App\Http\Controllers\Backend\MenuBuilderController2::class, 'UpdateMegaMenuTitle'])->name('backend.UpdateMegaMenuTitlee')->middleware(['auth','is_admin']);
+	Route::post('/UpdateSortableMenuListt', [App\Http\Controllers\Backend\MenuBuilderController2::class, 'UpdateSortableMenuList'])->name('backend.UpdateSortableMenuListt')->middleware(['auth','is_admin']);
+
+
 	Route::get('/menu-builder/{lan}/{id}', [App\Http\Controllers\Backend\MenuBuilderController::class, 'getMenuBuilderPageLoad'])->name('backend.menu-builder')->middleware(['auth','is_admin']);
 	Route::get('/getPageMenuBuilderData', [App\Http\Controllers\Backend\MenuBuilderController::class, 'getPageMenuBuilderData'])->name('backend.getPageMenuBuilderData')->middleware(['auth','is_admin']);
 	Route::get('/getBrandMenuBuilderData', [App\Http\Controllers\Backend\MenuBuilderController::class, 'getBrandMenuBuilderData'])->name('backend.getBrandMenuBuilderData')->middleware(['auth','is_admin']);
@@ -691,6 +707,10 @@ Route::prefix('seller')->group(function(){
 	Route::post('/getStatusList', [App\Http\Controllers\Backend\ComboController::class, 'getStatusList'])->name('seller.getStatusList')->middleware(['auth','is_seller']);
 	Route::post('/getCategoryList', [App\Http\Controllers\Backend\ComboController::class, 'getCategoryList'])->name('seller.getCategoryList')->middleware(['auth','is_seller']);
 	Route::post('/getBrandList', [App\Http\Controllers\Backend\ComboController::class, 'getBrandList'])->name('seller.getBrandList')->middleware(['auth','is_seller']);
+
+	Route::get('/get-sub-categories/{id}', [App\Http\Controllers\Seller\ProductsController::class, 'getSubCategories'])
+    ->name('seller.get.sub.categories');
+	Route::post('/getSubCategoryList', [App\Http\Controllers\Seller\ProductsController::class, 'getSubCategoryList']);
 
 });
 

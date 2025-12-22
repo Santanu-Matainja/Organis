@@ -63,7 +63,7 @@
 									<div class="col-md-6">
 										<div class="form-group">
 											<label for="phone">{{ __('Phone') }}<span class="red">*</span></label>
-											<input type="text" name="phone" id="phone" value="{{ $seller_data['phone'] }}" class="form-control parsley-validated" data-required="true">
+											<input type="text" name="phone" id="phone" value="{{ $seller_data['phone'] }}" class="form-control parsley-validated" data-required="true" maxlength="10">
 										</div>
 									</div>
 									<div class="col-md-6">
@@ -389,6 +389,18 @@ function selectLocation() {
     var modal = bootstrap.Modal.getInstance(document.getElementById("mapModal"));
     modal.hide();
 }
+
+$(function () {
+    $('[name="phone"], [name="zip_code"]').on('input', function () {
+        this.value = this.value.replace(/\D/g, '');
+    });
+	$('[name="shipping_fee"]').on('input', function () {
+        this.value = this.value
+            .replace(/[^0-9.]/g, '')  
+            .replace(/(\..*)\./g, '$1'); 
+    });
+});
+
 </script>
 
 @endpush

@@ -1,7 +1,7 @@
 
 <div class="sidebar">
 
-	<div class="widget-card">
+	{{-- <div class="widget-card">
 		<div class="widget-title">{{ __('Categories') }}</div>
 		<div class="widget-body">
 			<ul class="widget-list">
@@ -21,8 +21,54 @@
 				@endforeach
 			</ul>
 		</div>
+	</div> --}}
+	<div class="widget-card">
+
+		@if(isset($metadata) && $metadata->id)
+			<div class="widget-title">
+				<a href="{{ route('frontend.product-category', [$metadata->id, $metadata->slug]) }}">
+					{{ $metadata->name }}
+				</a>
+			</div>
+		@else
+			<div class="widget-title">{{ __('Categories') }}</div>
+		@endif
+
+		<div class="widget-body">
+			<ul class="widget-list">
+
+				@if(isset($metadata) && $metadata->id)
+					@php
+						$CategoryListForFilter = SubCategoryListForFilter($metadata->id);
+					@endphp
+				@else
+					@php
+						$CategoryListForFilter = CategoryListForFilter();
+					@endphp
+				@endif
+
+				@forelse ($CategoryListForFilter as $row)
+					<li>
+						<div class="icon">
+							<a href="{{ route('frontend.product-category', [$row->id, $row->slug]) }}">
+								<img src="{{ asset_path('media/'.$row->thumbnail) }}" alt="{{ $row->name }}">
+							</a>
+						</div>
+						<div class="desc">
+							<a href="{{ route('frontend.product-category', [$row->id, $row->slug]) }}">
+								{{ $row->name }}
+							</a>
+						</div>
+						<div class="count">{{ $row->TotalProduct }}</div>
+					</li>
+				@empty
+					<li class="text-muted">{{ __('No Sub Categories Found') }}</li>
+				@endforelse
+
+			</ul>
+		</div>
 	</div>
-	
+
 	<div class="widget-card">
 		<div class="widget-title">{{ __('Filter by Price') }}</div>
 		<div class="widget-body">

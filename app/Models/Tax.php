@@ -13,5 +13,6 @@ class Tax extends Model
         'title', 
 		'percentage', 
 		'is_publish',
+        'category',
     ];	
 }

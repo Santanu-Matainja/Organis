@@ -149,16 +149,23 @@
 								</div>
 								<div class="col-md-3">
 									<div class="form-group">
-										<label for="categoryid">{{ __('Category') }}<span class="red">*</span></label>
-										<select name="categoryid" id="categoryid" class="chosen-select form-control">
+										<label for="parent_category">{{ __('Category') }}<span class="red">*</span></label>
+										<select name="parent_category" id="parent_category" class="chosen-select form-control">
+											<option value="">{{ __('Select Category') }}</option>
 											@foreach($categorylist as $row)
-												<option value="{{ $row->id }}">
-													{{ $row->name }}
-												</option>
+												<option value="{{ $row->id }}">{{ $row->name }}</option>
 											@endforeach
 										</select>
 									</div>
 								</div>	
+								<div class="col-md-3"  id="subCategoryBox" style="display:none;">
+									<div class="form-group">
+										<label for="categoryid">{{ __('Sub Category') }}<span class="red">*</span></label>
+										<select name="categoryid" id="categoryid" class="chosen-select form-control">
+											
+										</select>
+									</div>
+								</div>
 								<div class="col-md-3">
 									<div class="form-group">
 										<label for="brandid">{{ __('Brand') }}<span class="red">*</span></label>
@@ -239,16 +246,23 @@
 								</div> --}}
 								<div class="col-md-3">
 									<div class="form-group">
-										<label for="categoryid">{{ __('Category') }}<span class="red">*</span></label>
-										<select name="categoryid2" id="categoryid2" class="chosen-select form-control">
+										<label for="parent_category">{{ __('Category') }}<span class="red">*</span></label>
+										<select name="parent_category" id="parent_category2" class="chosen-select form-control">
+											<option value="">{{ __('Select Category') }}</option>
 											@foreach($categorylist as $row)
-												<option value="{{ $row->id }}">
-													{{ $row->name }}
-												</option>
+												<option value="{{ $row->id }}">{{ $row->name }}</option>
 											@endforeach
 										</select>
 									</div>
 								</div>	
+								<div class="col-md-3"  id="subCategoryBox2" style="display:none;">
+									<div class="form-group">
+										<label for="categoryid">{{ __('Sub Category') }}<span class="red">*</span></label>
+										<select name="categoryid" id="categoryid2" class="chosen-select form-control">
+											
+										</select>
+									</div>
+								</div>
 								<div class="col-md-3">
 									<div class="form-group">
 										<label for="brandid">{{ __('Brand') }}<span class="red">*</span></label>
@@ -318,4 +332,68 @@ var TEXT = [];
 </script>
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <script src="{{asset_path('backend/pages/products_seller.js')}}"></script>
+<script>
+$('#parent_category').on('change', function () {
+
+    let parentId = $(this).val();
+
+    if (parentId === '') {
+        $('#subCategoryBox').hide();
+        $('#categoryid').html('<option value="">Select Sub Category</option>');
+        return;
+    }
+
+    $.ajax({
+        url: base_url + "/seller/get-sub-categories/"+ parentId,
+        type: "GET",
+        success: function (data) {
+
+            if (data.length > 0) {
+                let options = '';
+
+                $.each(data, function (key, row) {
+                    options += `<option value="${row.id}">${row.name}</option>`;
+                });
+
+                $('#categoryid').html(options);
+                $('#subCategoryBox').show();
+                $('#categoryid').trigger("chosen:updated");
+            } else {
+                $('#subCategoryBox').hide();
+            }
+        }
+    });
+});
+$('#parent_category2').on('change', function () {
+
+    let parentId = $(this).val();
+
+    if (parentId === '') {
+        $('#subCategoryBox2').hide();
+        $('#categoryid2').html('<option value="">Select Sub Category</option>');
+        return;
+    }
+
+    $.ajax({
+        url: base_url + "/seller/get-sub-categories/"+ parentId,
+        type: "GET",
+        success: function (data) {
+
+            if (data.length > 0) {
+                let options = '';
+
+                $.each(data, function (key, row) {
+                    options += `<option value="${row.id}">${row.name}</option>`;
+                });
+
+                $('#categoryid2').html(options);
+                $('#subCategoryBox2').show();
+                $('#categoryid2').trigger("chosen:updated");
+            } else {
+                $('#subCategoryBox2').hide();
+            }
+        }
+    });
+});
+</script>
 @endpush

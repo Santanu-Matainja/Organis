@@ -29,7 +29,14 @@ class ProductsController extends Controller
 		$languageslist = DB::table('languages')->where('status', 1)->orderBy('language_name', 'asc')->get();
 		$brandlist = Brand::where('is_publish', 1)->orderBy('name','asc')->get();
 		$delivarytypes = DeliveryType::orderBy('lable','asc')->get();
-		$categorylist = Pro_category::where('is_publish', 1)->orderBy('name','asc')->get();
+		$categorylist = Pro_category::where('is_publish', 1)
+			->where(function ($q) {
+				$q->whereNull('parent_id')
+				->orWhere('parent_id', 0);
+			})
+			->orderBy('name', 'asc')
+			->get();
+			
 		$publishstatus = Tp_status::get();
 
 		$datalist = DB::table('products')
@@ -144,6 +151,16 @@ class ProductsController extends Controller
 		}
 	}
 	
+	public function getSubCategories($id)
+	{
+		$subCategories = Pro_category::where('parent_id', $id)
+			->where('is_publish', 1)
+			->orderBy('name', 'asc')
+			->get(['id', 'name']);
+
+		return response()->json($subCategories);
+	}
+
 	//Save data for Products
     public function saveProductsData(Request $request){
 		$res = array();
@@ -152,7 +169,7 @@ class ProductsController extends Controller
 		$title = esc($request->input('title'));
 		$slug = esc(str_slug($request->input('slug')));
 		$lan = $request->input('lan');
-		$cat_id = $request->input('categoryid');
+		$cat_id = $request->filled('categoryid') ? $request->input('categoryid') : $request->input('parent_category');
 		$brand_id = $request->input('brandid');
 		$user_id = $request->input('user_id');
 		$exdate = $request->input('exdate');
@@ -503,14 +520,38 @@ class ProductsController extends Controller
 		$languageslist = DB::table('languages')->where('status', 1)->orderBy('id', 'asc')->get();
 		
 		$brandlist = Brand::where('lan', '=', $lan)->where('is_publish', '=', 1)->orderBy('name','asc')->get();
-		$categorylist = Pro_category::where('lan', '=', $lan)->where('is_publish', '=', 1)->orderBy('name','asc')->get();
+		$categorylist = Pro_category::where('is_publish', 1)
+			->where(function ($q) {
+				$q->whereNull('parent_id')
+				->orWhere('parent_id', 0);
+			})
+			->orderBy('name', 'asc')
+			->get();
+
+		$selectedCategory = Pro_category::where('id', $datalist->cat_id)->first();
+
+		$parentCategoryId = null;
+		$selectedSubCategoryId = null;
+
+		if ($selectedCategory && $selectedCategory->parent_id) {
+			$parentCategoryId = $selectedCategory->parent_id;
+			$selectedSubCategoryId = $selectedCategory->id;
+		}	
 		
 		$unitlist = Attribute::orderBy('name','asc')->get();
 		$taxlist = Tax::orderBy('title','asc')->get();
 
-        return view('seller.product', compact('datalist', 'statuslist', 'languageslist', 'brandlist', 'categorylist', 'unitlist', 'taxlist'));
+        return view('seller.product', compact('datalist', 'statuslist', 'languageslist', 'brandlist', 'categorylist', 'unitlist', 'taxlist', 'parentCategoryId', 'selectedSubCategoryId'));
     }
 	
+	public function getSubCategoryList(Request $request)
+	{
+		return Pro_category::where('parent_id', $request->parent_id)
+			->where('is_publish', 1)
+			->orderBy('name', 'asc')
+			->get(['id', 'name']);
+	}
+
 	//Update data for Products
     public function updateProductsData(Request $request){
 		$res = array();
@@ -526,9 +567,8 @@ class ProductsController extends Controller
 		$is_featured = $request->input('is_featured');
 		$lan = $request->input('lan');
 		$f_thumbnail = $request->input('f_thumbnail');
-		$category_ids = $request->input('cat_id');
-		$cat_id = $request->input('cat_id');
-		
+		$category_ids = $request->filled('categoryid') ? $request->input('categoryid') : $request->input('cat_id');
+		$cat_id = $request->filled('categoryid') ? $request->input('categoryid') : $request->input('cat_id');
 		$variation_size = $request->input('variation_size');
 		$sale_price = $request->input('sale_price');
 

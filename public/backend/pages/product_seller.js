@@ -210,3 +210,44 @@ function upload_form() {
 		onErrorMsg(TEXT['Sorry only you can upload jpg, png and gif file type']);
 	}
 }
+
+function loadSubCategories(parentId, selectedSub = null) {
+
+    if (!parentId) {
+        $('#subCategoryBox').hide();
+        return;
+    }
+
+    $.ajax({
+        type: 'POST',
+        url: base_url + '/seller/getSubCategoryList',
+        data: {
+            parent_id: parentId,
+            _token: $('meta[name="csrf-token"]').attr('content')
+        },
+        success: function (data) {
+
+            if (data.length > 0) {
+
+                // ✅ SHOW BLOCK IMMEDIATELY
+                $('#subCategoryBox').show();
+
+                let html = '';
+
+                $.each(data, function (i, obj) {
+                    let selected = (selectedSub == obj.id) ? 'selected' : '';
+                    html += `<option value="${obj.id}" ${selected}>${obj.name}</option>`;
+                });
+
+                $('#categoryid').html(html);
+
+                // Re-init chosen AFTER show
+                $('#categoryid').chosen({width: '100%'});
+                $('#categoryid').trigger('chosen:updated');
+
+            } else {
+                $('#subCategoryBox').hide();
+            }
+        }
+    });
+}

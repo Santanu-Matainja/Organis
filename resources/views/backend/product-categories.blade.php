@@ -114,6 +114,34 @@
 									</div>
 								</div>
 							</div>
+							<div class="row mb-3">
+								<div class="col-md-6">
+									<label for="has_sub_category">
+										{{ __('Sub Category') }} <span class="red">*</span>
+									</label>
+
+									<select name="has_sub_category" id="has_sub_category" class="chosen-select form-control">
+										<option value="0" selected>No</option>
+										<option value="1">Yes</option>
+									</select>
+								</div>
+							
+								<div class="col-md-6"  id="subCategoryDiv">
+									<label for="parent_category_id">
+										{{ __('Parent Category') }} <span class="red">*</span>
+									</label>
+
+									<select name="parent_id" id="parent_id" class="chosen-select form-control">
+										<option value="">-- Select Parent Category --</option>
+										@foreach($proCategories as $category)
+											<option value="{{ $category->id }}">
+												{{ $category->name }}
+											</option>
+										@endforeach
+									</select>
+								</div>
+							</div>
+
 							<div class="row">
 								<div class="col-md-12">
 									<div class="form-group">
@@ -252,4 +280,24 @@ var TEXT = [];
 </script>
 <script src="{{asset_path('backend/pages/product-categories.js')}}"></script>
 <script src="{{asset_path('backend/pages/global-media.js')}}"></script>
+<script>
+$(document).ready(function () {
+
+    function toggleParentCategory() {
+        if ($('#has_sub_category').val() == '1') {
+            $('#subCategoryDiv').show();
+        } else {
+            $('#subCategoryDiv').hide();
+            $('#parent_id').val('').trigger("chosen:updated");
+        }
+    }
+    toggleParentCategory();
+    $('#has_sub_category').on('change', function () {
+        toggleParentCategory();
+    });
+
+});
+
+</script>
+
 @endpush

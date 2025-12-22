@@ -60,4 +60,27 @@ function onConfirmWhenAddEdit() {
 	});
 }
 
+var slabIndex = 0;
 
+$('#addTaxSlab').on('click', function () {
+
+    var template = $('#taxSlabTemplate').html();
+    template = template.replace(/__INDEX__/g, slabIndex);
+
+    var $slab = $(template);
+
+    // add chosen-select ONLY now
+    $slab.find('.slab-status, .slab-category')
+         .addClass('chosen-select');
+
+    $('#taxSlabContainer').append($slab);
+
+    // initialize chosen ONLY for this slab
+    $slab.find('.chosen-select').chosen();
+
+    slabIndex++;
+});
+
+$(document).on('click', '.removeSlab', function () {
+    $(this).closest('.tax-slab').remove();
+});

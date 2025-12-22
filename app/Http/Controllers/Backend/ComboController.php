@@ -51,6 +51,10 @@ class ComboController extends Controller
 			->where(function ($query) use ($lan){
 				$query->whereRaw("lan = '".$lan."' OR '".$lan."' = '0'");
 			})
+			->where(function ($q) {
+				$q->whereNull('parent_id')
+				->orWhere('parent_id', 0);
+			})
 			->orderBy('name','asc')
 			->get();
 		

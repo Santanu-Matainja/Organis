@@ -1125,6 +1125,22 @@ function CategoryListForFilter(){
 	return $datalist;
 }
 
+// Sub Category List for Filter
+function SubCategoryListForFilter($parent_id){
+    $lan = glan();
+
+    $sql = "SELECT b.id, b.slug, b.name, b.thumbnail, COUNT(a.id) TotalProduct
+        FROM products a
+        RIGHT JOIN pro_categories b ON a.cat_id = b.id
+        WHERE b.is_publish = 1
+        AND b.parent_id = '".$parent_id."'
+        AND b.lan = '".$lan."'
+        GROUP BY b.thumbnail, b.id, b.slug, b.name
+        ORDER BY b.name";
+
+    return DB::select($sql);
+}
+
 //Brand List for Filter
 function BrandListForFilter(){
 	$lan = glan();
@@ -1365,22 +1381,43 @@ function OrderCountForSeller($status_id) {
 	return $count;
 }
 
-function getTax() {
+// function getTax() {
 	
-	$results = Tax::offset(0)->limit(1)->get();
+// 	$results = Tax::offset(0)->limit(1)->get();
 
-	$datalist = array('id' => '', 'title' => 'VAT', 'percentage' => 0, 'is_publish' => 2);
-	foreach ($results as $row){
-		$datalist['id'] = $row->id;
-		$datalist['title'] = $row->title;
-		if($row->is_publish == 2){
-			$datalist['percentage'] = 0;
-		}else{
-			$datalist['percentage'] = $row->percentage;
-		}
-		$datalist['is_publish'] = $row->is_publish;
-	}
-	return $datalist;
+// 	$datalist = array('id' => '', 'title' => 'VAT', 'percentage' => 0, 'is_publish' => 2);
+// 	foreach ($results as $row){
+// 		$datalist['id'] = $row->id;
+// 		$datalist['title'] = $row->title;
+// 		if($row->is_publish == 2){
+// 			$datalist['percentage'] = 0;
+// 		}else{
+// 			$datalist['percentage'] = $row->percentage;
+// 		}
+// 		$datalist['is_publish'] = $row->is_publish;
+// 	}
+// 	return $datalist;
+// }
+function getTax() {
+
+    $results = Tax::orderBy('id', 'asc')->get();
+
+    $taxes = [];
+
+    foreach ($results as $row) {
+
+        $tax = [
+            'id'         => $row->id,
+            'title'      => $row->title ?? 'VAT',
+            'percentage' => ($row->is_publish == 2) ? 0 : $row->percentage,
+            'is_publish' => $row->is_publish,
+            'category'   => $row->category ? json_decode($row->category, true) : null // null for default tax
+        ];
+
+        $taxes[] = $tax;
+    }
+
+    return $taxes;
 }
 
 function str_slug($str) {

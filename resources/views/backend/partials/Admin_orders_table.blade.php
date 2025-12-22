@@ -14,7 +14,7 @@
 				<th class="text-center" style="width:5%">{{ __('Total Amount') }}</th>
 				<th class="text-center" style="width:9%">{{ __('Payment Method') }}</th>
 				<th class="text-center" style="width:9%">{{ __('Payment Status') }}</th>
-				<th class="text-center" style="width:15%">{{ __('Order Status') }}</th>
+				<th class="text-center" style="width:20%">{{ __('Order Status') }}</th>
 				<th class="text-center" style="width:5%">{{ __('Action') }}</th>
 			</tr>
 		</thead>
@@ -85,7 +85,21 @@
 				
 				<td class="text-center">{{ $row->method_name }}</td>
 				<td class="text-center"><span class="status_btn pstatus_{{ $row->payment_status_id }}">{{ $row->pstatus_name }}</span></td>
-				<td class="text-center"><span class="status_btn ostatus_{{ $row->order_status_id }}">{{ $row->ostatus_name }}</span></td>
+				<td class="text-center">
+					@php
+						$names = explode(', ', $row->ostatus_name);
+						$ids   = explode(',', $row->order_status_ids_full);
+					@endphp
+
+					@foreach($names as $i => $name)
+						@if(isset($ids[$i]))
+							<span class="status_btn ostatus_{{ trim($ids[$i]) }}">
+								{{ trim($name) }}
+							</span>
+						@endif
+					@endforeach
+				</td>
+
 				
 				<td class="text-center">
 					<div class="btn-group action-group">

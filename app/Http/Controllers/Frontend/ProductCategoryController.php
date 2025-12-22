@@ -14,65 +14,120 @@ class ProductCategoryController extends Controller
 {
 	
     //get Product Category Page
-    public function getProductCategoryPage($id, $title){
+    // public function getProductCategoryPage($id, $title){
 		
+	// 	$params = array('category_id' => $id);
+		
+	// 	$mdata = Pro_category::where('id', '=', $id)->where('is_publish', '=', 1)->first();
+	// 	if($mdata !=''){
+	// 		$metadata = $mdata;
+	// 	}else{
+	// 		$metadata = array(
+	// 			'id' => '',
+	// 			'name' => '',
+	// 			'slug' => '',
+	// 			'thumbnail' => '',
+	// 			'subheader_image' => '',
+	// 			'description' => '',
+	// 			'lan' => '',
+	// 			'parent_id' => '',
+	// 			'is_subheader' => '',
+	// 			'is_publish' => '',
+	// 			'og_title' => '',
+	// 			'og_image' => '',
+	// 			'og_description' => '',
+	// 			'og_keywords' => ''
+	// 		);
+	// 	}
+		
+	// 	$sData = Tp_option::where('option_name', '=', 'page_variation')->first();
+	// 	if($sData !=''){
+	// 		$dataObj = json_decode($sData['option_value']);
+	// 		$category_variation = $dataObj->category_variation;
+	// 	}else{
+	// 		$category_variation = 'left_sidebar';
+	// 	}
+		
+	// 	if(($category_variation == 'left_sidebar') || ($category_variation == 'right_sidebar')){
+	// 		$num = 9;
+	// 	}else{
+	// 		$num = 12;
+	// 	}
+		
+	// 	$datalist = DB::table('products')
+	// 		->join('users', 'products.user_id', '=', 'users.id')
+	// 		->select('products.*', 'users.shop_name', 'users.id as seller_id', 'users.shop_url')
+	// 		->where('products.is_publish', '=', 1)
+	// 		->where('users.status_id', '=', 1)
+	// 		->where('products.cat_id', '=', $id)
+	// 		->orderBy('products.id','desc')
+	// 		->paginate($num);
+
+	// 	for($i=0; $i<count($datalist); $i++){
+	// 		$Reviews = getReviews($datalist[$i]->id);
+	// 		$datalist[$i]->TotalReview = $Reviews[0]->TotalReview;
+	// 		$datalist[$i]->TotalRating = $Reviews[0]->TotalRating;
+	// 		$datalist[$i]->ReviewPercentage = number_format($Reviews[0]->ReviewPercentage);
+	// 	}
+
+    //     return view('frontend.product-category', compact('params', 'metadata', 'category_variation', 'datalist'));
+    // }
+	public function getProductCategoryPage($id, $title){
+
 		$params = array('category_id' => $id);
-		
-		$mdata = Pro_category::where('id', '=', $id)->where('is_publish', '=', 1)->first();
-		if($mdata !=''){
-			$metadata = $mdata;
-		}else{
-			$metadata = array(
-				'id' => '',
-				'name' => '',
-				'slug' => '',
-				'thumbnail' => '',
-				'subheader_image' => '',
-				'description' => '',
-				'lan' => '',
-				'parent_id' => '',
-				'is_subheader' => '',
-				'is_publish' => '',
-				'og_title' => '',
-				'og_image' => '',
-				'og_description' => '',
-				'og_keywords' => ''
-			);
+
+		$metadata = Pro_category::where('id', $id)
+			->where('is_publish', 1)
+			->first();
+
+		if (!$metadata) {
+			abort(404);
 		}
-		
-		$sData = Tp_option::where('option_name', '=', 'page_variation')->first();
-		if($sData !=''){
-			$dataObj = json_decode($sData['option_value']);
-			$category_variation = $dataObj->category_variation;
-		}else{
-			$category_variation = 'left_sidebar';
-		}
-		
-		if(($category_variation == 'left_sidebar') || ($category_variation == 'right_sidebar')){
-			$num = 9;
-		}else{
-			$num = 12;
-		}
-		
+
+		$sData = Tp_option::where('option_name', 'page_variation')->first();
+		$category_variation = $sData ? json_decode($sData->option_value)->category_variation : 'left_sidebar';
+
+		$num = (($category_variation == 'left_sidebar') || ($category_variation == 'right_sidebar')) ? 9 : 12;
+
+		$subCategoryIds = Pro_category::where('parent_id', $id)
+			->where('is_publish', 1)
+			->pluck('id')
+			->toArray();
+
+	
+		$categoryIds = array_merge([$id], $subCategoryIds);
+
 		$datalist = DB::table('products')
 			->join('users', 'products.user_id', '=', 'users.id')
-			->select('products.*', 'users.shop_name', 'users.id as seller_id', 'users.shop_url')
-			->where('products.is_publish', '=', 1)
-			->where('users.status_id', '=', 1)
-			->where('products.cat_id', '=', $id)
+			->select(
+				'products.*',
+				'users.shop_name',
+				'users.id as seller_id',
+				'users.shop_url'
+			)
+			->where('products.is_publish', 1)
+			->where('users.status_id', 1)
+			->whereIn('products.cat_id', $categoryIds)
 			->orderBy('products.id','desc')
 			->paginate($num);
 
-		for($i=0; $i<count($datalist); $i++){
-			$Reviews = getReviews($datalist[$i]->id);
-			$datalist[$i]->TotalReview = $Reviews[0]->TotalReview;
-			$datalist[$i]->TotalRating = $Reviews[0]->TotalRating;
-			$datalist[$i]->ReviewPercentage = number_format($Reviews[0]->ReviewPercentage);
+		foreach ($datalist as $row) {
+			$Reviews = getReviews($row->id);
+			$row->TotalReview = $Reviews[0]->TotalReview;
+			$row->TotalRating = $Reviews[0]->TotalRating;
+			$row->ReviewPercentage = number_format($Reviews[0]->ReviewPercentage);
 		}
 
-        return view('frontend.product-category', compact('params', 'metadata', 'category_variation', 'datalist'));
-    }
-	
+		return view('frontend.product-category', compact(
+			'params',
+			'metadata',
+			'category_variation',
+			'datalist',
+			'id'
+		));
+	}
+
+
 	//Get data for Product Category Pagination
 	public function getProductCategoryGrid(Request $request){
 

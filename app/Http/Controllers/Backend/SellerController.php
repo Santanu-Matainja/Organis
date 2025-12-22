@@ -499,8 +499,8 @@ class SellerController extends Controller
 			'name' => $request->input('name'),
 			'email' => $request->input('email'),
 			'password' => $request->input('password'),
-			'shop_name' => $request->input('shop_name'),
-			'shop_url' => $request->input('shop_url'),
+			// 'shop_name' => $request->input('shop_name'),
+			// 'shop_url' => $request->input('shop_url'),
 			'phone' => $request->input('phone'),
 			'address' => $request->input('address'),
 			'city' => $request->input('city'),
@@ -516,8 +516,8 @@ class SellerController extends Controller
 			'name' => 'required|max:191',
 			'email' => 'required|max:191|unique:users,email' . $rId,
 			'password' => 'required|max:191',
-			'shop_name' => 'required',
-			'shop_url' => 'required',
+			// 'shop_name' => 'required',
+			// 'shop_url' => 'required',
 			'phone' => 'required',
 			'address' => 'required',
 			'city' => 'required',
@@ -552,19 +552,19 @@ class SellerController extends Controller
 			return response()->json($res);
 		}
 		
-		if($errors->has('shop_name')){
-			$res['msgType'] = 'error';
-			$res['msg'] = $errors->first('shop_name');
-			$res['id'] = '';
-			return response()->json($res);
-		}
+		// if($errors->has('shop_name')){
+		// 	$res['msgType'] = 'error';
+		// 	$res['msg'] = $errors->first('shop_name');
+		// 	$res['id'] = '';
+		// 	return response()->json($res);
+		// }
 		
-		if($errors->has('shop_url')){
-			$res['msgType'] = 'error';
-			$res['msg'] = $errors->first('shop_url');
-			$res['id'] = '';
-			return response()->json($res);
-		}
+		// if($errors->has('shop_url')){
+		// 	$res['msgType'] = 'error';
+		// 	$res['msg'] = $errors->first('shop_url');
+		// 	$res['id'] = '';
+		// 	return response()->json($res);
+		// }
 		
 		if($errors->has('phone')){
 			$res['msgType'] = 'error';

@@ -1881,6 +1881,12 @@ ul.outer-border li.accordion-section .accordion-section-content .itemchecklist {
 .red_border {
 	border: 1px solid #f25961 !important;
 }
+.sub-child-menu-list {
+    margin-left: 25px;
+    padding-left: 10px;
+    border-left: 2px dashed #ddd;
+}
+
 
 /* ======================
    Media css

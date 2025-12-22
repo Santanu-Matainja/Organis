@@ -103,8 +103,7 @@
 														<input type="email" name="email" id="email" class="form-control parsley-validated" data-required="true" >
 													</div>
 												</div>
-											</div>
-											<div class="row">
+											
 												<div class="col-md-6">
 													<div class="form-group relative">
 														<label for="password">{{ __('Password') }}<span class="red">*</span></label>
@@ -114,14 +113,12 @@
 												</div>
 												<div class="col-md-6">
 													<div class="form-group">
-														<label for="shop_name">{{ __('Company Name') }}<span class="red">*</span></label>
-														<input type="text" name="shop_name" id="shop_name" class="form-control parsley-validated" data-required="true" >
+														<label for="shop_name">{{ __('Company Name') }}</label>
+														<input type="text" name="shop_name" id="shop_name" class="form-control parsley-validated">
 													</div>
 												</div>
-											</div>
-
-											<div class="row">
-												<div class="col-md-6">
+									
+												<div class="col-md-6 d-none">
 													<div class="form-group">
 														<label for="shop_url">{{ __('Company URL') }}<span class="red">*</span></label>
 														<input type="text" name="shop_url" id="shop_url" class="form-control parsley-validated" data-required="true" >
@@ -130,12 +127,10 @@
 												<div class="col-md-6">
 													<div class="form-group">
 														<label for="phone">{{ __('Phone') }}<span class="red">*</span></label>
-														<input type="text" name="phone" id="phone" class="form-control parsley-validated" data-required="true" >
+														<input type="text" name="phone" id="phone" class="form-control parsley-validated" data-required="true" maxlength="10">
 													</div>
 												</div>
-											</div>
 											
-											<div class="row">
 												<div class="col-md-6">
 													<div class="form-group">
 														<label for="address">{{ __('Address') }}<span class="red">*</span></label>
@@ -148,9 +143,7 @@
 														<input type="text" name="city" id="city" class="form-control parsley-validated" data-required="true" >
 													</div>
 												</div>
-											</div>
 											
-											<div class="row">
 												<div class="col-md-6">
 													<div class="form-group">
 														<label for="state">{{ __('State') }}<span class="red">*</span></label>
@@ -160,12 +153,10 @@
 												<div class="col-md-6">
 													<div class="form-group">
 														<label for="zip_code">{{ __('Zip Code') }}<span class="red">*</span></label>
-														<input type="text" name="zip_code" id="zip_code" class="form-control parsley-validated" data-required="true" >
+														<input type="text" name="zip_code" id="zip_code" class="form-control parsley-validated" data-required="true" maxlength="6">
 													</div>
 												</div>
-											</div>
-
-											<div class="row">
+						
 												<div class="col-md-6">
 													<div class="form-group">
 														<label for="vat_number">{{ __('Vat Number') }}<span class="red">*</span></label>
@@ -178,9 +169,7 @@
 														<input type="text" name="trade_register_number" id="trade_register_number" class="form-control parsley-validated" data-required="true" >
 													</div>
 												</div>
-											</div>
 											
-											<div class="row">
 												<div class="col-md-6">
 													<div class="form-group">
 														<label for="country_id">{{ __('Country') }}<span class="red">*</span></label>
@@ -205,9 +194,7 @@
 														</select>
 													</div>
 												</div>
-											</div>
-
-											<div class="row">
+											
 												<div class="col-md-6">
 													<div class="form-group">
 														<label for="photo_thumbnail">{{ __('Logo') }}</label>
@@ -388,4 +375,47 @@ var TEXT = [];
 </script>
 <script src="{{asset_path('backend/pages/sellers.js')}}"></script>
 <script src="{{asset_path('backend/pages/global-media.js')}}"></script>
+<script>
+$("input[name='name']").on("blur", function () {
+	if ($("#shop_name").val().trim() === "") {
+		generateSlug();
+	}
+});
+
+function generateSlug() {
+    let shopName = $("#shop_name").val().trim();
+    let userName = $("input[name='name']").val().trim();
+
+    // If shop name empty → use user name
+    let finalName = shopName !== "" ? shopName : userName;
+
+    if(finalName.length > 0){
+        $.ajax({
+            type: 'POST',
+            url: base_url + '/frontend/hasShopSlug',
+            data: {
+                shop_url: finalName,
+                _token: $('meta[name="csrf-token"]').attr('content')
+            },
+            success: function (response) {
+                $("#shop_url").val(response.slug);
+            }
+        });
+    }
+}
+$("#shop_name").on("blur", function () {
+    generateSlug();
+});
+
+$(function () {
+    $('[name="phone"], [name="zip_code"]').on('input', function () {
+        this.value = this.value.replace(/\D/g, '');
+    });
+	$('[name="shipping_fee"]').on('input', function () {
+        this.value = this.value
+            .replace(/[^0-9.]/g, '')  
+            .replace(/(\..*)\./g, '$1'); 
+    });
+});
+</script>
 @endpush

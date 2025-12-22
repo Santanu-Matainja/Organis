@@ -122,6 +122,7 @@ class CartController extends Controller
 				"exdate" => $datalist['exdate'],
 				"perisible" => $datalist['perisible'],
 				"delivarytypeid" => $datalist['delivarytypeid'],
+				"category_id" => $datalist['cat_id'],
 				"seller_name" => $user['name'],
 				"store_name" => $user['shop_name'],
 				"store_logo" => $user['photo'],
@@ -149,14 +150,87 @@ class CartController extends Controller
 	}
 	
 	//Add to Cart
-	public function ViewCart(){
+	// public function ViewCart(){
+	// 	$gtext = gtext();
+	// 	$gtax = getTax();
+	// 	$taxRate = $gtax['percentage'];
+	// 	$Path = asset_path('media');
+
+	// 	$userId = Auth::id();
+	// 	// $ShoppingCartData = session()->get('shopping_cart');
+	// 	$cartRecord = DB::table('carts')->where('user_id', $userId)->first();
+	// 	$ShoppingCartData = $cartRecord && $cartRecord->cart_data
+	// 		? json_decode($cartRecord->cart_data, true)
+	// 		: [];
+
+	// 	$count = 0;
+	// 	$Total_Price = 0;
+	// 	$Sub_Total = 0;
+	// 	$tax = 0;
+	// 	$total = 0;
+	// 	$items = '';
+	// 	// if(session()->get('shopping_cart')){
+	// 	// 	foreach ($ShoppingCartData as $row) {
+	// 	if (!empty($ShoppingCartData)) {
+    //     	foreach ($ShoppingCartData as $row) {
+	// 			$count += $row['qty'];
+	// 			$Total_Price += $row['price']*$row['qty'];
+	// 			$Sub_Total += $row['price']*$row['qty'];
+				
+	// 			if($gtext['currency_position'] == 'left'){
+	// 				$price = '<span id="product-quatity">'.$row['qty'].'</span> x '.$gtext['currency_icon'].$row['price']; 
+	// 			}else{
+	// 				$price = '<span id="product-quatity">'.$row['qty'].'</span> x '.$row['price'].$gtext['currency_icon']; 
+	// 			}
+			
+	// 			$items .= '<li>
+	// 						<div class="cart-item-card">
+	// 							<a data-id="'.$row['id'].'" id="removetocart_'.$row['id'].'" onclick="onRemoveToCart('.$row['id'].')" href="javascript:void(0);" class="item-remove"><i class="bi bi-x"></i></a>
+	// 							<div class="cart-item-img">
+	// 								<img src="'.$Path.'/'.($row['thumbnail'] ? $row['thumbnail'] : 'no-image.png').'" alt="'.$row['name'].'" />
+	// 							</div>
+	// 							<div class="cart-item-desc">
+	// 								<h6><a href="'.route('frontend.product', [$row['id'], str_slug($row['name'])]).'">'.$row['name'].'</a></h6>
+	// 								<p>'.$price.'</p>
+	// 							</div>
+	// 						</div>
+	// 					</li>';
+	// 		}
+	// 	}
+		
+	// 	$TotalPrice = NumberFormat($Total_Price);
+	// 	$SubTotal = NumberFormat($Sub_Total);
+		
+	// 	$TaxCal = ($Total_Price*$taxRate)/100;
+	// 	$tax = NumberFormat($TaxCal);
+		
+	// 	$total = $Sub_Total+$TaxCal;
+	// 	$GrandTotal = NumberFormat($total);
+	// 	$discount = 0;
+		
+	// 	$datalist = array();
+	// 	$datalist['items'] = $items;
+	// 	$datalist['total_qty'] = $count;
+	// 	if($gtext['currency_position'] == 'left'){
+	// 		$datalist['sub_total'] = $gtext['currency_icon'].$SubTotal;
+	// 		$datalist['tax'] = $gtext['currency_icon'].$tax;
+	// 		$datalist['price_total'] = $gtext['currency_icon'].$TotalPrice;
+	// 		$datalist['total'] = $gtext['currency_icon'].$GrandTotal;
+	// 	}else{
+	// 		$datalist['sub_total'] = $SubTotal.$gtext['currency_icon'];
+	// 		$datalist['tax'] = $tax.$gtext['currency_icon'];
+	// 		$datalist['price_total'] = $TotalPrice.$gtext['currency_icon'];
+	// 		$datalist['total'] = $GrandTotal.$gtext['currency_icon'];
+	// 	}
+
+	// 	return response()->json($datalist);
+	// }
+	public function ViewCart() {
 		$gtext = gtext();
-		$gtax = getTax();
-		$taxRate = $gtax['percentage'];
+		$gtax = getTax(); // all tax rows including slabs
 		$Path = asset_path('media');
 
 		$userId = Auth::id();
-		// $ShoppingCartData = session()->get('shopping_cart');
 		$cartRecord = DB::table('carts')->where('user_id', $userId)->first();
 		$ShoppingCartData = $cartRecord && $cartRecord->cart_data
 			? json_decode($cartRecord->cart_data, true)
@@ -165,23 +239,55 @@ class CartController extends Controller
 		$count = 0;
 		$Total_Price = 0;
 		$Sub_Total = 0;
-		$tax = 0;
-		$total = 0;
+		$taxTotal = 0;
 		$items = '';
-		// if(session()->get('shopping_cart')){
-		// 	foreach ($ShoppingCartData as $row) {
+
 		if (!empty($ShoppingCartData)) {
-        	foreach ($ShoppingCartData as $row) {
+			foreach ($ShoppingCartData as $row) {
+
 				$count += $row['qty'];
-				$Total_Price += $row['price']*$row['qty'];
-				$Sub_Total += $row['price']*$row['qty'];
-				
-				if($gtext['currency_position'] == 'left'){
+				$Total_Price += $row['price'] * $row['qty'];
+				$Sub_Total += $row['price'] * $row['qty'];
+
+				// Determine applicable tax percentage
+				$taxRate = 0;
+				$matched = false;
+
+				foreach ($gtax as $taxRow) {
+					if (!empty($taxRow['category'])) {
+						// check if product category_id matches slab category
+						if (in_array($row['category_id'], $taxRow['category'])) {
+							$taxRate = $taxRow['percentage'];
+							$matched = true;
+							break;
+						} else {
+							// check if product category is a sub-category
+							$parentId = DB::table('pro_categories')
+								->where('id', $row['category_id'])
+								->value('parent_id');
+
+							if ($parentId && in_array($parentId, $taxRow['category'])) {
+								$taxRate = $taxRow['percentage'];
+								$matched = true;
+								break;
+							}
+						}
+					}
+				}
+
+				// if no slab matched, use default tax (category=null)
+				if (!$matched) {
+					$defaultTax = collect($gtax)->firstWhere('category', null);
+					$taxRate = $defaultTax ? $defaultTax['percentage'] : 0;
+				}
+
+				// price display
+				if ($gtext['currency_position'] == 'left') {
 					$price = '<span id="product-quatity">'.$row['qty'].'</span> x '.$gtext['currency_icon'].$row['price']; 
-				}else{
+				} else {
 					$price = '<span id="product-quatity">'.$row['qty'].'</span> x '.$row['price'].$gtext['currency_icon']; 
 				}
-			
+
 				$items .= '<li>
 							<div class="cart-item-card">
 								<a data-id="'.$row['id'].'" id="removetocart_'.$row['id'].'" onclick="onRemoveToCart('.$row['id'].')" href="javascript:void(0);" class="item-remove"><i class="bi bi-x"></i></a>
@@ -194,37 +300,38 @@ class CartController extends Controller
 								</div>
 							</div>
 						</li>';
+
+				// calculate tax for this item
+				$taxTotal += ($row['price'] * $row['qty'] * $taxRate) / 100;
 			}
 		}
-		
+
 		$TotalPrice = NumberFormat($Total_Price);
 		$SubTotal = NumberFormat($Sub_Total);
-		
-		$TaxCal = ($Total_Price*$taxRate)/100;
-		$tax = NumberFormat($TaxCal);
-		
-		$total = $Sub_Total+$TaxCal;
+		$tax = NumberFormat($taxTotal);
+		$total = $Sub_Total + $taxTotal;
 		$GrandTotal = NumberFormat($total);
-		$discount = 0;
-		
-		$datalist = array();
+
+		$datalist = [];
 		$datalist['items'] = $items;
 		$datalist['total_qty'] = $count;
-		if($gtext['currency_position'] == 'left'){
-			$datalist['sub_total'] = $gtext['currency_icon'].$SubTotal;
-			$datalist['tax'] = $gtext['currency_icon'].$tax;
-			$datalist['price_total'] = $gtext['currency_icon'].$TotalPrice;
-			$datalist['total'] = $gtext['currency_icon'].$GrandTotal;
-		}else{
-			$datalist['sub_total'] = $SubTotal.$gtext['currency_icon'];
-			$datalist['tax'] = $tax.$gtext['currency_icon'];
-			$datalist['price_total'] = $TotalPrice.$gtext['currency_icon'];
-			$datalist['total'] = $GrandTotal.$gtext['currency_icon'];
+		$currency = $gtext['currency_icon'];
+
+		if ($gtext['currency_position'] == 'left') {
+			$datalist['sub_total'] = $currency.$SubTotal;
+			$datalist['tax'] = $currency.$tax;
+			$datalist['price_total'] = $currency.$TotalPrice;
+			$datalist['total'] = $currency.$GrandTotal;
+		} else {
+			$datalist['sub_total'] = $SubTotal.$currency;
+			$datalist['tax'] = $tax.$currency;
+			$datalist['price_total'] = $TotalPrice.$currency;
+			$datalist['total'] = $GrandTotal.$currency;
 		}
 
 		return response()->json($datalist);
 	}
-	
+
 	//Remove to Cart
 	// public function RemoveToCart($rowid){
 	// 	$res = array();
@@ -284,11 +391,61 @@ class CartController extends Controller
     }
 	
     //get Cart
-    public function getViewCartData()
+    // public function getViewCartData()
+	// {
+	// 	$gtext = gtext();
+	// 	$gtax = getTax();
+	// 	$taxRate = (float) $gtax['percentage'];
+
+	// 	$userId = Auth::id();
+	// 	$cartRecord = DB::table('carts')->where('user_id', $userId)->first();
+	// 	$ShoppingCartData = $cartRecord && $cartRecord->cart_data
+	// 		? json_decode($cartRecord->cart_data, true)
+	// 		: [];
+
+	// 	$count = 0;
+	// 	$Total_Price = 0.0;
+	// 	$Sub_Total = 0.0;
+
+	// 	if (!empty($ShoppingCartData)) {
+	// 		foreach ($ShoppingCartData as $row) {
+	// 			$price = (float) str_replace([',', '€', ' '], '', $row['price']); // ensure numeric
+	// 			$qty = (float) $row['qty'];
+	// 			$count += $qty;
+	// 			$Total_Price += $price * $qty;
+	// 			$Sub_Total += $price * $qty;
+	// 		}
+	// 	}
+
+	// 	// Calculate numbers (before formatting)
+	// 	$TaxCal = ($Total_Price * $taxRate) / 100;
+	// 	$GrandTotal = $Sub_Total + $TaxCal;
+	// 	$discount = 0.0;
+
+	// 	// Helper for German formatting
+	// 	$formatCurrency = function ($value) use ($gtext) {
+	// 		$formatted = number_format($value, 2, ',', '.'); // German format
+	// 		return $gtext['currency_position'] == 'left'
+	// 			? $gtext['currency_icon'] . $formatted
+	// 			: $formatted . $gtext['currency_icon'];
+	// 	};
+
+	// 	// Prepare output
+	// 	$datalist = [];
+	// 	$datalist['total_qty'] = $count;
+	// 	$datalist['sub_total'] = $formatCurrency($Sub_Total);
+	// 	$datalist['tax'] = $formatCurrency($TaxCal);
+	// 	$datalist['price_total'] = $formatCurrency($Total_Price);
+	// 	$datalist['total'] = $formatCurrency($GrandTotal);
+	// 	$datalist['discount'] = $formatCurrency($discount);
+
+	// 	return response()->json($datalist);
+	// }
+	
+	public function getViewCartData()
 	{
 		$gtext = gtext();
-		$gtax = getTax();
-		$taxRate = (float) $gtax['percentage'];
+		$gtax = getTax(); // all tax rows including slabs
 
 		$userId = Auth::id();
 		$cartRecord = DB::table('carts')->where('user_id', $userId)->first();
@@ -299,35 +456,72 @@ class CartController extends Controller
 		$count = 0;
 		$Total_Price = 0.0;
 		$Sub_Total = 0.0;
+		$taxTotal = 0.0;
 
 		if (!empty($ShoppingCartData)) {
+			// Preload parent_ids for all products to minimize DB queries
+			$categoryIds = array_column($ShoppingCartData, 'category_id');
+			$parents = DB::table('pro_categories')
+				->whereIn('id', $categoryIds)
+				->pluck('parent_id', 'id')
+				->toArray();
+
 			foreach ($ShoppingCartData as $row) {
-				$price = (float) str_replace([',', '€', ' '], '', $row['price']); // ensure numeric
+				$price = (float) str_replace([',', '€', ' '], '', $row['price']); // numeric price
 				$qty = (float) $row['qty'];
 				$count += $qty;
 				$Total_Price += $price * $qty;
 				$Sub_Total += $price * $qty;
+
+				// Determine applicable tax percentage
+				$taxRate = 0;
+				$matched = false;
+
+				foreach ($gtax as $taxRow) {
+					if (!empty($taxRow['category'])) {
+						// direct category match
+						if (in_array($row['category_id'], $taxRow['category'])) {
+							$taxRate = $taxRow['percentage'];
+							$matched = true;
+							break;
+						} else {
+							// check parent category
+							$parentId = $parents[$row['category_id']] ?? null;
+							if ($parentId && in_array($parentId, $taxRow['category'])) {
+								$taxRate = $taxRow['percentage'];
+								$matched = true;
+								break;
+							}
+						}
+					}
+				}
+
+				// if no slab matched, use default tax (category=null)
+				if (!$matched) {
+					$defaultTax = collect($gtax)->firstWhere('category', null);
+					$taxRate = $defaultTax ? $defaultTax['percentage'] : 0;
+				}
+
+				// calculate tax for this item
+				$taxTotal += ($price * $qty * $taxRate) / 100;
 			}
 		}
 
-		// Calculate numbers (before formatting)
-		$TaxCal = ($Total_Price * $taxRate) / 100;
-		$GrandTotal = $Sub_Total + $TaxCal;
+		$GrandTotal = $Sub_Total + $taxTotal;
 		$discount = 0.0;
 
-		// Helper for German formatting
+		// German format helper
 		$formatCurrency = function ($value) use ($gtext) {
-			$formatted = number_format($value, 2, ',', '.'); // German format
+			$formatted = number_format($value, 2, ',', '.');
 			return $gtext['currency_position'] == 'left'
 				? $gtext['currency_icon'] . $formatted
 				: $formatted . $gtext['currency_icon'];
 		};
 
-		// Prepare output
 		$datalist = [];
 		$datalist['total_qty'] = $count;
 		$datalist['sub_total'] = $formatCurrency($Sub_Total);
-		$datalist['tax'] = $formatCurrency($TaxCal);
+		$datalist['tax'] = $formatCurrency($taxTotal);
 		$datalist['price_total'] = $formatCurrency($Total_Price);
 		$datalist['total'] = $formatCurrency($GrandTotal);
 		$datalist['discount'] = $formatCurrency($discount);

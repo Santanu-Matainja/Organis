@@ -350,7 +350,7 @@ function bulkupload() {
 
     const formData = {
         _token: $('meta[name="csrf-token"]').attr('content'),
-        categoryid: $('#categoryid2').val(),
+        categoryid: ($('#categoryid2').val() !== '' && $('#categoryid2').val() !== null) ? $('#categoryid2').val() : $('#parent_category2').val(),
         user_id: $('#user_id2').val(),
         brand_id2: $('#brandid2').val(),
         excelData: excelData

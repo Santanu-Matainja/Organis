@@ -97,10 +97,20 @@
 											<select name="cat_id" id="cat_id" class="chosen-select form-control">
 											<option value="" selected="selected">{{ __('Select Category') }}</option>
 											@foreach($categorylist as $row)
-												<option {{ $row->id == $datalist['cat_id'] ? "selected=selected" : '' }} value="{{ $row->id }}">
+												<option 
+													value="{{ $row->id }}"
+													{{ (isset($parentCategoryId) && $parentCategoryId == $row->id) || $row->id == $datalist['cat_id'] ? 'selected' : '' }}>
 													{{ $row->name }}
 												</option>
 											@endforeach
+											</select>
+										</div>
+									</div>
+									<div class="col-lg-6">
+										<div class="form-group" id="subCategoryBox" style="display:none;">
+											<label for="categoryid">{{ __('Sub Category') }}<span class="red">*</span></label>
+											<select name="categoryid" id="categoryid" class="chosen-select form-control">
+												
 											</select>
 										</div>
 									</div>
@@ -277,4 +287,55 @@ var TEXT = [];
 <script src="{{asset_path('backend/editor/summernote-lite.min.js')}}"></script>
 <script src="{{asset_path('backend/pages/product.js')}}"></script>
 <script src="{{asset_path('backend/pages/global-media.js')}}"></script>
+<script>
+    const parentCategoryId = @json($parentCategoryId ?? null);
+    const selectedSubCategoryId = @json($selectedSubCategoryId ?? null);
+    $('#cat_id').on('change', function () {
+        loadSubCategories($(this).val(), null);
+    });
+    if (parentCategoryId && selectedSubCategoryId) {
+        loadSubCategories(parentCategoryId, selectedSubCategoryId);
+    }
+
+	function loadSubCategories(parentId, selectedSub = null) {
+
+    if (!parentId) {
+        $('#subCategoryBox').hide();
+        return;
+    }
+
+    $.ajax({
+        type: 'POST',
+        url: base_url + '/seller/getSubCategoryList',
+        data: {
+            parent_id: parentId,
+            _token: $('meta[name="csrf-token"]').attr('content')
+        },
+        success: function (data) {
+
+            if (data.length > 0) {
+
+                // ✅ SHOW BLOCK IMMEDIATELY
+                $('#subCategoryBox').show();
+
+                let html = '';
+
+                $.each(data, function (i, obj) {
+                    let selected = (selectedSub == obj.id) ? 'selected' : '';
+                    html += `<option value="${obj.id}" ${selected}>${obj.name}</option>`;
+                });
+
+                $('#categoryid').html(html);
+
+                // Re-init chosen AFTER show
+                $('#categoryid').chosen({width: '100%'});
+                $('#categoryid').trigger('chosen:updated');
+
+            } else {
+                $('#subCategoryBox').hide();
+            }
+        }
+    });
+}
+</script>
 @endpush

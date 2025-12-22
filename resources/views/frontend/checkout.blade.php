@@ -4,7 +4,7 @@
 @php 
 $gtext = gtext(); 
 $gtax = getTax();
-$tax_rate = $gtax['percentage'];
+// $tax_rate = $gtax['percentage'];
 @endphp
 
 @section('meta-content')
@@ -255,421 +255,272 @@ $tax_rate = $gtax['percentage'];
 							</div>
 						</div>
 					</div>
-					
-					{{-- <div class="col-lg-5">
-						<div class="carttotals-card">
-							<div class="carttotals-head">{{ __('Order Summary') }}</div>
-							<div class="carttotals-body">
-							@if(session('shopping_cart'))
-								<table class="table">
-									<tbody>
-										@php 
-										$CartDataArr = array();
-										$Total_Price = 0;
-										@endphp
-										@foreach(session('shopping_cart') as $row)
-											@php
-											
-											$Total_Price += $row['price']*$row['qty'];
-											
-											$data = array(
-												'rowId' => $row['id'], 
-												'id' => $row['id'], 
-												'qty' => $row['qty'], 
-												'name' => $row['name'], 
-												'price' => $row['price'], 
-												'weight' => $row['weight'], 
-												'thumbnail' => $row['thumbnail'], 
-												'unit' => $row['unit'],
-												'seller_id' => $row['seller_id'],
-												'seller_name' => $row['seller_name'],
-												'store_name' => $row['store_name'],
-												'store_logo' => $row['store_logo'],
-												'store_url' => $row['store_url'],
-												'seller_email' => $row['seller_email'],
-												'seller_phone' => $row['seller_phone'],
-												'seller_address' => $row['seller_address'],
-												"exdate" => $row['exdate'],
-												"perisible" => $row['perisible'],
-												"delivarytypeid" => $row['delivarytypeid'],
-											);
-											
-											$CartDataArr[$row['seller_id']][] = $data;
-											@endphp
-										@endforeach
-										
-										@php $CartData_Arr = array(); @endphp
-										@foreach($CartDataArr as $aRows)
-											@foreach($aRows as $row)
-												@php $CartData_Arr[] = $row; @endphp
-											@endforeach
-										@endforeach
-										
-										@php 
-										$tempSellerId = ''; 
-										$SellerCount = 0; 
-										$delivaryTypeId = '';
-										@endphp
-		
-										@foreach($CartData_Arr as $row)
-											@php
-											if($row['unit'] == '0'){
-												$unit = '';
-											}else{
-												$unit = '<strong>'.$row['qty'].' '.$row['unit'].'</strong>';
-											}
-										
-											$delivaryTypeId = $row['delivarytypeid']; 
-											@endphp
-											
-											@if($tempSellerId != $row['seller_id'])
-											<tr>
-												<td colspan="2" class="tp_group">
-													<div class="store_logo">
-														<a href="{{ route('frontend.stores', [$row['seller_id'], str_slug($row['store_name'])]) }}">
-															<img src="{{ asset_path('media/'.$row['store_logo']) }}" alt="{{ $row['store_name'] }}" />
-														</a>
-													</div>
-													<div class="store_name">
-														<p><strong>{{ __('Sold By') }}</strong></p>
-														<p><a href="{{ route('frontend.stores', [$row['seller_id'], str_slug($row['store_url'])]) }}">{{ $row['store_name'] }}</a></p>
-													</div>
-												</td>
-											</tr>
-											
-											@php 
-											$tempSellerId=$row['seller_id']; 
-											$SellerCount++;
-											@endphp
-											
-											@endif
-											
-											@if($gtext['currency_position'] == 'left')
-											<tr>
-												<td>
-													<p class="title"><a href="{{ route('frontend.product', [$row['id'], str_slug($row['name'])]) }}">{{ $row['name'] }}</a></p>
-													<p class="sub-title">@php echo $unit; @endphp</p>
-												</td>
-												<td>
-													<p class="price">{{ $gtext['currency_icon'] }}{{ NumberFormat($row['price']*$row['qty']) }}</p>
-													<p class="sub-price">{{ $gtext['currency_icon'] }}{{ $row['price'] }} x {{ $row['qty'] }}</p>
-												</td>
-											</tr>
-											@else
-											<tr>
-												<td>
-													<p class="title">{{ $row['name'] }}</p>
-													<p class="sub-title">@php echo $unit; @endphp</p>
-												</td>
-												<td>
-													<p class="price">{{ NumberFormat($row['price']*$row['qty']) }}{{ $gtext['currency_icon'] }}</p>
-													<p class="sub-price">{{ $row['price'] }}{{ $gtext['currency_icon'] }} x {{ $row['qty'] }}</p>
-												</td>
-											</tr>
-											@endif
-										@endforeach
-										
-										@php
-										
-											$TaxCal = ($Total_Price*$tax_rate)/100;
-											$TotalPrice = $Total_Price+$TaxCal;
-											
-											if($gtext['currency_position'] == 'left'){
-												$ShippingFee = $gtext['currency_icon'].'<span class="shipping_fee">0</span>'; 
-												$tax = $gtext['currency_icon'].NumberFormat($TaxCal);
-												$total = $gtext['currency_icon'].'<span class="total_amount">'.NumberFormat($TotalPrice).'</span>';
-											}else{
-												$ShippingFee = '<span class="shipping_fee">0</span>'.$gtext['currency_icon'];
-												$tax = NumberFormat($TaxCal).$gtext['currency_icon'];
-												$total = '<span class="total_amount">'.NumberFormat($TotalPrice).'</span>'.$gtext['currency_icon'];
-											}
-										@endphp
-										
-										<tr><td colspan="2"><span class="title">{{ __('Shipping Fee') }} </span><span class="price">@php echo $ShippingFee; @endphp</span></td></tr>
-										<tr><td colspan="2"><span class="title">{{ __('Tax') }}</span><span class="price">{{ $tax }}</span></td></tr>
-										<tr><td colspan="2"><span class="total">{{ __('Total') }}</span><span class="total-price">@php echo $total; @endphp</span></td></tr>
-									</tbody>
-								</table>
-								
-								@if(count($shipping_list)>0)
-								<h5>{{ __('Shipping Method') }}</h5>
-								<div class="row">
-									<div class="col-md-12">
-										<span class="text-danger error-text shipping_method_error"></span>
-										@foreach($shipping_list as $row)
-										    @if($delivaryTypeId == $row->id) 
-												@php
-													if($gtext['currency_position'] == 'left'){
-														$shipping_fee = $gtext['currency_icon'].$row->shipping_fee;
-													}else{
-														$shipping_fee = $row->shipping_fee.$gtext['currency_icon'];
-													}
-												@endphp
-												<div class="checkboxlist">
-													<label class="checkbox-title">
-														<input data-seller_count="{{ $SellerCount }}" data-shippingfee="{{ $row->shipping_fee }}" data-total="{{ NumberFormat($TotalPrice) }}" class="shipping_method" name="shipping_method" type="radio" value="{{ $row->id }}">{{ $row->lable }} : {{ $shipping_fee }}
-													</label>
-												</div>
-											@endif	
-										@endforeach
-									</div>
-								</div>
-								@endif
-								<input name="customer_id" type="hidden" value="@if(isset(Auth::user()->id)) {{ Auth::user()->id }} @endif" />
-								<input name="razorpay_payment_id" id="razorpay_payment_id" type="hidden" />
-								<a id="checkout_submit_form" href="javascript:void(0);" class="btn theme-btn mt10 checkout_btn">{{ __('Checkout') }}</a>
-
-								@if(Session::has('pt_payment_error'))
-								<div class="alert alert-danger">
-									{{Session::get('pt_payment_error')}}
-								</div>
-								@endif
-							@endif
-							</div>
-						</div>
-					</div> --}}
 					<div class="col-lg-5">
 						<div class="carttotals-card">
 							<div class="carttotals-head">{{ __('Order Summary') }}</div>
 							<div class="carttotals-body">
-    @if($ShoppingCartData)
-        <table class="table">
-            <tbody>
-                @php
-                    // Build grouped array: seller -> perishable_flag (0/1) -> products
-                    $CartDataArr = [];
-                    $Total_Price = 0;
-                    $GrandTotal = 0;
+								@if($ShoppingCartData)
+									<table class="table">
+										<tbody>
+											@php
+												$CartDataArr = [];
+												$Total_Price = 0;
+												$GrandTotal = 0;
 
-                    foreach ($ShoppingCartData as $row) {
-                        $Total_Price += $row['price'] * $row['qty'];
-                        $pid = (int) ($row['perisible'] ?? 0);
-                        $sellerId = $row['seller_id'];
-                        $CartDataArr[$sellerId][$pid][] = $row;
-                    }
-                @endphp
+												foreach ($ShoppingCartData as $row) {
+													$Total_Price += $row['price'] * $row['qty'];
+													$pid = (int) ($row['perisible'] ?? 0);
+													$sellerId = $row['seller_id'];
+													$CartDataArr[$sellerId][$pid][] = $row;
+												}
 
-                @foreach($CartDataArr as $sellerId => $groups)
-                    {{-- Seller header (showed only once per seller) --}}
-                    @php
-                        // Find a sample product for store-logo and name (first non-empty group)
-                        $sample = null;
-                        foreach($groups as $g) { if(count($g) > 0){ $sample = $g[0]; break; } }
-                    @endphp
+												 $categoryIds = array_column($ShoppingCartData, 'category_id');
+												  $parents = \DB::table('pro_categories')
+															->whereIn('id', $categoryIds)
+															->pluck('parent_id', 'id')
+															->toArray();
+											@endphp
 
-                    @if($sample)
-                        <tr>
-                            <td colspan="2" class="tp_group">
-                                <div class="store_logo">
-                                    <a href="{{ route('frontend.stores', [$sample['seller_id'], str_slug($sample['store_name'])]) }}">
-                                        <img src="{{ asset_path('media/'.$sample['store_logo']) }}" alt="{{ $sample['store_name'] }}" />
-                                    </a>
-                                </div>
-                                <div class="store_name">
-                                    <p><strong>{{ __('Sold By') }}</strong></p>
-                                    <p><a href="{{ route('frontend.stores', [$sample['seller_id'], str_slug($sample['store_url'])]) }}">{{ $sample['store_name'] }}</a></p>
-                                </div>
-                            </td>
-                        </tr>
-                    @endif
+											@foreach($CartDataArr as $sellerId => $groups)
+												
+												@php
+													
+													$sample = null;
+													foreach($groups as $g) { if(count($g) > 0){ $sample = $g[0]; break; } }
+												@endphp
 
-                    {{-- Loop perishable groups (0 = non-perishable, 1 = perishable) --}}
-                    @foreach([0,1] as $isPerishable)
-                        @if(isset($groups[$isPerishable]) && count($groups[$isPerishable])>0)
-                            @php
-                                $products = $groups[$isPerishable];
-                                $sellerTotalPrice = 0;
-                                $taxTotal = 0;
-                                $sellerShippingSlab = 0;
-                            @endphp
+												@if($sample)
+													<tr>
+														<td colspan="2" class="tp_group">
+															<div class="store_logo">
+																<a href="{{ route('frontend.stores', [$sample['seller_id'], str_slug($sample['store_name'])]) }}">
+																	<img src="{{ asset_path('media/'.$sample['store_logo']) }}" alt="{{ $sample['store_name'] }}" />
+																</a>
+															</div>
+															<div class="store_name">
+																<p><strong>{{ __('Sold By') }}</strong></p>
+																<p><a href="{{ route('frontend.stores', [$sample['seller_id'], str_slug($sample['store_url'])]) }}">{{ $sample['store_name'] }}</a></p>
+															</div>
+														</td>
+													</tr>
+												@endif
 
-                            {{-- Group title --}}
-                            <tr>
-                                <td colspan="2" style="background:#f9f9f9;padding:8px 12px;">
-                                    <strong>
-                                        @if($isPerishable == 1)
-                                            {{ __('Perishable Items') }}
-                                        @else
-                                            {{ __('Non-Perishable Items') }}
-                                        @endif
-                                    </strong>
-                                </td>
-                            </tr>
+												@foreach([0,1] as $isPerishable)
+													@if(isset($groups[$isPerishable]) && count($groups[$isPerishable])>0)
+														@php
+															$products = $groups[$isPerishable];
+															$sellerTotalPrice = 0;
+															$taxTotal = 0;
+															$sellerShippingSlab = 0;
+														@endphp
 
-                            {{-- Products in the group --}}
-                            @foreach($products as $row)
-                                @php
-                                    $unit = $row['unit'] == '0' ? '' : '<strong>'.$row['qty'].' '.$row['unit'].'</strong>';
-                                    $priceTotal = $row['price'] * $row['qty'];
-                                    $tax = ($priceTotal * $tax_rate) / 100;
-                                    $TotalPrice = $priceTotal + $tax;
+														<tr>
+															<td colspan="2" style="background:#f9f9f9;padding:8px 12px;">
+																<strong>
+																	@if($isPerishable == 1)
+																		{{ __('Perishable Items') }}
+																	@else
+																		{{ __('Non-Perishable Items') }}
+																	@endif
+																</strong>
+															</td>
+														</tr>
 
-                                    $sellerTotalPrice += $TotalPrice;
-                                    $taxTotal += $tax;
+														@foreach($products as $row)
+															@php
+																$unit = $row['unit'] == '0' ? '' : '<strong>'.$row['qty'].' '.$row['unit'].'</strong>';
+																// new tax rate
+																$priceTotal = $row['price'] * $row['qty'];
+																$taxRate = 0;
+																$matched = false;
 
-                                    // product-specific slab shipping
-                                    $productShipping = \DB::table('product_shippings')->where('product_id', $row['id'])->first();
-                                    $productShippingFee = 0;
-                                    if ($productShipping && !empty($productShipping->slab)) {
-                                        $slabs = json_decode($productShipping->slab, true);
-                                        if (is_string($slabs)) $slabs = json_decode($slabs, true);
-                                        if (is_array($slabs) && count($slabs) > 0) {
-                                            foreach ($slabs as $slab) {
-                                                $min = (int)$slab['min_qty'];
-                                                $max = (int)$slab['max_qty'];
-                                                $price = (float)$slab['price'];
-                                                if($row['qty'] >= $min && $row['qty'] <= $max){
-                                                    $productShippingFee = $price;
-                                                    break;
-                                                }
-                                            }
-                                        }
-                                    }
-                                    $sellerShippingSlab += $productShippingFee;
-                                @endphp
+																foreach($gtax as $taxRow){
+																	if(!empty($taxRow['category'])){
+																		if(in_array($row['category_id'], $taxRow['category'])){
+																			$taxRate = $taxRow['percentage'];
+																			$matched = true;
+																			break;
+																		} else {
+																			$parentId = $parents[$row['category_id']] ?? null;
+																			if($parentId && in_array($parentId, $taxRow['category'])){
+																				$taxRate = $taxRow['percentage'];
+																				$matched = true;
+																				break;
+																			}
+																		}
+																	}
+																}
 
-                                <tr>
-                                    <td>
-                                        <p class="title">
-                                            <a href="{{ route('frontend.product', [$row['id'], str_slug($row['name'])]) }}">{{ $row['name'] }}</a>
-                                        </p>
-                                        <p class="sub-title">{!! $unit !!}</p>
-                                    </td>
-                                    <td>
-                                        @if($gtext['currency_position'] == 'left')
-                                            <p class="price">{{ $gtext['currency_icon'] }}{{ NumberFormat($priceTotal) }}</p>
-                                            <p class="sub-price">{{ $gtext['currency_icon'] }}{{ $row['price'] }} x {{ $row['qty'] }}</p>
-                                        @else
-                                            <p class="price">{{ NumberFormat($priceTotal) }}{{ $gtext['currency_icon'] }}</p>
-                                            <p class="sub-price">{{ $row['price'] }}{{ $gtext['currency_icon'] }} x {{ $row['qty'] }}</p>
-                                        @endif
-                                    </td>
-                                </tr>
-                            @endforeach
+																if(!$matched){
+																	$defaultTax = collect($gtax)->firstWhere('category', null);
+																	$taxRate = $defaultTax ? $defaultTax['percentage'] : 0;
+																}
 
-                            {{-- Tax row (group) --}}
-                            <tr>
-                                <td colspan="2">
-                                    <span class="title">{{ __('Tax') }}</span>
-                                    <span class="price">{{ $gtext['currency_icon'] . NumberFormat($taxTotal) }}</span>
-                                </td>
-                            </tr>
+																$tax = ($priceTotal * $taxRate) / 100;
+																$TotalPrice = $priceTotal + $tax;
 
-                            {{-- Shipping fee (group) --}}
-                            <tr>
-                                <td colspan="2">
-                                    <span class="title">{{ __('Shipping Fee') }}</span>
-                                    @php $initialShippingFee = $sellerShippingSlab; @endphp
-                                    <span class="price shipping_fee">{{ $gtext['currency_icon'] . NumberFormat($initialShippingFee) }}</span>
-                                </td>
-                            </tr>
+																$sellerTotalPrice += $TotalPrice;
+																$taxTotal += $tax;
 
-                            {{-- Total (group) --}}
-                            <tr>
-                                <td colspan="2">
-                                    <span class="total">{{ __('Total') }}</span>
-                                    <span class="total-price">{{ $gtext['currency_icon'] . NumberFormat($sellerTotalPrice + $initialShippingFee) }}</span>
-                                </td>
-                            </tr>
+																// product-specific slab shipping
+																$productShipping = \DB::table('product_shippings')->where('product_id', $row['id'])->first();
+																$productShippingFee = 0;
+																if ($productShipping && !empty($productShipping->slab)) {
+																	$slabs = json_decode($productShipping->slab, true);
+																	if (is_string($slabs)) $slabs = json_decode($slabs, true);
+																	if (is_array($slabs) && count($slabs) > 0) {
+																		foreach ($slabs as $slab) {
+																			$min = (int)$slab['min_qty'];
+																			$max = (int)$slab['max_qty'];
+																			$price = (float)$slab['price'];
+																			if($row['qty'] >= $min && $row['qty'] <= $max){
+																				$productShippingFee = $price;
+																				break;
+																			}
+																		}
+																	}
+																}
+																$sellerShippingSlab += $productShippingFee;
+															@endphp
 
-                            {{-- Shipping Method specific to this group --}}
-                            <tr>
-                                <td colspan="2">
-                                    <h6>{{ __('Shipping Method') }}</h6>
+															<tr>
+																<td>
+																	<p class="title">
+																		<a href="{{ route('frontend.product', [$row['id'], str_slug($row['name'])]) }}">{{ $row['name'] }}</a>
+																	</p>
+																	<p class="sub-title">{!! $unit !!}</p>
+																</td>
+																<td>
+																	@if($gtext['currency_position'] == 'left')
+																		<p class="price">{{ $gtext['currency_icon'] }}{{ NumberFormat($priceTotal) }}</p>
+																		<p class="sub-price">{{ $gtext['currency_icon'] }}{{ $row['price'] }} x {{ $row['qty'] }}</p>
+																	@else
+																		<p class="price">{{ NumberFormat($priceTotal) }}{{ $gtext['currency_icon'] }}</p>
+																		<p class="sub-price">{{ $row['price'] }}{{ $gtext['currency_icon'] }} x {{ $row['qty'] }}</p>
+																	@endif
+																</td>
+															</tr>
+														@endforeach
 
-                                    @foreach($shipping_list as $ship)
-                                        @if(in_array($ship->id, explode(',', $products[0]['delivarytypeid'])))
-                                            @php
-                                                $shipping_fee = 0;
-                                                if($ship->id == 2) $shipping_fee = $sellerShippingSlab;
-                                                elseif($ship->id == 3) $shipping_fee = 0;
-                                                elseif($ship->id == 4) $shipping_fee = ($ship->shipping_fee ?? 0) + $sellerShippingSlab;
-                                                else $shipping_fee = $ship->shipping_fee ?? 0;
+														{{-- Tax row (group) --}}
+														<tr>
+															<td colspan="2">
+																<span class="title">{{ __('Tax') }}</span>
+																<span class="price">{{ $gtext['currency_icon'] . NumberFormat($taxTotal) }}</span>
+															</td>
+														</tr>
 
-                                                $displayFee = $gtext['currency_position'] == 'left'
-                                                    ? $gtext['currency_icon'] . NumberFormat($shipping_fee)
-                                                    : NumberFormat($shipping_fee) . $gtext['currency_icon'];
-                                            @endphp
+														<tr>
+															<td colspan="2">
+																<span class="title">{{ __('Shipping Fee') }}</span>
+																@php $initialShippingFee = $sellerShippingSlab; @endphp
+																<span class="price shipping_fee">{{ $gtext['currency_icon'] . NumberFormat($initialShippingFee) }}</span>
+															</td>
+														</tr>
 
-                                            <div class="checkboxlist">
-                                                <label class="checkbox-title">
-                                                    <input type="radio"
-                                                        class="shipping_method"
-                                                        name="shipping_method[{{ $sellerId }}][{{ $isPerishable }}]"
-                                                        data-sellerid="{{ $sellerId }}"
-                                                        data-perishable="{{ $isPerishable }}"
-                                                        data-shipid="{{ $ship->id }}"
-                                                        data-shippingfee="{{ $shipping_fee }}"
-                                                        data-total="{{ $sellerTotalPrice }}"
-                                                        value="{{ $shipping_fee }}"
-                                                        {{ $ship->id == 2 ? 'checked' : '' }}
-                                                    >
-                                                    {{ $ship->lable }} : {{ $displayFee }}
-                                                </label>
-                                            </div>
-                                        @endif
-                                    @endforeach
+														{{-- Total (group) --}}
+														<tr>
+															<td colspan="2">
+																<span class="total">{{ __('Total') }}</span>
+																<span class="total-price">{{ $gtext['currency_icon'] . NumberFormat($sellerTotalPrice + $initialShippingFee) }}</span>
+															</td>
+														</tr>
 
-                                    <input type="hidden"
-                                        id="shipping_id_{{ $sellerId }}_{{ $isPerishable }}"
-                                        name="shipping_id[{{ $sellerId }}][{{ $isPerishable }}]"
-                                        value=""
-                                    >
-                                </td>
-                            </tr>
+														{{-- Shipping Method specific to this group --}}
+														<tr>
+															<td colspan="2">
+																<h6>{{ __('Shipping Method') }}</h6>
 
-                            @php
-                                // add group totals into grand total
-                                $GrandTotal += ($sellerTotalPrice + $sellerShippingSlab);
-                            @endphp
+																@foreach($shipping_list as $ship)
+																	@if(in_array($ship->id, explode(',', $products[0]['delivarytypeid'])))
+																		@php
+																			$shipping_fee = 0;
+																			if($ship->id == 2) $shipping_fee = $sellerShippingSlab;
+																			elseif($ship->id == 3) $shipping_fee = 0;
+																			elseif($ship->id == 4) $shipping_fee = ($ship->shipping_fee ?? 0) + $sellerShippingSlab;
+																			else $shipping_fee = $ship->shipping_fee ?? 0;
 
-                        @endif
-                    @endforeach
-                @endforeach
+																			$displayFee = $gtext['currency_position'] == 'left'
+																				? $gtext['currency_icon'] . NumberFormat($shipping_fee)
+																				: NumberFormat($shipping_fee) . $gtext['currency_icon'];
+																		@endphp
 
-                {{-- Commission --}}
-                <tr>
-                    <td colspan="2" style="border-top:2px solid #ccc;">
-                        <strong>{{ __('Commission') }}</strong>
-                        <span class="price">
-                            {{ $gtext['currency_icon'] }}<span class="commission">{{ NumberFormat($commision->commission) }}</span>
-                        </span>
-                    </td>
-                </tr>
+																		<div class="checkboxlist">
+																			<label class="checkbox-title">
+																				<input type="radio"
+																					class="shipping_method"
+																					name="shipping_method[{{ $sellerId }}][{{ $isPerishable }}]"
+																					data-sellerid="{{ $sellerId }}"
+																					data-perishable="{{ $isPerishable }}"
+																					data-shipid="{{ $ship->id }}"
+																					data-shippingfee="{{ $shipping_fee }}"
+																					data-total="{{ $sellerTotalPrice }}"
+																					value="{{ $shipping_fee }}"
+																					{{ $ship->id == 2 ? 'checked' : '' }}
+																				>
+																				{{ $ship->lable }} : {{ $displayFee }}
+																			</label>
+																		</div>
+																	@endif
+																@endforeach
 
-                {{-- Hidden raw commission value (numeric) for JS --}}
-                <input type="hidden" id="commission" value="{{ $commision->commission }}">
+																<input type="hidden"
+																	id="shipping_id_{{ $sellerId }}_{{ $isPerishable }}"
+																	name="shipping_id[{{ $sellerId }}][{{ $isPerishable }}]"
+																	value=""
+																>
+															</td>
+														</tr>
 
-                {{-- Grand total --}}
-                <tr>
-                    <td colspan="2">
-                        <strong>{{ __('Grand Total') }}</strong>
-                        <span class="price">
-                            {{ $gtext['currency_icon'] }}<span class="grand_total_value">{{ NumberFormat($GrandTotal + 0) }}</span>
-                        </span>
-                    </td>
-                </tr>
+														@php
+															// add group totals into grand total
+															$GrandTotal += ($sellerTotalPrice + $sellerShippingSlab);
+														@endphp
 
-            </tbody>
-        </table>
+													@endif
+												@endforeach
+											@endforeach
 
-        {{-- Checkout Section --}}
-        <input name="customer_id" type="hidden" value="@if(isset(Auth::user()->id)) {{ Auth::user()->id }} @endif" />
-        <input name="razorpay_payment_id" id="razorpay_payment_id" type="hidden" />
-        <a id="checkout_submit_form" href="javascript:void(0);" class="btn theme-btn mt10 checkout_btn">{{ __('Checkout') }}</a>
+											{{-- Commission --}}
+											<tr>
+												<td colspan="2" style="border-top:2px solid #ccc;">
+													<strong>{{ __('Commission') }}</strong>
+													<span class="price">
+														{{ $gtext['currency_icon'] }}<span class="commission">{{ NumberFormat($commision->commission) }}</span>
+													</span>
+												</td>
+											</tr>
 
-        @if(Session::has('pt_payment_error'))
-            <div class="alert alert-danger">
-                {{ Session::get('pt_payment_error') }}
-            </div>
-        @endif
-    @endif
-</div>
+											{{-- Hidden raw commission value (numeric) for JS --}}
+											<input type="hidden" id="commission" value="{{ $commision->commission }}">
 
+											{{-- Grand total --}}
+											<tr>
+												<td colspan="2">
+													<strong>{{ __('Grand Total') }}</strong>
+													<span class="price">
+														{{ $gtext['currency_icon'] }}<span class="grand_total_value">{{ NumberFormat($GrandTotal + 0) }}</span>
+													</span>
+												</td>
+											</tr>
+
+										</tbody>
+									</table>
+
+									{{-- Checkout Section --}}
+									<input name="customer_id" type="hidden" value="@if(isset(Auth::user()->id)) {{ Auth::user()->id }} @endif" />
+									<input name="razorpay_payment_id" id="razorpay_payment_id" type="hidden" />
+									<a id="checkout_submit_form" href="javascript:void(0);" class="btn theme-btn mt10 checkout_btn">{{ __('Checkout') }}</a>
+
+									@if(Session::has('pt_payment_error'))
+										<div class="alert alert-danger">
+											{{ Session::get('pt_payment_error') }}
+										</div>
+									@endif
+								@endif
+							</div>
 						</div>
 					</div>
-
-
 				</div>
 			</form>
 		</div>

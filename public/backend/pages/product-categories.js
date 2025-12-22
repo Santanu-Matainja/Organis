@@ -35,6 +35,9 @@ $(function () {
 	
 	$("#is_publish").chosen();
 	$("#is_publish").trigger("chosen:updated");
+
+	$("#parent_id").chosen();
+	$("#parent_id").trigger("chosen:updated");
 	
 	$("#on_thumbnail").on("click", function () {
 		media_type = 'Product_Thumbnail';
@@ -146,6 +149,7 @@ function resetForm(id) {
 	
 	$("#lan").trigger("chosen:updated");
 	$("#is_publish").trigger("chosen:updated");
+	$("#parent_id").trigger("chosen:updated");
 	$("#is_subheader").trigger("chosen:updated");
 }
 
@@ -170,6 +174,8 @@ function onFormPanel() {
 	
 	$("#lan").trigger("chosen:updated");
 	$("#is_publish").trigger("chosen:updated");
+	$("#has_sub_category").val("0").trigger("chosen:updated");
+	$("#subCategoryDiv").hide();
 	$("#is_subheader").trigger("chosen:updated");
 			
     $('#list-panel, .btn-form').hide();
@@ -266,6 +272,23 @@ function onLoadEditData() {
 				
 			$("#lan").val(data.lan).trigger("chosen:updated");
 			$("#is_publish").val(data.is_publish).trigger("chosen:updated");
+
+			if (data.parent_id != null) {
+				$("#has_sub_category")
+					.val('1')
+					.trigger("change")
+					.trigger("chosen:updated");
+
+				$("#parent_id")
+					.val(data.parent_id)
+					.trigger("chosen:updated");
+			} else {
+				$("#has_sub_category")
+					.val('0')
+					.trigger("change")
+					.trigger("chosen:updated");
+			}
+
 
 			if(data.description != null){
 				$("#description").val(data.description);

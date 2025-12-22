@@ -335,7 +335,24 @@ class ProductsController extends Controller
 		$languageslist = DB::table('languages')->where('status', 1)->orderBy('id', 'asc')->get();
 		
 		$brandlist = Brand::where('lan', '=', $lan)->where('is_publish', '=', 1)->orderBy('name','asc')->get();
-		$categorylist = Pro_category::where('lan', '=', $lan)->where('is_publish', '=', 1)->orderBy('name','asc')->get();
+		$categorylist = Pro_category::where('is_publish', 1)
+			->where(function ($q) {
+				$q->whereNull('parent_id')
+				->orWhere('parent_id', 0);
+			})
+			->orderBy('name', 'asc')
+			->get();
+
+			
+		$selectedCategory = Pro_category::where('id', $datalist->cat_id)->first();
+
+		$parentCategoryId = null;
+		$selectedSubCategoryId = null;
+
+		if ($selectedCategory && $selectedCategory->parent_id) {
+			$parentCategoryId = $selectedCategory->parent_id;
+			$selectedSubCategoryId = $selectedCategory->id;
+		}
 		
 		$taxlist = Tax::orderBy('title','asc')->get();
 		$unitlist = Attribute::orderBy('name','asc')->get();
@@ -348,9 +365,16 @@ class ProductsController extends Controller
 			->orderBy('users.shop_name','asc')
 			->get();
 			
-        return view('backend.product', compact('datalist', 'statuslist', 'languageslist', 'brandlist', 'categorylist', 'taxlist', 'media_datalist', 'storeList', 'unitlist'));
+        return view('backend.product', compact('datalist', 'statuslist', 'languageslist', 'brandlist', 'categorylist', 'taxlist', 'media_datalist', 'storeList', 'unitlist', 'parentCategoryId', 'selectedSubCategoryId'));
     }
-	
+
+	public function getSubCategoryList(Request $request)
+	{
+		return Pro_category::where('parent_id', $request->parent_id)
+			->where('is_publish', 1)
+			->orderBy('name', 'asc')
+			->get(['id', 'name']);
+	}
 	//Update data for Products
     public function updateProductsData(Request $request){
 		$res = array();
@@ -367,8 +391,9 @@ class ProductsController extends Controller
 		$lan = $request->input('lan');
 		$is_publish = $request->input('is_publish');
 		$f_thumbnail = $request->input('f_thumbnail');
-		$category_ids = $request->input('cat_id');
-		$cat_id = $request->input('cat_id');
+		$category_ids = $request->filled('categoryid') ? $request->input('categoryid') : $request->input('cat_id');
+		$cat_id = $request->filled('categoryid') ? $request->input('categoryid') : $request->input('cat_id');
+		// $cat_id = $request->input('cat_id');
 		$user_id = $request->input('storeid');
 		$variation_size = $request->input('variation_size');
 		$sale_price = $request->input('sale_price');

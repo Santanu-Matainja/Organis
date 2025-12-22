@@ -613,8 +613,9 @@ class OrdersController extends Controller
 				DB::raw("MIN(a.customer_id) as customer_id"),
 				DB::raw("MIN(a.payment_status_id) as payment_status_id"),
 				DB::raw("MIN(a.order_status_id) as order_status_id"),  
-
+				DB::raw("GROUP_CONCAT(a.order_status_id SEPARATOR ',') as order_status_ids_full"),
 				DB::raw("GROUP_CONCAT(f.ostatus_name SEPARATOR ', ') as ostatus_name"), 
+ 
 
 				DB::raw("MIN(a.created_at) as created_at"),
 				DB::raw("MIN(a.shipping_title) as shipping_title"),
@@ -644,7 +645,7 @@ class OrdersController extends Controller
 		$payment_status_list = DB::table('payment_status')->get();
 		$order_status_list   = DB::table('order_status')->get();
 
-		  $mdata = DB::table('order_masters as a')
+		$mdata = DB::table('order_masters as a')
 			->leftJoin('users as b', 'a.customer_id', '=', 'b.id')
 			->join('users as c', 'a.seller_id', '=', 'c.id')
 			->join('payment_method as d', 'a.payment_method_id', '=', 'd.id')
@@ -674,7 +675,7 @@ class OrdersController extends Controller
 				DB::raw("MIN(a.city) as city"),
 				DB::raw("MIN(a.address) as customer_address"),
 				DB::raw("MIN(a.comments) as comments"),
-				DB::raw("MIN(a.seller_id) as seller_id"),
+				DB::raw("GROUP_CONCAT(DISTINCT a.seller_id) as seller_id"),
 
 				DB::raw("GROUP_CONCAT(DISTINCT c.shop_name SEPARATOR ', ') as shop_name"),
 				DB::raw("GROUP_CONCAT(DISTINCT c.shop_url SEPARATOR ', ') as shop_url"),

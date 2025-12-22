@@ -64,8 +64,9 @@ class CheckoutFrontController extends Controller
     {
 		$res = array();
 		$gtext = gtext();
-		$gtax = getTax();
-		$tax_rate = $gtax['percentage'];
+		// $gtax = getTax();
+		// $tax_rate = $gtax['percentage'];
+		$taxSlabs = getTax(); // must return ALL rows
 
 		Session::forget('pt_payment_error');
 		
@@ -82,6 +83,35 @@ class CheckoutFrontController extends Controller
 		$total_qty = 0;
 		$TotalPrice = 0;
 
+		$categoryIds = array_column($CartDataList, 'category_id');
+
+		$categoryParents = DB::table('pro_categories')
+			->whereIn('id', $categoryIds)
+			->pluck('parent_id', 'id')
+			->toArray();
+
+		$getTaxRateForProduct = function ($categoryId) use ($taxSlabs, $categoryParents) {
+			foreach ($taxSlabs as $slab) {
+				if (!empty($slab['category']) && in_array($categoryId, $slab['category'])) {
+					return (float) $slab['percentage'];
+				}
+			}
+			$parentId = $categoryParents[$categoryId] ?? null;
+			if ($parentId) {
+				foreach ($taxSlabs as $slab) {
+					if (!empty($slab['category']) && in_array($parentId, $slab['category'])) {
+						return (float) $slab['percentage'];
+					}
+				}
+			}
+			foreach ($taxSlabs as $slab) {
+				if (empty($slab['category'])) {
+					return (float) $slab['percentage'];
+				}
+			}
+			return 0;
+		};
+	
 		// if(session()->get('shopping_cart')){
 		if($CartDataList){
 			foreach ($CartDataList as $row) {
@@ -90,8 +120,8 @@ class CheckoutFrontController extends Controller
 			}
 		}
 		
-		$TaxCal = ($TotalPrice*$tax_rate)/100;
-		$total_amount = $TotalPrice+$TaxCal;
+		// $TaxCal = ($TotalPrice*$tax_rate)/100;
+		// $total_amount = $TotalPrice+$TaxCal;
 		
 		if($total_qty == 0){
 			$res['msgType'] = 'error';
@@ -270,10 +300,17 @@ class CheckoutFrontController extends Controller
 					$qty = comma_remove($cartRow['qty']);
 					$price = comma_remove($cartRow['price']);
 					$total_price = $qty * $price;
-					$tax = ($total_price * $tax_rate) / 100;
+					// $tax = ($total_price * $tax_rate) / 100;
 
 					$seller_total_qty += $qty;
 					$seller_total_price += $total_price;
+					// $seller_tax += $tax;
+
+					$categoryId = $cartRow['category_id'] ?? null;
+					$taxRate = $getTaxRateForProduct($categoryId);
+
+					$tax = ($total_price * $taxRate) / 100;
+
 					$seller_tax += $tax;
 
 					// shipping price 
@@ -368,8 +405,11 @@ class CheckoutFrontController extends Controller
 			
 			$total_price = $row['price']*$row['qty'];
 			
-			$total_tax = (($total_price*$tax_rate)/100);
-			
+			// $total_tax = (($total_price*$tax_rate)/100);
+			$categoryId = $row['category_id'] ?? null;
+			$taxRate = $getTaxRateForProduct($categoryId);
+			$total_tax = ($total_price * $taxRate) / 100;
+
 			$OrderItemData = array(
 				'order_master_id' => $order_master_id,
 				'customer_id' => $customer_id,
@@ -409,7 +449,8 @@ class CheckoutFrontController extends Controller
 			
 				// sum per-seller shipping fees
 			$shippingFeeTotal = array_sum($perSellerShippingFee);
-			$t_amount = comma_remove($total_amount);
+			// $t_amount = comma_remove($total_amount);
+			$t_amount = array_sum(array_column($perSellerTotals, 'total_amount'));
 			$commisiontable = DB::table('commissions')->limit(1)->first();
 			$totalCommission = $commisiontable->commission;
 			

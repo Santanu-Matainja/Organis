@@ -82,7 +82,7 @@
 												}
 											}
 										@endphp
-										<td class="text-left" style="border: none;">Shipping Mode : {{ $shippingTitle }}</td>
+										<td class="text-left" style="border: none; padding: 0rem .75rem;">Shipping Mode : {{ $shippingTitle }}</td>
 									</tr>
 									<tr>
 										<td class="text-left" style="border: none;padding: 0rem .75rem .75rem;">Order Status : {{ $row->ostatus_name }}</td>
@@ -214,9 +214,21 @@
 				<div class="card mt-25">
 					<div class="card-header">{{ __('Company') }}</div>
 					<div class="card-body">
-						@if ($mdata->shop_name != '')
-						<p><a href="{{ route('frontend.stores', [$mdata->seller_id, str_slug($mdata->shop_url)]) }}" target="_blank">{{ $mdata->shop_name }}</a></p>
-						@endif
+					@if ($mdata->shop_name && $mdata->seller_id)
+						@php
+							$names = array_map('trim', explode(',', $mdata->shop_name));
+							$sellerIds = array_map('trim', explode(',', $mdata->seller_id));
+						@endphp
+						@foreach ($names as $index => $name)
+							@if(isset($sellerIds[$index]))
+								<p>
+									<a href="{{ route('frontend.stores', [$sellerIds[$index], str_slug($name)]) }}" target="_blank">
+										{{ $name }}
+									</a>
+								</p>
+							@endif
+						@endforeach
+					@endif
 					</div>
 				</div>
 				<div class="card mt-25">

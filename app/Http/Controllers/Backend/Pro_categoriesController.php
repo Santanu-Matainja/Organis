@@ -14,6 +14,7 @@ class Pro_categoriesController extends Controller
     //Product Categories page load
     public function getProductCategoriesPageLoad() {
 		$media_datalist = Media_option::orderBy('id','desc')->paginate(28);
+		$proCategories = DB::table('pro_categories')->select('id' , 'name')->get();
 		
 		$statuslist = DB::table('tp_status')->orderBy('id', 'asc')->get();
 		$languageslist = DB::table('languages')->where('status', 1)->orderBy('language_name', 'asc')->get();
@@ -25,7 +26,7 @@ class Pro_categoriesController extends Controller
 			->orderBy('pro_categories.id','desc')
 			->paginate(10);
 
-        return view('backend.product-categories', compact('media_datalist', 'statuslist', 'languageslist', 'datalist'));
+        return view('backend.product-categories', compact('media_datalist', 'statuslist', 'languageslist', 'datalist', 'proCategories'));
     }
 	
 	//Get data for Product Categories Pagination
@@ -82,6 +83,7 @@ class Pro_categoriesController extends Controller
 		$og_image = $request->input('og_image');
 		$og_description = esc($request->input('og_description'));
 		$og_keywords = esc($request->input('og_keywords'));
+		$parent_id = esc($request->input('parent_id'));
 		
 		$validator_array = array(
 			'name' => $request->input('name'),
@@ -136,7 +138,8 @@ class Pro_categoriesController extends Controller
 			'og_title' => $og_title,
 			'og_image' => $og_image,
 			'og_description' => $og_description,
-			'og_keywords' => $og_keywords
+			'og_keywords' => $og_keywords,
+			'parent_id' => $parent_id
 		);
 
 		if($id ==''){
