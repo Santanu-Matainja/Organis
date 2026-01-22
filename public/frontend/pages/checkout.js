@@ -10,17 +10,17 @@ $(function () {
 		}
 	});
 	
-    $("#new_account").on("click", function () {
-		if($(this).is(":checked")){
-			$("#new_account_pass").removeClass("hideclass");
-			$("#password").attr("required", "");
-			$("#password_confirmation").attr("required", "");
-		}else if($(this).is(":not(:checked)")){
-			$("#new_account_pass").addClass("hideclass");
-			$("#password").removeAttr("required");
-			$("#password_confirmation").removeAttr("required");
-		}
-    });
+    // $("#new_account").on("click", function () {
+	// 	if($(this).is(":checked")){
+	// 		$("#new_account_pass").removeClass("hideclass");
+	// 		$("#password").attr("required", "");
+	// 		$("#password_confirmation").attr("required", "");
+	// 	}else if($(this).is(":not(:checked)")){
+	// 		$("#new_account_pass").addClass("hideclass");
+	// 		$("#password").removeAttr("required");
+	// 		$("#password_confirmation").removeAttr("required");
+	// 	}
+    // });
 	
     $("#payment_method_stripe").on("click", function () {
 		$("#pay_paypal").addClass("hideclass");

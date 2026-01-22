@@ -328,8 +328,8 @@ class CustomerAuthController extends Controller
 				//Delete the token
 				DB::table('password_resets')->where('email', $tokenEmail)->delete();
 				
-				return redirect()->back()->withSuccess(__('Your password changed successfully'));
-				
+				return redirect('/user/login')->withSuccess(__('Your password changed successfully'));
+
 			}else{
 				return redirect()->back()->withFail(__('Oops! You are failed change password. Please try again'));
 			}

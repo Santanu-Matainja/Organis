@@ -42,7 +42,7 @@ class OrderTrackingController extends Controller
 					'd.method_name', 
 					'e.pstatus_name', 
 					'f.ostatus_name')
-				->where('a.order_no', $order_no)
+				->where('a.master_order_no', $order_no)
 				->where('a.email', $email)
 				->groupBy(
 					'a.customer_id', 
@@ -68,10 +68,17 @@ class OrderTrackingController extends Controller
 			$datalist = DB::table('order_items')
 				->join('products', 'order_items.product_id', '=', 'products.id')
 				->join('order_masters', 'order_items.order_master_id', '=', 'order_masters.id')
-				->select('order_items.*', 'products.title', 'products.f_thumbnail', 'products.id')
-				->where('order_masters.order_no', $order_no)
+				->select(
+					'order_items.*',
+					'products.title',
+					'products.f_thumbnail',
+					'products.id',
+					'order_masters.order_no'
+				)
+				->where('order_masters.master_order_no', $order_no)
 				->where('order_masters.email', $email)
 				->get();
+
 				
 			$isfind = "block";
 		}else{

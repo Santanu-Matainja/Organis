@@ -68,7 +68,7 @@ $gtax = getTax();
 				@csrf
 				<div class="row">
 					<div class="col-lg-7">
-						<h5>{{ __('Shipping Information') }}</h5>
+						<h5>{{ __('Delivary Information') }}</h5>
 						@auth
 						@else
 						<p>{{ __('Already have an account?') }} <strong><a href="{{ route('frontend.login') }}">{{ __('login') }}</a></strong></p>
@@ -76,7 +76,7 @@ $gtax = getTax();
 						<div class="row">
 							<div class="col-md-12">
 								<div class="mb-3">
-									<input id="name" name="name" type="text" placeholder="{{ __('Name') }}" value="@if(isset(Auth::user()->name)) {{ Auth::user()->name }} @endif" class="form-control parsley-validated" data-required="true">
+									<input id="name" name="name" type="text" placeholder="{{ __('Name') }}" value="{{ old('name', $shippinginfo->name ?? '') }}" class="form-control parsley-validated" data-required="true">
 									<span class="text-danger error-text name_error"></span>
 								</div>
 							</div>
@@ -84,13 +84,13 @@ $gtax = getTax();
 						<div class="row">
 							<div class="col-md-6">
 								<div class="mb-3">
-									<input id="email" name="email" type="email" placeholder="{{ __('Email Address') }}" value="@if(isset(Auth::user()->email)) {{ Auth::user()->email }} @endif" class="form-control parsley-validated" data-required="true">
+									<input id="email" name="email" type="email" placeholder="{{ __('Email Address') }}" value="{{ old('email', $shippinginfo->email ?? '') }}" class="form-control parsley-validated" data-required="true">
 									<span class="text-danger error-text email_error"></span>
 								</div>
 							</div>
 							<div class="col-md-6">
 								<div class="mb-3">
-									<input id="phone" name="phone" type="text" placeholder="{{ __('Phone') }}" value="@if(isset(Auth::user()->phone)) {{ Auth::user()->phone }} @endif" class="form-control parsley-validated" data-required="true">
+									<input id="phone" name="phone" type="text" placeholder="{{ __('Phone') }}" value="{{ old('phone', $shippinginfo->phone ?? '') }}" class="form-control parsley-validated" data-required="true">
 									<span class="text-danger error-text phone_error"></span>
 								</div>
 							</div>
@@ -99,19 +99,21 @@ $gtax = getTax();
 							<div class="col-md-6">
 								<div class="mb-3">
 									<select id="country" name="country" class="form-control parsley-validated" data-required="true">
-									<option value="">{{ __('Country') }}</option>
-									@foreach($country_list as $row)
-									<option value="{{ $row->country_name }}" @if(isset(Auth::user()->country_id) && Auth::user()->country_id == $row->id) selected @endif>
-										{{ $row->country_name }}
-									</option>
-									@endforeach
+										<option value="">{{ __('Country') }}</option>
+										@foreach($country_list as $row)
+											<option value="{{ $row->id }}"
+												{{ old('country', $shippinginfo->country ?? '') == $row->id ? 'selected' : '' }}>
+												{{ $row->country_name }}
+											</option>
+										@endforeach
 									</select>
+
 									<span class="text-danger error-text country_error"></span>
 								</div>
 							</div>
 							<div class="col-md-6">
 								<div class="mb-3">
-									<input id="state" name="state" type="text" placeholder="{{ __('State') }}" class="form-control parsley-validated" data-required="true" value="@if(isset(Auth::user()->state)) {{ Auth::user()->state }} @endif">
+									<input id="state" name="state" type="text" placeholder="{{ __('State') }}" class="form-control parsley-validated" data-required="true" value="{{ old('state', $shippinginfo->state ?? '') }}">
 									<span class="text-danger error-text state_error"></span>
 								</div>
 							</div>
@@ -119,13 +121,13 @@ $gtax = getTax();
 						<div class="row">
 							<div class="col-md-6">
 								<div class="mb-3">
-									<input id="zip_code" name="zip_code" type="number" placeholder="{{ __('Zip Code') }}" class="form-control parsley-validated" data-required="true" value="@if(isset(Auth::user()->zip_code)) {{ Auth::user()->zip_code }} @endif">
+									<input id="zip_code" name="zip_code" type="number" placeholder="{{ __('Zip Code') }}" class="form-control parsley-validated" data-required="true" value="{{ old('zip_code', $shippinginfo->zip_code ?? '') }}">
 									<span class="text-danger error-text zip_code_error"></span>
 								</div>
 							</div>
 							<div class="col-md-6">
 								<div class="mb-3">
-									<input id="city" name="city" type="text" placeholder="{{ __('City') }}" class="form-control parsley-validated" data-required="true" value="@if(isset(Auth::user()->city)) {{ Auth::user()->city }} @endif">
+									<input id="city" name="city" type="text" placeholder="{{ __('City') }}" class="form-control parsley-validated" data-required="true" value="{{ old('city', $shippinginfo->city ?? '') }}">
 									<span class="text-danger error-text city_error"></span>
 								</div>
 							</div>
@@ -133,7 +135,7 @@ $gtax = getTax();
 						<div class="row">
 							<div class="col-md-12">
 								<div class="mb-3">
-									<textarea id="address" name="address" placeholder="{{ __('Address') }}" rows="2" class="form-control parsley-validated" data-required="true">@if(isset(Auth::user()->address)) {{ Auth::user()->address }} @endif</textarea>
+									<textarea id="address" name="address" placeholder="{{ __('Address') }}" rows="2" class="form-control parsley-validated" data-required="true">{{ old('address', $shippinginfo->address ?? '') }}</textarea>
 									<span class="text-danger error-text address_error"></span>
 								</div>
 							</div>
@@ -142,7 +144,7 @@ $gtax = getTax();
 							<div class="col-md-12">
 								<div class="checkboxlist">
 									<label class="checkbox-title">
-										<input id="new_account" name="new_account" type="checkbox">{{ __('Register an account with above information?') }} 
+										<input id="new_account" name="new_account" type="checkbox" value="1">{{ __('Use Registered Address As Delivary Address') }} 
 									</label>
 								</div>
 								@if ($errors->has('password'))
@@ -151,7 +153,7 @@ $gtax = getTax();
 							</div>
 						</div>
 						
-						<div class="row hideclass" id="new_account_pass">
+						{{-- <div class="row hideclass" id="new_account_pass">
 							<div class="col-md-6">
 								<div class="mb-3">
 									<input type="password" name="password" id="password" class="form-control" placeholder="{{ __('Password') }}">
@@ -163,7 +165,7 @@ $gtax = getTax();
 									<input type="password" name="password_confirmation" id="password_confirmation" class="form-control" placeholder="{{ __('Confirm password') }}">
 								</div>
 							</div>
-						</div>
+						</div> --}}
 						
 						<h5 class="mt10">{{ __('Payment Method') }}</h5>
 						<div class="row">
@@ -557,4 +559,50 @@ var TEXT = [];
 </script>
 @endif
 <script src="{{asset_path('frontend/pages/checkout.js')}}"></script>
+<script>
+const shipinfo = {
+    name: "{{ $shippinginfo->name ?? '' }}",
+    email: "{{ $shippinginfo->email ?? '' }}",
+    phone: "{{ $shippinginfo->phone ?? '' }}",
+    country_id: "{{ $shippinginfo->country ?? '' }}",
+    state: "{{ $shippinginfo->state ?? '' }}",
+    zip_code: "{{ $shippinginfo->zip_code ?? '' }}",
+    city: "{{ $shippinginfo->city ?? '' }}",
+    address: "{{ $shippinginfo->address ?? '' }}"
+};
+
+const authAddress = {
+    name: "{{ Auth::user()->name ?? '' }}",
+    email: "{{ Auth::user()->email ?? '' }}",
+    phone: "{{ Auth::user()->phone ?? '' }}",
+    country_id: "{{ Auth::user()->country_id ?? '' }}",
+    state: "{{ Auth::user()->state ?? '' }}",
+    zip_code: "{{ Auth::user()->zip_code ?? '' }}",
+    city: "{{ Auth::user()->city ?? '' }}",
+    address: "{{ Auth::user()->address ?? '' }}"
+};
+
+$('#new_account').on('change', function () {
+    if ($(this).is(':checked')) {
+		$('#name').val(authAddress.name);
+        $('#email').val(authAddress.email);
+        $('#phone').val(authAddress.phone);
+        $('#country').val(authAddress.country_id).trigger("change");
+        $('#state').val(authAddress.state);
+        $('#zip_code').val(authAddress.zip_code);
+        $('#city').val(authAddress.city);
+        $('#address').val(authAddress.address);
+    } else {
+         $('#name').val(shipinfo.name);
+        $('#email').val(shipinfo.email);
+        $('#phone').val(shipinfo.phone);
+        $('#country').val(shipinfo.country_id).trigger("change");
+        $('#state').val(shipinfo.state);
+        $('#zip_code').val(shipinfo.zip_code);
+        $('#city').val(shipinfo.city);
+        $('#address').val(shipinfo.address);
+    }
+});
+</script>
+
 @endpush	

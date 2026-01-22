@@ -135,7 +135,8 @@
 				<div class="row">
 					<div class="col-lg-12">
 						@foreach($masterData as $mdata)
-						<div class="row mb10">
+							<div class="row mb10">
+							@if($loop->first)
 							<div class="col-lg-6 mb10">
 								<h5>{{ __('BILL TO') }}:</h5>
 								<p class="mb5"><strong>{{ $mdata->customer_name }}</strong></p>
@@ -144,15 +145,25 @@
 								<p class="mb5">{{ $mdata->customer_email }}</p>
 								<p class="mb5">{{ $mdata->customer_phone }}</p>
 							</div>
+							@endif
+							@if(!$loop->first)
+							<div class="col-lg-6 mb10">
+							</div>
+							@endif
 							<div class="col-lg-6 mb10 order_status">
 								<p class="mb5"><strong>{{ __('Order#') }}</strong>: {{ $mdata->order_no }}</p>
 								<p class="mb5"><strong>{{ __('Order Date') }}</strong>: {{ date('d-m-Y', strtotime($mdata->created_at)) }}</p>
 								<p class="mb5"><strong>{{ __('Payment Method') }}</strong>: {{ $mdata->method_name }}</p>
-								<p class="mb5"><strong>{{ __('Payment Status') }}</strong>: <span class="status_btn pstatus_{{ $mdata->payment_status_id }}">{{ $mdata->pstatus_name }}</span></p>
-								<p class="mb5"><strong>{{ __('Order Status') }}</strong>: <span class="status_btn ostatus_{{ $mdata->order_status_id }}">{{ $mdata->ostatus_name }}</span></p>
+								<p class="mb5"><strong>{{ __('Payment Status') }}</strong>:
+									<span class="status_btn pstatus_{{ $mdata->payment_status_id }}">{{ $mdata->pstatus_name }}</span>
+								</p>
+								<p class="mb5"><strong>{{ __('Order Status') }}</strong>:
+									<span class="status_btn ostatus_{{ $mdata->order_status_id }}">{{ $mdata->ostatus_name }}</span>
+								</p>
 							</div>
 						</div>
 						@endforeach
+
 						<div class="row mt15">
 							<div class="col-lg-12">
 								<div class="table-responsive">
@@ -161,6 +172,7 @@
 											<tr>
 												<th>{{ __('Image') }}</th>
 												<th>{{ __('Product') }}</th>
+												<th>{{ __('Order ID') }}</th>
 												<th>{{ __('Variation') }}</th>
 												<th class="text-center">{{ __('Price') }}</th>
 												<th class="text-center">{{ __('Quantity') }}</th>
@@ -195,6 +207,7 @@
 												<td class="pro-name-w">
 													<span class="pro-name"><a href="{{ route('frontend.product', [$row->id, str_slug($row->title)]) }}">{{ $row->title }}</a></span>
 												</td>
+												<td class="text-left">{{ $row->order_no }}</td>
 												<td class="text-left">@php echo $size; @endphp</td>
 												<td class="text-center">{{ $price }}</td>
 												<td class="text-center">{{ $row->quantity }}</td>
@@ -215,41 +228,52 @@
 									<div class="carttotals-body">
 										<table class="table">
 											<tbody>
-											@foreach($masterData as $mdata)
-												@php	
-													if ($mdata->shipping_fee === '') {
-														$mdata->shipping_fee = 0.00;
-													} elseif (strpos($mdata->shipping_fee, ',') !== false) {
-														$mdata->shipping_fee = array_map('trim', explode(',', $mdata->shipping_fee));
-														$mdata->shipping_fee = array_map('floatval', $mdata->shipping_fee);
-														$mdata->shipping_fee = array_sum($mdata->shipping_fee);
-													} else {
-														$mdata->shipping_fee = (float)$mdata->shipping_fee;
-													}
-													$total_amount_shipping_fee = $mdata->total_amount+$mdata->shipping_fee+$mdata->tax+$commissionset;
-
-													if($gtext['currency_position'] == 'left'){
-														$shipping_fee = $gtext['currency_icon'].NumberFormat($mdata->shipping_fee);
-														$tax = $gtext['currency_icon'].NumberFormat($mdata->tax);
-														$subtotal = $gtext['currency_icon'].NumberFormat($mdata->total_amount);
-														$total_amount = $gtext['currency_icon'].NumberFormat($total_amount_shipping_fee);
-														$commission = $gtext['currency_icon'].NumberFormat($commissionset);
-													}else{
-														$shipping_fee = NumberFormat($mdata->shipping_fee).$gtext['currency_icon'];
-														$tax = NumberFormat($mdata->tax).$gtext['currency_icon'];
-														$subtotal = NumberFormat($mdata->total_amount).$gtext['currency_icon'];
-														$total_amount = NumberFormat($total_amount_shipping_fee).$gtext['currency_icon'];
-														$commission = NumberFormat($commissionset).$gtext['currency_icon'];
-
-													}
+												@php
+													$sumShipping = 0;
+													$sumTax = 0;
+													$sumSubtotal = 0;
 												@endphp
-												
-												<tr><td><span class="title">{{ __('Shipping Fee') }}<br>({{ $mdata->shipping_title }})</span><span class="price">{{ $shipping_fee }}</span></td></tr>
-												<tr><td><span class="title">{{ __('Tax') }}</span><span class="price">{{ $tax }}</span></td></tr>
-												<tr><td><span class="title">{{ __('Commission') }}</span><span class="price">{{ $commission }}</span></td></tr>
-												<tr><td><span class="title">{{ __('Subtotal') }}</span><span class="price">{{ $subtotal }}</span></td></tr>
-												<tr><td><span class="total">{{ __('Total') }}</span><span class="total-price">{{ $total_amount }}</span></td></tr>
+											@foreach($masterData as $mdata)
+												@php
+													if ($mdata->shipping_fee === '') {
+														$ship = 0;
+													} elseif (strpos($mdata->shipping_fee, ',') !== false) {
+														$ship = array_sum(array_map('floatval', explode(',', $mdata->shipping_fee)));
+													} else {
+														$ship = (float) $mdata->shipping_fee;
+													}
+
+													$sumShipping += $ship;
+													$sumTax += $mdata->tax;
+													$sumSubtotal += $mdata->total_amount;
+												@endphp
+												@if($loop->last)
+													@php
+														$grandTotal = $sumSubtotal + $sumShipping + $sumTax + $commissionset;
+														$sumSubtotal =  $sumSubtotal + $sumShipping + $sumTax;
+														if($gtext['currency_position'] == 'left'){
+															$shipping_fee = $gtext['currency_icon'].NumberFormat($sumShipping);
+															$tax = $gtext['currency_icon'].NumberFormat($sumTax);
+															$subtotal = $gtext['currency_icon'].NumberFormat($sumSubtotal);
+															$commission = $gtext['currency_icon'].NumberFormat($commissionset);
+															$total_amount = $gtext['currency_icon'].NumberFormat($grandTotal);
+														}else{
+															$shipping_fee = NumberFormat($sumShipping).$gtext['currency_icon'];
+															$tax = NumberFormat($sumTax).$gtext['currency_icon'];
+															$subtotal = NumberFormat($sumSubtotal).$gtext['currency_icon'];
+															$commission = NumberFormat($commissionset).$gtext['currency_icon'];
+															$total_amount = NumberFormat($grandTotal).$gtext['currency_icon'];
+														}
+													@endphp
+
+													<tr><td><span class="title">{{ __('Shipping Fee') }}</span><span class="price">{{ $shipping_fee }}</span></td></tr>
+													<tr><td><span class="title">{{ __('Tax') }}</span><span class="price">{{ $tax }}</span></td></tr>
+													<tr><td><span class="title">{{ __('Subtotal') }}</span><span class="price">{{ $subtotal }}</span></td></tr>
+													<tr><td><span class="title">{{ __('Commission') }}</span><span class="price">{{ $commission }}</span></td></tr>
+													<tr><td><span class="total">{{ __('Total') }}</span><span class="total-price">{{ $total_amount }}</span></td></tr>
+												@endif
 												@endforeach
+
 											</tbody>
 										</table>
 									</div>

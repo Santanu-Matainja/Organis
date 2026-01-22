@@ -26,7 +26,7 @@
 
 		@if(isset($metadata) && $metadata->id)
 			<div class="widget-title">
-				<a href="{{ route('frontend.product-category', [$metadata->id, $metadata->slug]) }}">
+				<a href="{{ route('frontend.product-category', [$metadata->id, $metadata->name]) }}">
 					{{ $metadata->name }}
 				</a>
 			</div>

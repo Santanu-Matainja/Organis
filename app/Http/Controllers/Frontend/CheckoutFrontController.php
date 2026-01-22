@@ -15,6 +15,7 @@ use App\Models\Order_item;
 use App\Models\Country;
 use App\Models\Shipping;
 use App\Models\DeliveryType;
+use App\Models\ShippingAddress;
 
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\SMTP;
@@ -52,7 +53,9 @@ class CheckoutFrontController extends Controller
 
 		$commision = DB::table('commissions')->limit(1)->first();
 
-        return view('frontend.checkout', compact('country_list', 'shipping_list', 'ShoppingCartData', 'commision'));
+		$shippinginfo = ShippingAddress::where('user_id', $userId )->first();
+		
+        return view('frontend.checkout', compact('country_list', 'shipping_list', 'ShoppingCartData', 'commision', 'shippinginfo'));
     }
 	
     public function LoadThank()
@@ -131,24 +134,21 @@ class CheckoutFrontController extends Controller
 		
 		$CustomerId = '';
 		
-		$newaccount = $request->input('new_account');
+		$new_account = $request->has('new_account') ? 1 : 0;
 		
-		if ($newaccount == 'true' || $newaccount == 'on') {
-			$new_account = 1;
-		}else {
-			$new_account = 0;
-		}
-
 		$payment_method_id = $request->input('payment_method');
 		// $shipping_method_id = $request->input('shipping_method');
 		
 		$shipping_methods_by_product = $request->input('shipping_method', []); 
 		$shipping_id = $request->input('shipping_id', []); 
 
-		if($new_account == 1){
+		$countryname = DB::table('countries')->where('id', $request->input('country'))->first();
+
+		if($new_account == 0){
 			
 			$validator = Validator::make($request->all(),[
 				'name' => 'required',
+				'email' => 'required|email',
 				'phone' => 'required',
 				'country' => 'required',
 				'state' => 'required',
@@ -157,8 +157,9 @@ class CheckoutFrontController extends Controller
 				'address' => 'required',
 				'payment_method' => 'required',
 				'shipping_method' => 'required',
-				'email' => 'required|email|unique:users',
-				'password' => 'required|confirmed',
+				'shipping_id' => 'required'
+				// 'email' => 'required|email|unique:users',
+				// 'password' => 'required|confirmed',
 			]);
 
 			if(!$validator->passes()){
@@ -168,6 +169,7 @@ class CheckoutFrontController extends Controller
 			}
 
 			$userData = array(
+				'user_id' => $request->input('customer_id'),
 				'name' => $request->input('name'),
 				'email' => $request->input('email'),
 				'phone' => $request->input('phone'),
@@ -175,13 +177,15 @@ class CheckoutFrontController extends Controller
 				'state' => $request->input('state'),
 				'zip_code' => $request->input('zip_code'),
 				'city' => $request->input('city'),
-				'password' => Hash::make($request->input('password')),
-				'bactive' => base64_encode($request->input('password')),
-				'status_id' => 1,
-				'role_id' => 2
+				'country' => $request->input('country'),
 			);
 			
-			$CustomerId = User::create($userData)->id;
+			$shipping = ShippingAddress::updateOrCreate(
+				['user_id' => $request->input('customer_id')],
+				$userData
+			);
+
+			$CustomerId = $shipping->user_id;
 			
 		}else{
 			
@@ -195,7 +199,8 @@ class CheckoutFrontController extends Controller
 				'city' => 'required',
 				'address' => 'required',
 				'payment_method' => 'required',
-				'shipping_method' => 'required'
+				'shipping_method' => 'required',
+				'shipping_id' => 'required'
 			]);
 			
 			if(!$validator->passes()){
@@ -204,7 +209,22 @@ class CheckoutFrontController extends Controller
 				return response()->json($res);
 			}
 
-			$CustomerId = $request->input('customer_id');
+			$userData = array(
+				'user_id' => $request->input('customer_id'),
+				'name' => $request->input('name'),
+				'email' => $request->input('email'),
+				'phone' => $request->input('phone'),
+				'address' => $request->input('address'), 
+				'state' => $request->input('state'),
+				'zip_code' => $request->input('zip_code'),
+				'city' => $request->input('city'),
+				'country' => $request->input('country'),
+			);
+			
+			$user = User::where('id', $request->customer_id)->firstOrFail();
+			$user->update($userData);
+
+			$CustomerId = $user->id;
 		}
 		
 		if($CustomerId == '') {
@@ -268,13 +288,9 @@ class CheckoutFrontController extends Controller
 						break;
 					}
 				}
-
-				// fallback if no match
 				if (!$matchedShipId && count($productShipIds) > 0) {
 					$matchedShipId = $productShipIds[0];
 				}
-
-				// get label
 				$shipping = DeliveryType::find($matchedShipId);
 				$titles[] = $pId . ': ' . ($shipping->lable ?? 'N/A');
 			}
@@ -370,7 +386,7 @@ class CheckoutFrontController extends Controller
 				'name' => $request->input('name'),
 				'email' => $request->input('email'),
 				'phone' => $request->input('phone'),
-				'country' => $request->input('country'),
+				'country' => $countryname->country_name,
 				'state' => $request->input('state'),
 				'zip_code' => $request->input('zip_code'),
 				'city' => $request->input('city'),
