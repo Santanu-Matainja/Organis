@@ -310,6 +310,8 @@ class OrdersSellerController extends Controller
 				'a.city', 
 				'a.address as customer_address',
 				'c.shop_name',  
+				'c.lat',  
+				'c.lng',  
 				'c.email as seller_email', 				
 				'd.method_name', 
 				'e.pstatus_name', 
@@ -324,7 +326,9 @@ class OrdersSellerController extends Controller
 				'e.pstatus_name', 
 				'd.method_name',
 				'c.shop_name', 
-				'c.email', 
+				'c.email',
+				'c.lat',  
+				'c.lng',
 				'a.shipping_title', 
 				'a.name', 
 				'a.phone', 
@@ -346,6 +350,7 @@ class OrdersSellerController extends Controller
 			->get();
 
 		$item_list = '';
+		$isPickupFromProducer = false;
 		foreach($datalist as $row){
 			
 			if($gtext['currency_position'] == 'left'){
@@ -379,6 +384,10 @@ class OrdersSellerController extends Controller
 					}
 				}
 			}
+			if ($shippingMode === 'Pickup from producer') {
+				$isPickupFromProducer = true;
+			}
+
 			$item_list .= '<tr>
 							<td style="width:70%;text-align:left;border:1px solid #ddd;">'
 								.$row->title.'<br>'.$color.$size
@@ -447,6 +456,38 @@ class OrdersSellerController extends Controller
 		}elseif($mdata->order_status_id == 5){
 			$ostatus = '#f25961'; //Canceled 5
 		}
+
+		$navigateButtonHtml = '';
+		if (
+			$isPickupFromProducer === true &&
+			$mdata->order_status_id == 3 &&
+			!empty($mdata->lat) &&
+			!empty($mdata->lng)
+		) {
+			$navigateUrl = 'https://www.google.com/maps/dir/?api=1&destination='
+				. $mdata->lat . ',' . $mdata->lng;
+
+			$navigateButtonHtml = '
+				<tr>
+					<td colspan="2" style="text-align:left;padding-top:10px; margin: 6px 2px 6px 2px;">
+						<a href="'.$navigateUrl.'"
+						target="_blank"
+						style="
+								display:inline-block;
+								border:1px solid #000;
+								border-radius:6px;
+								padding:6px 12px;
+								text-decoration:none;
+								color:#000;
+								font-weight:600;
+						">
+							Navigate to Seller
+						</a>
+					</td>
+				</tr>
+			';
+		}
+
 
 		$base_url = url('/');
 
@@ -552,7 +593,9 @@ class OrdersSellerController extends Controller
 													</table>
 												</td>
 											</tr>
-											
+											<tr>
+											  '.$navigateButtonHtml.'
+											</tr>
 											<tr><td style="padding-top:10px;border-top:1px solid #ddd;text-align:center;">'.__('Thank you for purchasing our products.').'</td></tr>
 											<tr><td style="padding-top:5px;text-align:center;">'.__('If you have any questions about this invoice, please contact us').'</td></tr>
 											<tr><td style="padding-top:5px;text-align:center;"><a href="'.$base_url.'">'.$base_url.'</a></td></tr>
